@@ -1,7 +1,5 @@
-## ====================
-# H5PP
-## HTML5 Package Python
-## ====================
+# H5PP - HTML5 Package Python
+
 H5PP is a port of H5P by Joubel to the Python language and the web framework Django. H5P makes it easy to create, share and reuse HTML5 content and applications. Authors may create and edit interactive video, presentations, games, advertisements and more. Content may be imported and exported. All that is needed to view or edit H5P content is a web browser.
 
 ## Quick start
@@ -32,7 +30,7 @@ Beta version use the inner system of login of Django. So don't forget to set you
 
 4. If not already done. Make a 'media' directory at the root of your Django project.
 
-5. Run 'python manage.py migrate' to create the h5pp models.
+5. Run `python manage.py migrate` to create the h5pp models.
 
 6. Start the development server and visit http://127.0.0.1:8000/h5p/home/ to access to the main menu of h5pp. Go to libraries to install the officiel H5P Release from h5p.org.
 
