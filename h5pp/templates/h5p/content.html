@@ -1,0 +1,27 @@
+{% extends "h5p/base.html" %}
+{% load static %}
+{% block head %}
+	<style type="text/css" media="all">
+	{% for style in data.assets.css %}
+		@import url("{% static style %}");
+	{% endfor %}
+	</style>
+	{% for script in data.assets.js %}
+		<script type="text/javascript" src="{% static script %}"></script>
+	{% endfor %}
+	<script type="text/javascript">
+		H5PIntegration = {% autoescape off %} {{data.integration}} {% endautoescape %}
+	</script>
+{% endblock head %}
+{% block body %}
+<div class="wrap">
+	<h3 class="h5p-admin-header">Contents</h3>
+	{% autoescape off %}
+	{{html}}
+	{% endautoescape %}
+	<form method="get" action="{% url "h5pedit" contentId=request.GET.contentId %}">
+		{% csrf_token %}
+		<input type="submit" value="Edit">
+	</form>
+</div>
+{% endblock body %}

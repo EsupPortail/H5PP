@@ -1,0 +1,31 @@
+{% extends "h5p/base.html" %}
+{% block body %}
+	<nav class="vertical">
+		<ul>
+			<li>
+				<a href="{% url "h5phome" %}">Home</a>
+			</li>
+			<li>
+				<a href="{% url "login" %}">Login</a>
+			</li>
+			<li>
+				<a href="{% url "logout" %}">Logout</a>
+			</li>
+			<li>
+				<a href="{% url "h5plibraries" %}">Libraries</a>
+			</li>
+			<li>
+				<a href="{% url "h5pcreate" %}">Create</a>
+			</li>
+			<li>
+				<a href="{% url "h5plistContents" %}">Contents</a>
+			</li>
+		</ul>
+	</nav>
+	{% if request.user.username %}
+		<p style="color:green">You are connected : {{ request.user.username }} with id : {{ request.user.id }}</p>
+	{% endif %}
+	{% if status %}
+		<p style="color:red">{{ status }}</p>
+	{% endif %}
+{% endblock body %}

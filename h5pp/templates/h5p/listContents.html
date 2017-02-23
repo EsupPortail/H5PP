@@ -1,0 +1,25 @@
+{% extends "h5p/base.html" %}
+{% block body %}
+<div class="wrap">
+	<h3 class="h5p-admin-header">List of contents</h3>
+	<nav class="vertical">
+		<ul>
+			{% for content in listContent %}
+				<li>
+					Title : {{content.title}}<br>
+					Version : {{content.library_major_version}}.{{content.library_minor_version}}<br>
+					id : {{content.id}}<br>
+					<a href="{% url "h5pcontent" %}?contentId={{content.id}}">View</a>
+					{% if request.user %}
+					<form method="post" action="{% url "h5plistContents" %}?contentId={{content.id}}">
+						{% csrf_token %}
+						<input type="submit" value="Delete">
+					</form>
+					{% endif %}
+				</li>
+			{% endfor %}
+		</ul>
+	</nav>
+	<p style="color:red">{{ status }}</p>
+</div>
+{% endblock body %}
