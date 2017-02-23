@@ -1,6 +1,5 @@
 from django import forms
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from h5pp.h5p.h5pclasses import H5PDjango
 from h5pp.h5p.h5pmodule import h5pInsert, h5pGetContent
 from h5pp.h5p.editor.h5peditormodule import createContent
@@ -25,24 +24,28 @@ def handleUploadedFile(files, filename):
 # Form for upload/update h5p libraries
 ##
 class LibrariesForm(forms.Form):
-	h5p = forms.FileField(label='H5P File ', help_text='Here you can upload new libraries or upload updates to existing libraries. Files uploaded here must be in the .h5p file format.')
-	
+	h5p = forms.FileField()
+	uninstall = forms.BooleanField(widget=forms.CheckboxInput())
+
 	def __init__(self, user, *args, **kwargs):
 		super(LibrariesForm, self).__init__(*args, **kwargs)
 		self.user = user
 
 	def clean(self):
 		h5pfile = self.cleaned_data.get('h5p')
-		interface = H5PDjango(self.user)
-		paths = handleUploadedFile(h5pfile, h5pfile.name)
-		validator = interface.h5pGetInstance('validator', paths['folderPath'], paths['path'])
-		
-		if not validator.isValidPackage(True, False):
-			raise ValidationError('The uploaded file was not a valid h5p package.')
+		if h5pfile != None:
+			interface = H5PDjango(self.user)
+			paths = handleUploadedFile(h5pfile, h5pfile.name)
+			validator = interface.h5pGetInstance('validator', paths['folderPath'], paths['path'])
+			
+			if not validator.isValidPackage(True, False):
+				raise forms.ValidationError('The uploaded file was not a valid h5p package.')
 
-		storage = interface.h5pGetInstance('storage')
-		if not storage.savePackage(None, None, True):
-			raise ValidationError('Error during library save.')
+			storage = interface.h5pGetInstance('storage')
+			if not storage.savePackage(None, None, True):
+				raise forms.ValidationError('Error during library save.')
+		else:
+			raise forms.ValidationError('You need to select a h5p package before uploading.')
 
 		return self.cleaned_data
 
@@ -75,12 +78,12 @@ class CreateForm(forms.Form):
 			validator = interface.h5pGetInstance('validator', paths['folderPath'], paths['path'])
 			
 			if not validator.isValidPackage(False, False):
-				raise ValidationError('The uploaded file was not a valid h5p package.')
+				raise forms.ValidationError('The uploaded file was not a valid h5p package.')
 
 			self.request.POST['h5p_upload'] = paths['path']
 			self.request.POST['h5p_upload_folder'] = paths['folderPath']
 			if not h5pInsert(self.request, interface):
-				raise ValidationError('Error during saving the content.')
+				raise forms.ValidationError('Error during saving the content.')
 		else:
 			interface = H5PDjango(self.request.user)
 			core = interface.h5pGetInstance('core')
@@ -88,16 +91,16 @@ class CreateForm(forms.Form):
 			content['disable'] = 0
 			libraryData = core.libraryFromString(self.request.POST['h5p_library'])
 			if not libraryData:
-				raise ValidationError('You must choose an H5P content type or upload an H5P file.')
+				raise forms.ValidationError('You must choose an H5P content type or upload an H5P file.')
 			else:
 				content['library'] = libraryData
 				runnable = h5p_libraries.objects.filter(machine_name=libraryData['machineName'], major_version=libraryData['majorVersion'], minor_version=libraryData['minorVersion']).values('runnable')
 				if not len(runnable) > 0 and runnable[0]['runnable'] == 0:
-					raise ValidationError('Invalid H5P content type')
+					raise forms.ValidationError('Invalid H5P content type')
 
 				content['library']['libraryId'] = core.h5pF.getLibraryId(content['library']['machineName'], content['library']['majorVersion'], content['library']['minorVersion'])
 				if not content['library']['libraryId']:
-					raise ValidationError('No such library')
+					raise forms.ValidationError('No such library')
 
 				content['title'] = self.request.POST['title']
 				content['params'] = self.request.POST['json_content']
@@ -105,7 +108,7 @@ class CreateForm(forms.Form):
 				content['id'] = core.saveContent(content)
 
 				if not createContent(self.request, content, params):
-					raise ValidationError('Impossible to create the content')
+					raise forms.ValidationError('Impossible to create the content')
 
 		return self.cleaned_data
 

@@ -2,11 +2,12 @@
 {% block body %}
 <div class="wrap">
 	<h3 class="h5p-admin-header">Upload Libraries</h3>
-	<form method="post" enctype="multipart/form-data" id="h5p-library-form">
+	<form method="post" enctype="multipart/form-data" id="h5p-library-form" style="display: inline;">
 		{% csrf_token %}
-		{{ form }}
-		<br><br>
+		<label> H5P Official Release Package : {{ form.h5p }}</label><br>
+		<label> Uninstall H5P : {{ form.uninstall }}</label><br><br>
 		<input type="submit" value="Upload">
+		{{ form.non_field_errors }}
 	</form>
 	<p style="color:red;">{{ status }}</p>
 </div>

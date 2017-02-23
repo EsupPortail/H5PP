@@ -18,6 +18,7 @@ def librariesView(request):
 			form = LibrariesForm(request.user, request.POST, request.FILES)
 			if form.is_valid():
 				return render(request, 'h5p/libraries.html', {'form': form, 'status': 'Upload complete'})
+			return render(request, 'h5p/libraries.html', {'form' : form})
 		else:
 			form = LibrariesForm(request.user)
 			return render(request, 'h5p/libraries.html', {'form': form})
@@ -31,7 +32,7 @@ def createView(request, contentId=None):
 			form = CreateForm(request, request.POST, request.FILES)
 			if form.is_valid():
 					return HttpResponseRedirect('/h5p/listContents')
-			return HttpResponseRedirect('/h5p/create')
+			return render(request, 'h5p/create.html', {'form': form, 'data': editor})
 		
 		elif contentId != None:
 			framework = H5PDjango(request.user)
