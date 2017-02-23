@@ -1,7 +1,7 @@
 ## ====================
 # H5PP
 ## HTML5 Package Python
-# ====================
+## ====================
 H5PP is a port of H5P by Joubel to the Python language and the web framework Django. H5P makes it easy to create, share and reuse HTML5 content and applications. Authors may create and edit interactive video, presentations, games, advertisements and more. Content may be imported and exported. All that is needed to view or edit H5P content is a web browser.
 
 ## Quick start
@@ -20,23 +20,22 @@ url(r'^h5p/', include('h5pp.urls'))
 
 3. Include these variables into the settings.py file of your Django project :
 <pre><code>
-# Login related settings
+\# Login related settings
 LOGIN_URL = '/h5p/login'
 LOGIN_REDIRECT_URL = '/h5p'
 
-
-# H5P Version 
+\# H5P Version
 H5P_VERSION = '7.x'
-# H5P : Enable development mode or not
+\# H5P : Enable development mode or not
 H5P_DEV_MODE = 0
-# H5P path and url
+\# H5P path and url
 H5P_PATH = os.path.join(BASE_DIR, 'h5pp/static/h5p')
 H5P_URL = '/h5p/'
-# H5P save frequency
+\# H5P save frequency
 H5P_SAVE = 30
-# H5P export content path
+\# H5P export content path
 H5P_EXPORT = '/exports/'
-# H5P language
+\# H5P language
 H5P_LANGUAGE = 'en'
 </code></pre>
 
