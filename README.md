@@ -20,24 +20,15 @@ url(r'^h5p/', include('h5pp.urls'))
 
 3. Include these variables into the settings.py file of your Django project :
 <pre><code>
-\# Login related settings
-LOGIN_URL = '/h5p/login'
-LOGIN_REDIRECT_URL = '/h5p'
-
-\# H5P Version
 H5P_VERSION = '7.x'
-\# H5P : Enable development mode or not
 H5P_DEV_MODE = 0
-\# H5P path and url
 H5P_PATH = os.path.join(BASE_DIR, 'h5pp/static/h5p')
 H5P_URL = '/h5p/'
-\# H5P save frequency
 H5P_SAVE = 30
-\# H5P export content path
 H5P_EXPORT = '/exports/'
-\# H5P language
 H5P_LANGUAGE = 'en'
 </code></pre>
+Beta version use the inner system of login of Django. So don't forget to set your `LOGIN_URL` and `LOGIN_REDIRECT_URL` variables in your settings.
 
 4. If not already done. Make a 'media' directory at the root of your Django project.
 
