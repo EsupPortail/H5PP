@@ -1,1 +1,5 @@
 *.pyc
+README.rst
+MANIFEST.in
+setup.py
+H5PP.egg-info
