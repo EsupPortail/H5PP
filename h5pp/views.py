@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from h5pp.forms import LibrariesForm, CreateForm
-from h5pp.h5p.h5pmodule import includeH5p, h5pSetStarted, h5pGetContentId, h5pGetListContent, h5pLoad, h5pDelete
+from h5pp.h5p.h5pmodule import includeH5p, h5pSetStarted, h5pGetContentId, h5pGetListContent, h5pLoad, h5pDelete, uninstall
 from h5pp.h5p.h5pclasses import H5PDjango
 from h5pp.h5p.editor.h5peditormodule import h5peditorContent, handleContentUserData
 from h5pp.h5p.editor.h5peditorclasses import H5PDjangoEditor
@@ -17,7 +17,11 @@ def librariesView(request):
 		if request.method == 'POST':
 			form = LibrariesForm(request.user, request.POST, request.FILES)
 			if form.is_valid():
-				return render(request, 'h5p/libraries.html', {'form': form, 'status': 'Upload complete'})
+				if request.POST['h5p'] != '':
+					return render(request, 'h5p/libraries.html', {'form': form, 'status': 'Upload complete'})
+				else:
+					status = uninstall()
+					return render(request, 'h5p/libraries.html', {'form': form, 'status': status})
 			return render(request, 'h5p/libraries.html', {'form' : form})
 		else:
 			form = LibrariesForm(request.user)

@@ -6,6 +6,7 @@ from h5pp.models import h5p_libraries, h5p_points, h5p_contents, h5p_content_use
 from h5pp.h5p.h5pclasses import H5PDjango
 import collections
 import hashlib
+import shutil
 import uuid
 import time
 import math
@@ -460,6 +461,15 @@ def h5pAddIframeAssets(request, integration, contentId, files):
 	else:
 		integration['contents']['cid-' + contentId]['scripts'] = core.getAssetsUrls(files['scripts'])
 
+##
+# Uninstall H5P
+##
+def uninstall():
+	basepath = settings.MEDIA_ROOT
+	for directory in ['/tmp', '/libraries', '/content', '/exports']:
+		shutil.rmtree(basepath + directory)
+
+	return 'H5PP is now uninstalled. Don\'t forget to clean your settings.py and run "pip uninstall H5PP".'
 
 
 ##

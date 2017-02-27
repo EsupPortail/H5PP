@@ -6,7 +6,7 @@
 		{% csrf_token %}
 		<label> H5P Official Release Package : {{ form.h5p }}</label><br>
 		<label> Uninstall H5P : {{ form.uninstall }}</label><br><br>
-		<input type="submit" value="Upload">
+		<input type="submit" value="Submit">
 		{{ form.non_field_errors }}
 	</form>
 	<p style="color:red;">{{ status }}</p>
