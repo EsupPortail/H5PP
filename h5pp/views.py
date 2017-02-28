@@ -17,7 +17,7 @@ def librariesView(request):
 		if request.method == 'POST':
 			form = LibrariesForm(request.user, request.POST, request.FILES)
 			if form.is_valid():
-				if request.POST['h5p'] != '':
+				if 'h5p' in request.POST and request.POST['h5p'] != '':
 					return render(request, 'h5p/libraries.html', {'form': form, 'status': 'Upload complete'})
 				else:
 					status = uninstall()
