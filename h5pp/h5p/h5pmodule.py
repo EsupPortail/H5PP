@@ -2,7 +2,7 @@
 # Django module h5p.
 ##
 from django.conf import settings
-from h5pp.models import h5p_libraries, h5p_points, h5p_contents, h5p_content_user_data
+from h5pp.models import *
 from h5pp.h5p.h5pclasses import H5PDjango
 import collections
 import hashlib
@@ -467,7 +467,18 @@ def h5pAddIframeAssets(request, integration, contentId, files):
 def uninstall():
 	basepath = settings.MEDIA_ROOT
 	for directory in ['/tmp', '/libraries', '/content', '/exports']:
-		shutil.rmtree(basepath + directory)
+		if os.path.exists(basepath + directory):
+			shutil.rmtree(basepath + directory)
+	
+	h5p_contents_libraries.objects.all().delete()
+	h5p_libraries.objects.all().delete()
+	h5p_libraries_libraries.objects.all().delete()
+	h5p_libraries_languages.objects.all().delete()
+	h5p_contents.objects.all().delete()
+	h5p_points.objects.all().delete()
+	h5p_content_user_data.objects.all().delete()
+	h5p_events.objects.all().delete()
+	h5p_counters.objects.all().delete()
 
 	return 'H5PP is now uninstalled. Don\'t forget to clean your settings.py and run "pip uninstall H5PP".'
 

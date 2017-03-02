@@ -11,8 +11,10 @@
 	<body>
 		{% block body %}
 		{% endblock body %}
+		{% block back %}
 		<form action="{% url "h5phome" %}">
 			<input type="submit" value="Back"/>
 		</form>
+		{% endblock back %}
 	</body>
 </html>

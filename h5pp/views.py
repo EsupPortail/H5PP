@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from h5pp.forms import LibrariesForm, CreateForm
+from h5pp.models import h5p_libraries
 from h5pp.h5p.h5pmodule import includeH5p, h5pSetStarted, h5pGetContentId, h5pGetListContent, h5pLoad, h5pDelete, uninstall
 from h5pp.h5p.h5pclasses import H5PDjango
 from h5pp.h5p.editor.h5peditormodule import h5peditorContent, handleContentUserData
@@ -14,18 +15,19 @@ def home(request):
 
 def librariesView(request):
 	if request.user.is_authenticated():
+		libraries = h5p_libraries.objects.all()
 		if request.method == 'POST':
 			form = LibrariesForm(request.user, request.POST, request.FILES)
 			if form.is_valid():
-				if 'h5p' in request.POST and request.POST['h5p'] != '':
-					return render(request, 'h5p/libraries.html', {'form': form, 'status': 'Upload complete'})
+				if 'h5p' in request.FILES and request.FILES['h5p'] != None:
+					return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries, 'status': 'Upload complete'})
 				else:
 					status = uninstall()
-					return render(request, 'h5p/libraries.html', {'form': form, 'status': status})
+					return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries, 'status': status})
 			return render(request, 'h5p/libraries.html', {'form' : form})
-		else:
-			form = LibrariesForm(request.user)
-			return render(request, 'h5p/libraries.html', {'form': form})
+		
+		form = LibrariesForm(request.user)
+		return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries})
 
 	return HttpResponseRedirect('/h5p/login')
 

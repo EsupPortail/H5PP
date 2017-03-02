@@ -11,4 +11,13 @@
 	</form>
 	<p style="color:red;">{{ status }}</p>
 </div>
+<div class="list">
+	{% if libraries %}
+	<h4>List of libraries availables</h4>
+	<ul>
+	{% for library in libraries %}
+	  <li><b>{{library.machine_name}}</b> {{library.major_version}}.{{library.minor_version}}</li>
+	{% endfor %}
+	</ul>
+	{% endif %}
 {% endblock body %}

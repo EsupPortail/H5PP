@@ -34,7 +34,6 @@ class LibrariesForm(forms.Form):
 	def clean(self):
 		h5pfile = self.cleaned_data.get('h5p')
 		unins = self.cleaned_data.get('uninstall')
-		print(h5pfile)
 		if h5pfile != None:
 			interface = H5PDjango(self.user)
 			paths = handleUploadedFile(h5pfile, h5pfile.name)
