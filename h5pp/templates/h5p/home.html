@@ -1,5 +1,31 @@
 {% extends "h5p/base.html" %}
+{% block head %}
+	<style>
+		.content {
+					background: rgba(102, 178, 255, .4);
+					border-radius: 25px;
+					padding: 20px;
+					max-width: 1000px;
+					margin: auto;
+				}
+		.h5p-admin-header {
+			font-family: 'Raleway', sans-serif;
+			font-size: 25px;
+			font-weight: 800;
+			line-height: 36px;
+			margin: 0 0 24px;
+			text-align: center;
+			text-decoration: overline;
+		}
+		p {
+			background-color: #ffdddd;
+			border-left: 6px solid #f44336;
+		}
+	</style>
+
+{% endblock head %}
 {% block body %}
+	<h3 class="h5p-admin-header">Home</h3>
 	<nav class="vertical">
 		<ul>
 			<li>
@@ -23,10 +49,10 @@
 		</ul>
 	</nav>
 	{% if request.user.username %}
-		<p style="color:green">You are connected : {{ request.user.username }} with id : {{ request.user.id }}</p>
+		<p>You are connected :<br><b>User </b>: {{ request.user.username }}<br><b>ID</b> : {{ request.user.id }}</p>
 	{% endif %}
 	{% if status %}
-		<p style="color:red">{{ status }}</p>
+		<p>{{ status }}</p>
 	{% endif %}
 {% endblock body %}
 {% block back %}{% endblock back %}

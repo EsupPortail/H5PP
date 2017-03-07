@@ -1,25 +1,104 @@
 {% extends "h5p/base.html" %}
+{% load static %}
+{% block head %}
+	<style>
+	.list {
+		border-radius: 5px;
+		background-color: #f2f2f2;
+		padding: 10px;
+	}
+	#searchbar {
+		background-image: url('../../static/h5p/images/search.png');
+		background-size: 30px 30px;
+		background-position: 8px 5px;
+		background-repeat: no-repeat;
+		width: 50%;
+		font-size: 16px;
+		padding: 12px 20px 12px 40px;
+		border: 1px solid #ddd;
+		margin-bottom: 12px;
+	}
+	#contents {
+		border-collapse: collapse;
+		width: 100%;
+		border: 1px solid #ddd;
+		font-size: 18px;
+	}
+	#contents th, #contents td {
+		text-align: left;
+		padding: 12px;
+	}
+	#contents tr {
+		border-bottom: 1px solid #ddd;
+	}
+	#contents tr.header, #contents tr:hover {
+		background-color: #f1f1f1;
+	}
+	.content {
+		background: rgba(102, 178, 255, .4);
+		border-radius: 25px;
+		padding: 20px;
+		max-width: 1000px;
+		margin: auto;
+	}
+	.h5p-admin-header {
+		font-family: 'Raleway', sans-serif;
+		font-size: 25px;
+		font-weight: 800;
+		line-height: 36px;
+		margin: 0 0 24px;
+		text-align: center;
+		text-decoration: overline;
+	}
+	p {
+		background-color: #ffdddd;
+		border-left: 6px solid #f44336;
+	}
+	</style>
+	<script>
+	function search() {
+			var input, filter, table, tr, td, i;
+			input = document.getElementById("searchbar");
+			filter = input.value.toUpperCase();
+			table = document.getElementById("contents");
+			tr = table.getElementsByTagName("tr");
+
+			for(i = 0; i < tr.length; i++) {
+				td = tr[i].getElementsByTagName("td")[0];
+				if(td) {
+					if(td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+						tr[i].style.display = "";
+					}else {
+						tr[i].style.display = "none";
+					}
+				}
+			}
+		}
+	</script>
+{% endblock head %}
 {% block body %}
 <div class="wrap">
 	<h3 class="h5p-admin-header">List of contents</h3>
-	<nav class="vertical">
-		<ul>
-			{% for content in listContent %}
-				<li>
-					Title : {{content.title}}<br>
-					Version : {{content.library_major_version}}.{{content.library_minor_version}}<br>
-					id : {{content.id}}<br>
-					<a href="{% url "h5pcontent" %}?contentId={{content.id}}">View</a>
-					{% if request.user %}
-					<form method="post" action="{% url "h5plistContents" %}?contentId={{content.id}}">
-						{% csrf_token %}
-						<input type="submit" value="Delete">
-					</form>
-					{% endif %}
-				</li>
-			{% endfor %}
-		</ul>
-	</nav>
-	<p style="color:red">{{ status }}</p>
+	<div class="list">
+		<input type="text" id="searchbar" onkeyup="search()" placeholder="Search for contents...">
+		<table id="contents">
+			<tr class="header">
+				<th style="width:60%;">Name</th>
+				<th style="width:40%;">Version</th>
+				<th style="width:40%;">ID</th>
+				{% if request.user %}
+				<th style="width:40%;">Options</th>
+				{% endif %}
+			</tr>
+		{% for content in listContent %}
+			<tr><td>{{content.title}} <a href="{% url "h5pcontent" %}?contentId={{content.id}}">View</a></td><td>{{content.library_major_version}}.{{content.library_minor_version}}</td><td>{{content.id}}</td>
+			{% if request.user %}
+			<td><form method="post" action="{% url "h5plistContents" %}?contentId={{content.id}}">{% csrf_token %}<input type="submit" value="Delete"></form></td>
+			{% endif %}
+			</tr>
+		{% endfor %}
+		</table>
+	</div>
+	<p>{{ status }}</p>
 </div>
 {% endblock body %}

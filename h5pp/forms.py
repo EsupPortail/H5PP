@@ -74,6 +74,9 @@ class CreateForm(forms.Form):
 	def clean(self):
 		if self.request.POST['h5p_type'] == 'upload':
 			h5pfile = self.cleaned_data.get('h5p')
+			if not h5pfile:
+				raise forms.ValidationError('You need to choose a valid h5p package.')
+				
 			interface = H5PDjango(self.request.user)
 			paths = handleUploadedFile(h5pfile, h5pfile.name)
 			validator = interface.h5pGetInstance('validator', paths['folderPath'], paths['path'])

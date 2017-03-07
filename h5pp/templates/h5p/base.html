@@ -9,12 +9,12 @@
 		{% block head %}{% endblock head %}
 	</head>
 	<body>
-		{% block body %}
-		{% endblock body %}
-		{% block back %}
-		<form action="{% url "h5phome" %}">
-			<input type="submit" value="Back"/>
-		</form>
-		{% endblock back %}
+		<div class="content">
+			{% block body %}
+			{% endblock body %}
+			{% block back %}
+			<input type="button" onclick="window.history.back();" value="Back"/>
+			{% endblock back %}
+		</div>
 	</body>
 </html>
