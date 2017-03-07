@@ -6,6 +6,24 @@
 		@import url("{% static style %}");
 	{% endfor %}
 	</style>
+	<style>
+	.content {
+					background: rgba(102, 178, 255, .4);
+					border-radius: 25px;
+					padding: 20px;
+					max-width: 1000px;
+					margin: auto;
+		}
+	.h5p-admin-header {
+		font-family: 'Raleway', sans-serif;
+		font-size: 25px;
+		font-weight: 800;
+		line-height: 36px;
+		margin: 0 0 24px;
+		text-align: center;
+		text-decoration: overline;
+	}
+	</style>
 	{% for script in data.assets.js %}
 		<script type="text/javascript" src="{% static script %}"></script>
 	{% endfor %}
@@ -19,9 +37,11 @@
 	{% autoescape off %}
 	{{html}}
 	{% endautoescape %}
+	<br>
 	<form method="get" action="{% url "h5pedit" contentId=request.GET.contentId %}">
 		{% csrf_token %}
 		<input type="submit" value="Edit">
 	</form>
 </div>
+<br>
 {% endblock body %}

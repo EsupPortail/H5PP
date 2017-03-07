@@ -1,13 +1,178 @@
 {% extends "h5p/base.html" %}
+{% load static %}
+{% block head %}
+	<style>
+		.content {
+					background: rgba(102, 178, 255, .4);
+					border-radius: 25px;
+					padding: 20px;
+					max-width: 1000px;
+					margin: auto;
+		}
+		.h5p-admin-header {
+			font-family: 'Raleway', sans-serif;
+			font-size: 25px;
+			font-weight: 800;
+			line-height: 36px;
+			margin: 0 0 24px;
+			text-align: center;
+			text-decoration: overline;
+		}
+		.upload {
+			border-radius: 5px;
+			background-color: #f2f2f2;
+			padding: 10px;
+		}
+		.list {
+			border-radius: 5px;
+			background-color: #f2f2f2;
+			padding: 10px;
+		}
+		#searchbar {
+			background-image: url('../../static/h5p/images/search.png');
+			background-size: 30px 30px;
+			background-position: 8px 5px;
+			background-repeat: no-repeat;
+			width: 50%;
+			font-size: 16px;
+			padding: 12px 20px 12px 40px;
+			border: 1px solid #ddd;
+			margin-bottom: 12px;
+		}
+		#libraries {
+			border-collapse: collapse;
+			width: 100%;
+			border: 1px solid #ddd;
+			font-size: 18px;
+		}
+		#libraries th, #libraries td {
+			text-align: left;
+			padding: 12px;
+		}
+		#libraries tr {
+			border-bottom: 1px solid #ddd;
+		}
+		#libraries tr.header, #libraries tr:hover {
+			background-color: #f1f1f1;
+		}
+		.file-container {
+			position: relative;
+			width: 225px;
+		}
+		.file-trigger {
+			border-radius: 5px;
+			display: block;
+			padding: 14px 45px;
+			background: #3399FF;
+			color : #fff;
+			font-size: 1em;
+			transition: all .4s;
+			cursor: pointer;
+		}
+		#id_h5p {
+			position: absolute;
+			top: 0; left: 0;
+			width: 225px;
+			padding: 14px 0;
+			opacity: 0;
+			cursor: pointer;
+		}
+		#id_h5p:hover + .file-trigger, #id_h5p:focus + .file-trigger, .file-trigger:hover, .file-trigger:focus {
+			background: #66B2FF;
+			color: white;
+		}
+		.file-return {
+			margin: 0;
+			font-style: italic;
+			font-size: .9em;
+			font-weight: bold;
+		}
+		.file-return:not(:empty) {
+			margin: 1em 0;
+		}
+		.file-return:not(:empty):before {
+			content: "Selected file: ";
+			font-style: normal;
+			font-weight: normal;
+		}
+		h4 {
+			margin-left: 44%
+		}
+	</style>
+	<script>
+		function search() {
+			var input, filter, table, tr, td, i;
+			input = document.getElementById("searchbar");
+			filter = input.value.toUpperCase();
+			table = document.getElementById("libraries");
+			tr = table.getElementsByTagName("tr");
+
+			for(i = 0; i < tr.length; i++) {
+				td = tr[i].getElementsByTagName("td")[0];
+				if(td) {
+					if(td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+						tr[i].style.display = "";
+					}else {
+						tr[i].style.display = "none";
+					}
+				}
+			}
+		}
+		window.onload = function() {
+			var fileInput = document.getElementById("id_h5p"),
+			button = document.getElementsByClassName("file-trigger")[0],
+			result = document.getElementsByClassName("file-return")[0];
+
+			button.addEventListener( "keydown", function(event) {
+				if(event.keyCode == 13 || event.keyCode == 32) {
+					fileInput.focus();
+				}
+			});
+			button.addEventListener( "click", function(event) {
+				fileInput.focus();
+				return false;
+			});
+			fileInput.addEventListener( "change", function(event) {
+				result.innerHTML = this.value;
+			});
+		};
+	</script>
+{% endblock head %}
 {% block body %}
 <div class="wrap">
 	<h3 class="h5p-admin-header">Upload Libraries</h3>
-	<form method="post" enctype="multipart/form-data" id="h5p-library-form">
-		{% csrf_token %}
-		{{ form }}
-		<br><br>
-		<input type="submit" value="Upload">
-	</form>
-	<p style="color:red;">{{ status }}</p>
+	<div class="upload">
+	<h4>Upload or delete libraries</h4>
+		<form method="post" enctype="multipart/form-data" id="h5p-library-form" style="display: inline;">
+			{% csrf_token %}
+			<div class="file-container">
+				{{ form.h5p }}
+				<label for="id_h5p" class="file-trigger" tabindex="0">Select H5P Libraries...</label>
+			</div>
+			<p class="file-return"></p>
+			<br>
+			<label> Uninstall H5P : {{ form.uninstall }}</label><br><br>
+			<input type="submit" value="Submit">
+			{{ form.non_field_errors }}
+		</form>
+		<p style="color:red;">{{ status }}</p>
+	</div>
 </div>
+<br>
+<div class="list">
+	{% if libraries %}
+	<h4>List of libraries availables</h4>
+	<input type="text" id="searchbar" onkeyup="search()" placeholder="Search for libraries...">
+	<table id="libraries">
+		<tr class="header">
+			<th style="width:60%;">Name</th>
+			<th style="width: 40%;">Version</th>
+		</tr>
+	{% for library in libraries %}
+	  <tr><td>{{library.machine_name}}</td><td>{{library.major_version}}.{{library.minor_version}}</td></tr>
+	{% endfor %}
+	</table>
+	{% endif %}
+</div>
+<br>
 {% endblock body %}
