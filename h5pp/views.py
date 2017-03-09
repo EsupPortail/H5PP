@@ -35,6 +35,8 @@ def createView(request, contentId=None):
 	if request.user.is_authenticated():
 		editor = h5peditorContent(request)
 		if request.method == 'POST':
+			if contentId != None:
+				request.POST['contentId'] = contentId
 			form = CreateForm(request, request.POST, request.FILES)
 			if form.is_valid():
 					return HttpResponseRedirect('/h5p/listContents')
@@ -44,6 +46,7 @@ def createView(request, contentId=None):
 			framework = H5PDjango(request.user)
 			edit = framework.loadContent(contentId)
 			request.GET = request.GET.copy()
+			request.GET['contentId'] = contentId
 			request.GET['json_content'] = edit['params']
 			request.GET['h5p_library'] = edit['library_name'] + ' ' + str(edit['library_major_version']) + '.' + str(edit['library_minor_version'])
 		

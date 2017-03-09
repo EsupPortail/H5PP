@@ -67,6 +67,7 @@ class CreateForm(forms.Form):
 	def __init__(self, request, *args, **kwargs):
 		super(CreateForm, self).__init__(*args, **kwargs)
 		self.request = request
+		self.fields['title'].initial = self.getTitle()
 		self.fields['json_content'].initial = self.getJsonContent()
 		self.fields['disable'].initial = self.getDisable()
 		self.fields['h5p_library'].initial = self.getLibrary()
@@ -109,6 +110,8 @@ class CreateForm(forms.Form):
 				content['title'] = self.request.POST['title']
 				content['params'] = self.request.POST['json_content']
 				params = json.loads(content['params'])
+				if 'contentId' in self.request.POST :
+					content['id'] = self.request.POST['contentId']
 				content['id'] = core.saveContent(content)
 
 				if not createContent(self.request, content, params):
@@ -135,6 +138,12 @@ class CreateForm(forms.Form):
 			return self.request.GET['disable']
 		else:
 			return 0
+
+	def getTitle(self):
+		if 'title' in self.request.GET:
+			return self.request.GET['title']
+		else:
+			return ''
 
 
 
