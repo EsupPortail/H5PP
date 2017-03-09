@@ -140,7 +140,7 @@ def h5pView(request):
 	if not html:
 		html = '<div>' + 'Sorry, preview of H5P content is not yet available.' + '</div>'
 	else:
-		h5pGetStarted(h5pGetContentId(request))
+		h5pSetStarted(h5pGetContentId(request))
 
 	return request
 
@@ -170,8 +170,11 @@ def includeH5p(request):
 ##
 def h5pSetStarted(user, contentId):
 	if user.id:
-		h5p_points.objects.filter(content_id=contentId, uid=user.id).update(content_id=contentId, uid=user.id, started=int(time.time()))
-
+		exist = h5p_points.objects.filter(content_id=contentId, uid=user.id).values()
+		if len(exist) > 0 :
+			h5p_points.objects.filter(content_id=contentId, uid=user.id).update(content_id=contentId, uid=user.id, started=int(time.time()))
+		else :
+			h5p_points.objects.create(content_id=contentId, uid=user.id, started=int(time.time()))
 ##
 # Callback function for storing the users results in the database
 ##
@@ -295,12 +298,12 @@ def h5pAddFilesAndSettings(request, embedType):
 	}
 	if embedType == 'div':
 		for script in files['scripts']:
-			url = settings.MEDIA_ROOT + script['path'] + script['version']
-			filesAssets['js'].append(script['path'])
+			url = settings.MEDIA_URL + script['path'] + script['version']
+			filesAssets['js'].append(settings.MEDIA_URL + script['path'])
 			integration['loadedJs'] = url
 		for style in files['styles']:
-			url = settings.MEDIA_ROOT + style['path'] + style['version']
-			filesAssets['css'].append(style['path'])
+			url = settings.MEDIA_URL + style['path'] + style['version']
+			filesAssets['css'].append(settings.MEDIA_URL + style['path'])
 			integration['loadedCss'] = url
 	elif embedType == 'iframe':
 		h5pAddIframeAssets(request, integration, content['id'], files)

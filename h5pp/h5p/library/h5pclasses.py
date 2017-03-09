@@ -1022,6 +1022,7 @@ class H5PCore:
 
         if content != None:
             content["library"] = {
+                "contentId": pid,
                 "id": content["library_id"],
                 "name": content["library_name"],
                 "majorVersion": content["library_major_version"],
@@ -1751,7 +1752,7 @@ class H5PContentValidator:
     ##
     # Validate given value against boolean semantics
     ##
-    def validateBoolean(self, boolean):
+    def validateBoolean(self, boolean, semantics):
         return isinstance(boolean, bool)
 
     ##
