@@ -41,10 +41,6 @@
 	{{html}}
 	{% endautoescape %}
 	<br>
-	<form method="get" action="{% url "h5pedit" contentId=request.GET.contentId %}">
-		{% csrf_token %}
-		<input type="submit" value="Edit">
-	</form>
 </div>
 <br>
 {% endblock body %}
