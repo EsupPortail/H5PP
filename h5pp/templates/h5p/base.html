@@ -7,20 +7,6 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>H5P</title>
 		{% block head %}{% endblock head %}
-		<script>
-		function inIframe() {
-			try {
-				return window.self !== window.top;
-			}catch(e) {
-				return true;
-			}
-		}
-		window.onload = function() {
-			if(inIframe()) {
-				document.getElementById("back").style.display = "none";
-			}
-		}
-		</script>
 	</head>
 	<body>
 		<div class="content">

@@ -77,7 +77,7 @@ class H5PDjango:
 		else:
 			response = requests.get(url)
 
-		return response if response.status_code == 200 else response.raise_for_status()
+		return response.content if response.status_code == 200 else response.raise_for_status()
 
 	##
 	# Set the tutorial URL for a library. All versions of the library is set
@@ -118,11 +118,11 @@ class H5PDjango:
 	# Get a list of the current installed libraries
 	##
 	def loadLibraries(self):
-		result = h5p_libraries.objects.extra(select={'id': 'library_id', 'name': 'machine_name'}).order_by('title', 'major_version', 'minor_version')
-
+		result = h5p_libraries.objects.extra(select={'id': 'library_id', 'name': 'machine_name'}).values('id', 'machine_name', 'title', 'major_version', 'minor_version', 'patch_version', 'runnable', 'restricted').order_by('title', 'major_version', 'minor_version')
 		if result.exists():
+			libraries = dict()
 			for library in result:
-				libraries[library.name].append(library)
+				libraries[library['machine_name']] = library
 			return libraries
 		else:
 			return ''
@@ -200,11 +200,12 @@ class H5PDjango:
 			WHERE main_library_id = library_id
 			GROUP BY machine_name, major_version, minor_version
 		""")
-		result = cursor.fetchall()
+		result = self.dictfetchall(cursor)
 
 		# Extract results
-		for lib in res:
-			contentCount[lib['machine_name'] + ' ' + lib['major_version'] + '.' + lib['minor_version']] = lib['count']
+		contentCount = dict()
+		for lib in result:
+			contentCount[lib['machine_name'] + ' ' + str(lib['major_version']) + '.' + str(lib['minor_version'])] = lib['count']
 
 		return contentCount
 
@@ -525,7 +526,7 @@ class H5PDjango:
     # Load all contents available
    	##
    	def loadAllContents(self):
-   		result = h5p_contents.objects.values('content_id')
+   		result = h5p_contents.objects.values('content_id', 'title')
    		return result if len(result) > 0 else None
 
 	##
@@ -572,6 +573,17 @@ class H5PDjango:
 			dependencies[dependency['library_id']] = dependency
 
 		return dependencies
+
+	def updateTutorial(self):
+		response = json.loads(self.fetchExternalData('https://h5p.org/libraries-metadata.json'))
+		libraries = h5p_libraries.objects.values()
+		for name, url in response['libraries'].iteritems():
+			for library in libraries:
+				if library['machine_name'] == name:
+					self.setLibraryTutorialUrl(library['machine_name'], url['tutorialUrl'])
+
+		return 0
+
 
 	##
 	# Get stored setting

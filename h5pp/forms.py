@@ -25,6 +25,7 @@ def handleUploadedFile(files, filename):
 ##
 class LibrariesForm(forms.Form):
 	h5p = forms.FileField(required=False)
+	download = forms.BooleanField(widget=forms.CheckboxInput(), required=False)
 	uninstall = forms.BooleanField(widget=forms.CheckboxInput(), required=False)
 
 	def __init__(self, user, *args, **kwargs):
@@ -33,6 +34,7 @@ class LibrariesForm(forms.Form):
 
 	def clean(self):
 		h5pfile = self.cleaned_data.get('h5p')
+		down = self.cleaned_data.get('download')
 		unins = self.cleaned_data.get('uninstall')
 		if h5pfile != None:
 			interface = H5PDjango(self.user)
@@ -45,6 +47,13 @@ class LibrariesForm(forms.Form):
 			storage = interface.h5pGetInstance('storage')
 			if not storage.savePackage(None, None, True):
 				raise forms.ValidationError('Error during library save.')
+		elif down != None:
+			libraries = h5p_libraries.objects.values()
+			if not len(libraries) > 0 :
+				raise forms.ValidationError('You cannot update libraries when you don\'t have libraries installed !.')
+
+			interface = H5PDjango(self.user)
+			interface.updateTutorial()
 		elif unins == None:
 			raise forms.ValidationError('You need to select a h5p package before uploading.')
 

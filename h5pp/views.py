@@ -21,6 +21,8 @@ def librariesView(request):
 			if form.is_valid():
 				if 'h5p' in request.FILES and request.FILES['h5p'] != None:
 					return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries, 'status': 'Upload complete'})
+				elif 'download' in request.POST:
+					return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries, 'status': 'Update complete'})
 				else:
 					status = uninstall()
 					return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries, 'status': status})

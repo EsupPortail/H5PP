@@ -181,7 +181,6 @@ def createContent(request, content, params):
 
 	editor.processParameters(contentId, content['library'], params)
 	core = framework.h5pGetInstance('core')
-	core.fs.deleteFileTree(settings.MEDIA_ROOT + '/editor')
 	return True
 
 

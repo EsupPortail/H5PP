@@ -3,11 +3,11 @@
 {% block head %}
 	<style>
 		.content {
-					background: rgba(102, 178, 255, .4);
-					border-radius: 25px;
-					padding: 20px;
-					max-width: 1000px;
-					margin: auto;
+			background: rgba(102, 178, 255, .4);
+			border-radius: 25px;
+			padding: 20px;
+			max-width: 1000px;
+			margin: auto;
 		}
 		.h5p-admin-header {
 			font-family: 'Raleway', sans-serif;
@@ -151,6 +151,8 @@
 			</div>
 			<p class="file-return"></p>
 			<br>
+			<label>Update libraries tutorialq : {{ form.download }}</label>
+			<br>
 			<label> Uninstall H5P : {{ form.uninstall }}</label><br><br>
 			<input type="submit" value="Submit">
 			{{ form.non_field_errors }}
@@ -167,9 +169,10 @@
 		<tr class="header">
 			<th style="width:60%;">Name</th>
 			<th style="width: 40%;">Version</th>
+			<th style="width: 40%;">Tutorial</th>
 		</tr>
 	{% for library in libraries %}
-	  <tr><td>{{library.machine_name}}</td><td>{{library.major_version}}.{{library.minor_version}}</td></tr>
+	  <tr><td>{{library.machine_name}}</td><td>{{library.major_version}}.{{library.minor_version}}</td><td>{% if library.tutorial_url %}<a href="{{library.tutorial_url}}">Available</a>{% else %}Unavailable{% endif %}</td></tr>
 	{% endfor %}
 	</table>
 	{% endif %}

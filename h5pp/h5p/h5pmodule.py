@@ -370,12 +370,11 @@ def h5pGetListContent(request):
 	interface = H5PDjango(request.user)
 	contents = interface.getNumContentPlus()
 	if contents > 0:
-		listContent = interface.loadAllContents()
-		core = interface.h5pGetInstance('core')
 		result = list()
-		for content in listContent:
-			result.append(core.loadContent(content['content_id']))
-
+		for content in interface.loadAllContents():
+			load = interface.loadContent(content['content_id'])
+			load['title'] = content['title']
+			result.append(load)
 		return result
 	else:
 		return 0

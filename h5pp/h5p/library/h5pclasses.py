@@ -1431,9 +1431,8 @@ class H5PCore:
         libs = self.h5pF.loadLibraries()
 
         for libName, library in libs.iteritems():
-            for libVersion in library:
-                librariesInstalled[libName + " " + str(libVersion['major_version']) +
-                                   "." + str(libVersion['minor_version'])] = libVersion['patch_version']
+            librariesInstalled[libName + " " + str(library['major_version']) +
+                                   "." + str(library['minor_version'])] = library['patch_version']
 
         return librariesInstalled
 
@@ -1467,7 +1466,7 @@ class H5PCore:
             "local_id": binascii.crc32(self.fullPluginPath),
             "type": self.h5pF.getOption("H5P_SITETYPE", "local"),
             "num_authors": self.h5pF.getNumAuthors(),
-            "libraries": json.dumps(self.combineArrayValues({
+            "libraries": json.dumps({
                 "patch": self.getLibrariesInstalled(),
                 "content": self.h5pF.getLibraryContentCount(),
                 "loaded": self.h5pF.getLibraryStats("library"),
@@ -1476,7 +1475,7 @@ class H5PCore:
                 "deleted": self.h5pF.getLibraryStats("content delete"),
                 "resultViews": self.h5pF.getLibraryStats("results content"),
                 "shortcodeInserts": self.h5pF.getLibraryStats("content shortcode insert")
-            }))
+            })
         }
 
         # Send request
