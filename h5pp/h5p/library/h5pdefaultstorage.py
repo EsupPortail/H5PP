@@ -264,14 +264,14 @@ class H5PDefaultStorage:
 
         for f in files:
             self.deleteFileTree(pdir + '/' + f) if os.path.isdir(pdir +
-                                                            '/' + f) else os.remove(pdir + '/' + f)
+                                                                 '/' + f) else os.remove(pdir + '/' + f)
 
         return os.rmdir(pdir)
 
     ##
     # Save files uploaded through the editor.
     ##
-    def saveFile(self, files, contentid, pid = None):
+    def saveFile(self, files, contentid, pid=None):
         filedata = files.getData()
         path = settings.MEDIA_ROOT + '/'
         if filedata != None and contentid == '0':
@@ -281,7 +281,8 @@ class H5PDefaultStorage:
             with open(path + files.getName(), 'w+') as f:
                 f.write(filedata)
         elif filedata != None and contentid != '0':
-            path = path + 'content/' + str(contentid) + '/' + files.getType() + 's/'
+            path = path + 'content/' + \
+                str(contentid) + '/' + files.getType() + 's/'
             if not os.path.exists(path):
                 os.makedirs(path)
             with open(path + files.getName(), 'w+') as f:
@@ -295,14 +296,15 @@ class H5PDefaultStorage:
                 for chunk in content.chunks():
                     f.write(chunk)
         else:
-            path = path + 'content/' + str(contentid) + '/' + files.getType() + 's/'
+            path = path + 'content/' + \
+                str(contentid) + '/' + files.getType() + 's/'
             content = files.getFile()
             if not os.path.exists(path):
                 os.makedirs(path)
             with open(path + files.getName(), 'w+') as f:
                 for chunk in content.chunks():
                     f.write(chunk)
-                    
+
     ##
     # Recursive function for removing directories.
     ##
@@ -314,7 +316,7 @@ class H5PDefaultStorage:
 
         for f in files:
             self.deleteFileTree(pdir + "/" + f) if os.path.isdir(pdir +
-                                                            "/" + f) else os.remove(pdir + "/" + f)
+                                                                 "/" + f) else os.remove(pdir + "/" + f)
 
         return os.rmdir(pdir)
 

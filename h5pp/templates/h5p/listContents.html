@@ -92,10 +92,11 @@
 			</tr>
 		{% for content in listContent %}
 			<tr><td>{{content.title}}</td><td>{{content.library_major_version}}.{{content.library_minor_version}}</td><td>{{content.id}}</td>
+			<td><a href="{% url "h5pcontent" %}?contentId={{content.id}}">View</a>
 			{% if request.user %}
-			<td><a href="{% url "h5pedit" contentId=content.id %}?title={{content.title}}">Edit</a><br><a href="{% url "h5pcontent" %}?contentId={{content.id}}">View</a><form method="post" action="{% url "h5plistContents" %}?contentId={{content.id}}">{% csrf_token %}<input type="submit" value="Delete"></form></td>
+			<a href="{% url "h5pedit" contentId=content.id %}?title={{content.title}}">Edit</a><br><form method="post" action="{% url "h5plistContents" %}?contentId={{content.id}}">{% csrf_token %}<input type="submit" value="Delete"></form>
 			{% endif %}
-			</tr>
+			</td></tr>
 		{% endfor %}
 		</table>
 	</div>
