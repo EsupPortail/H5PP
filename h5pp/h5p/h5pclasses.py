@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.db import connection
 from h5pp.models import h5p_libraries, h5p_libraries_libraries, h5p_libraries_languages, h5p_contents, h5p_counters, h5p_contents_libraries, h5p_content_user_data
 from h5pp.h5p.h5pevent import H5PEvent
-from h5pp.h5p.library.h5pclasses import H5PCore, H5PValidator, H5PStorage, H5PContentValidator
+from h5pp.h5p.library.h5pclasses import H5PCore, H5PValidator, H5PStorage, H5PContentValidator, H5PExport
 from h5pp.h5p.editor.h5peditorclasses import H5PDjangoEditor
 from h5pp.h5p.editor.library.h5peditorstorage import H5PEditorStorage
 import collections
@@ -184,12 +184,13 @@ class H5PDjango:
     # dependencies to other libraries
     ##
     def getLibraryUsage(self, libraryId, skipContent=False):
+        usage = dict()
         cursor = connection.cursor()
         cursor.execute("""
-			SELECT COUNT(distinct n.nid)
+			SELECT COUNT(distinct n.content_id)
 			FROM h5p_libraries l
-			JOIN h5p_contents_libraries cl ON l.library_id = nl.library_id
-			JOIN h5p_contents n ON nl.content_id = n.content_id
+			JOIN h5p_contents_libraries cl ON l.library_id = cl.library_id
+			JOIN h5p_contents n ON cl.content_id = n.content_id
 			WHERE l.library_id = %s
 		""" % libraryId)
         usage['content'] = cursor.fetchall()

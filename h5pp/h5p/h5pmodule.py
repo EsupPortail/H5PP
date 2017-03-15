@@ -37,7 +37,7 @@ SCRIPTS = [
 
 
 def h5pGetExportPath(content):
-    return str(settings.H5P_PATH + '/exports/' + (content['slug'] if content['slug'] + '-' else '') + content['id'] + '.h5p')
+    return settings.MEDIA_ROOT + '/exports/' + ((content['slug'] + '-') if 'slug' in content else '') + str(content['id']) + '.h5p'
 
 ##
 # Creates the title for the library details page
@@ -45,8 +45,8 @@ def h5pGetExportPath(content):
 
 
 def h5pLibraryDetailsTitle(libraryId):
-    return h5p_libraries.objects.filter(library_id=libraryId).values('title')
-
+    result = h5p_libraries.objects.filter(library_id=libraryId).values('title')
+    return result[0] if len(result) > 0 else None
 
 def h5pInsert(request, interface):
     if 'h5p_upload' in request.POST:
@@ -222,18 +222,18 @@ def h5pSetFinished(request, user):
 
 
 def h5pAddCoreAssets():
-    path = settings.H5P_PATH
+    path = settings.STATIC_URL + 'h5p/'
     assets = {
         'css': list(),
         'js': list()
     }
 
     for style in STYLES:
-        css = settings.STATIC_URL + 'h5p/' + style
+        css = path + style
         assets['css'].append(css)
 
     for script in SCRIPTS:
-        js = settings.STATIC_URL + 'h5p/' + script
+        js = path + script
         assets['js'].append(js)
 
     return assets
