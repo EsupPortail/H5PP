@@ -413,7 +413,6 @@ def h5pGetListContent(request):
         result = list()
         for content in interface.loadAllContents():
             load = interface.loadContent(content['content_id'])
-            load['title'] = content['title']
             result.append(load)
         return result
     else:

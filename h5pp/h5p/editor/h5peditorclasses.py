@@ -267,8 +267,6 @@ class H5PDjangoEditor:
         else:
             oldPath = self.basePath + editorPath + params['path']
             newPath = self.basePath + self.contentDirectory + params['path']
-            print(oldPath)
-            print(newPath)
             if os.path.exists(newPath):
                 self.storage.keepFile(newPath, newPath)
             elif os.path.exists(oldPath):

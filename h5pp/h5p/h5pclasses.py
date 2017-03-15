@@ -373,7 +373,7 @@ class H5PDjango:
 
         # Log update event
         event = H5PEvent('content', 'update', content['id'], content['title'], content['library'][
-                         'machineName'], content['library']['majorVersion'] + '.' + content['library']['minorVersion'])
+                         'machineName'], str(content['library']['majorVersion']) + '.' + str(content['library']['minorVersion']))
 
     ##
     # Insert new content
@@ -390,7 +390,7 @@ class H5PDjango:
             slug='')
 
         event = H5PEvent('content', 'create', result.content_id, content['title'] if 'title' in content else '', content[
-                         'library']['machineName'], content['library']['majorVersion'] + '.' + content['library']['minorVersion'])
+                         'library']['machineName'], str(content['library']['majorVersion']) + '.' + str(content['library']['minorVersion']))
 
         return result.content_id
 
@@ -542,7 +542,6 @@ class H5PDjango:
 					hl.minor_version AS library_minor_version,
 					hl.embed_types AS library_embed_types,
 					hl.fullscreen AS library_fullscreen,
-					hl.title,
 					hn.filtered,
 					hn.disable,
 					hn.slug

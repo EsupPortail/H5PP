@@ -7,7 +7,9 @@ from h5pp.h5p.library.h5pclasses import *
 from h5pp.h5p.editor.h5peditorclasses import H5PDjangoEditor
 import django
 
-# Create your tests here.
+##
+# Tests for h5p implementations classes
+##
 
 class H5pModuleTestCase(TestCase):
 
@@ -230,7 +232,119 @@ class H5PClassesTestCase(TestCase):
 		self.assertTrue(result[0]['title'] == 'Test3')
 		print('test_save_library_data ---- Check')
 
-		##
-		# TODO
-		# Place libraries dependencies test
-		##
+	def test_insert_content(self):
+		user = User.objects.get(username='titi')
+		interface = H5PDjango(user)
+		content = {
+			'title': 'ContentTest',
+			'params': '',
+			'library': {
+				'libraryId': 1,
+				'machineName': 'H5P.Test',
+				'majorVersion': 1,
+				'minorVersion': 1
+			},
+			'disable': 0,
+		}
+
+		self.assertEqual(1, interface.insertContent(content))
+		self.assertTrue(len(h5p_contents.objects.values()) > 0)
+		print('test_insert_content ---- Check')
+
+	def test_update_content(self):
+		user = User.objects.get(username='titi')
+		interface = H5PDjango(user)
+		content = {
+			'id': 1,
+			'title': 'ContentTest',
+			'params': '',
+			'library': {
+				'libraryId': 1,
+				'machineName': 'H5P.Test',
+				'majorVersion': 1,
+				'minorVersion': 1
+			},
+			'disable': 0,
+		}
+
+		interface.updateContent(content)
+		result = h5p_contents.objects.filter(content_id=1).values()
+
+		self.assertTrue(result.exists())
+
+		content['title'] = 'ContentTest2'
+		content['h5p_library'] = 'H5P.Test 1.12'
+		del(content['library']['machineName'])
+		del(content['library']['majorVersion'])
+		del(content['library']['minorVersion'])
+		interface.updateContent(content)
+		result = h5p_contents.objects.filter(content_id=1).values()
+
+		self.assertTrue(result[0]['title'] == 'ContentTest2')
+		self.assertTrue(content['library']['machineName'] == 'H5P.Test')
+		self.assertTrue(content['library']['majorVersion'] == '1' and content['library']['minorVersion'] == '12')
+		print('test_update_content ---- Check')
+
+	def test_load_content(self):
+		user = User.objects.get(username='titi')
+		interface = H5PDjango(user)
+		content = {
+			'id': 1,
+			'title': 'ContentTest',
+			'params': '',
+			'library': {
+				'libraryId': 1,
+				'machineName': 'H5P.Test',
+				'majorVersion': 1,
+				'minorVersion': 1
+			},
+			'disable': 0,
+		}
+
+		interface.insertContent(content)
+		result = interface.loadContent(1)
+
+		self.assertTrue(result['title'] == 'ContentTest')
+		self.assertTrue(result['library_name'] == 'H5P.Test')
+		self.assertEqual(None, interface.loadContent(2))
+		print('test_load_content ---- Check')
+
+
+
+
+
+
+
+
+
+	##
+	# TODO
+	# Place libraries dependencies test
+	##
+
+class H5pEditorClassesTestCase(TestCase):
+
+	def setUp(self):
+		test = User.objects.create(
+			username='titi'
+		)
+		print('setUp of EditorClassesTestCase ---- Ready')
+
+	def test_create_directories(self):
+		user = User.objects.get(username='titi')
+		interface = H5PDjango(user)
+		editor = interface.h5pGetInstance('editor')
+
+		editor.createDirectories(1)
+
+		self.assertTrue(os.path.exists('/home/pod/H5PP/media/content/1/'))
+		self.assertTrue(os.path.exists('/home/pod/H5PP/media/content/1/audios/'))
+		self.assertTrue(os.path.exists('/home/pod/H5PP/media/content/1/files/'))
+		self.assertTrue(os.path.exists('/home/pod/H5PP/media/content/1/images/'))
+		self.assertTrue(os.path.exists('/home/pod/H5PP/media/content/1/videos/'))
+		print('test_create_directories ---- Check')
+
+	##
+	# TODO
+	# Place request-based test
+	##
