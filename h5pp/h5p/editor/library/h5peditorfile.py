@@ -1,3 +1,5 @@
+from django.conf import settings
+import Image
 import json
 import uuid
 import os
@@ -22,6 +24,7 @@ class H5PEditorFile:
         self.result = dict()
         self.field = json.loads(field)
         self.files = files['file']
+        self.path = settings.MEDIA_ROOT + '/tmp/' + self.files.name
 
         # Check if uploaded base64 encoded file
         if 'dataURI' in request.POST and request.POST['dataURI'] != '':
@@ -99,15 +102,16 @@ class H5PEditorFile:
             if 'data' in locals() or 'data' in globals():
                 image = Image.open(self.data)
             else:
+                with open(self.path, 'w+') as f:
+                    f.write(self.files.read())
                 # Image size from tmp file
-                image = Image.open(files.name)
+                image = Image.open(self.path)
 
             if not image:
                 print('File is not an image')
                 return False
 
-            self.result['width'] = image[0]
-            self.result['height'] = image[1]
+            self.result['width'], self.result['height'] = image.size
             self.result['mime'] = self.typ
 
         elif self.field['type'] == 'audio':
@@ -185,4 +189,5 @@ class H5PEditorFile:
         global name
         self.result['path'] = self.getType() + 's/' + self.getName()
         name = None
+        os.remove(settings.MEDIA_ROOT + '/tmp/' + self.files.name)
         return json.dumps(self.result)
