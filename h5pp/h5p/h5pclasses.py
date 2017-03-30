@@ -652,6 +652,12 @@ class H5PDjango:
             h5p_contents.objects.filter(content_id=pid).update(**query)
 
     ##
+    # Not implemented yet
+    ##
+    def afterExportCreated(self):
+        return 0
+
+    ##
     # Will clear filtered params for all the content that uses the specified
     # library. This means that the content dependencies will have to be rebuilt,
     # and the parameters refiltered

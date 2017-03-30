@@ -242,7 +242,9 @@ class H5PDjangoEditor:
         elif field['type'] == 'group':
             if params:
                 if len(field['fields']) == 1:
-                    params = field['fields'][0]['name']['params']
+                    params = {
+                        field['fields'][0]['name']: params
+                    }
                 self.processSemantics(files, field['fields'], params)
             return
         elif field['type'] == 'list':
@@ -267,9 +269,7 @@ class H5PDjangoEditor:
         else:
             oldPath = self.basePath + editorPath + params['path']
             newPath = self.basePath + self.contentDirectory + params['path']
-            if os.path.exists(newPath):
-                self.storage.keepFile(newPath, newPath)
-            elif os.path.exists(oldPath):
+            if not os.path.exists(newPath) and os.path.exists(oldPath):
                 shutil.copy(oldPath, newPath)
 
         files.append(params['path'])

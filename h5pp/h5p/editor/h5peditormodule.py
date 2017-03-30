@@ -5,6 +5,7 @@ from django.conf import settings
 from h5pp.models import h5p_content_user_data, h5p_libraries
 from h5pp.h5p.h5pmodule import h5pAddCoreAssets, h5pAddFilesAndSettings
 from h5pp.h5p.h5pclasses import H5PDjango
+import shutil
 import time
 import json
 import os
@@ -198,7 +199,7 @@ def createContent(request, content, params):
         return False
 
     editor.processParameters(contentId, content['library'], params)
-    core = framework.h5pGetInstance('core')
+
     return True
 
 

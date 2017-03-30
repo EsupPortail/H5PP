@@ -189,5 +189,4 @@ class H5PEditorFile:
         global name
         self.result['path'] = self.getType() + 's/' + self.getName()
         name = None
-        os.remove(settings.MEDIA_ROOT + '/tmp/' + self.files.name)
         return json.dumps(self.result)

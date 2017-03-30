@@ -120,8 +120,12 @@ class H5PDefaultStorage:
         if not self.dirReady(self.path + '/exports'):
             raise Exception('Unable to create directory for H5P export file.')
 
-        if not shutil.copy(source, self.path + '/exports/' + filename):
-            raise Exception('Unable to save H5P export file.')
+        try:
+            shutil.copy(source, self.path + '/exports/' + filename)
+        except IOError, e:
+            print('Unable to copy %s' % e)
+
+        return True
 
     ##
     # Remove given export file.
