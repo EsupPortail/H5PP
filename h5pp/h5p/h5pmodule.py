@@ -246,7 +246,7 @@ def h5pGetCoreSettings(user):
         'postUserStatistics': user.id > 0,
         'ajaxPath': settings.BASE_URL + settings.H5P_URL + 'ajax',
         'ajax': {
-            'setFinished': settings.BASE_URL + settings.H5P_URL + 'ajax/?set-finished.json',
+            'setFinished': settings.BASE_URL + settings.H5P_URL + 'ajax/?setFinished',
             'contentUserData': settings.BASE_URL + settings.H5P_URL + 'ajax/?content-user-data&contentId=:contentId&dataType=:dataType&subContentId=:subContentId'
         },
         'tokens': {
@@ -515,8 +515,6 @@ def h5pAddIframeAssets(request, integration, contentId, files):
 ##
 # Uninstall H5P
 ##
-
-
 def uninstall():
     basepath = settings.MEDIA_ROOT
     for directory in ['/tmp', '/libraries', '/content', '/exports']:
@@ -534,6 +532,30 @@ def uninstall():
     h5p_counters.objects.all().delete()
 
     return 'H5PP is now uninstalled. Don\'t forget to clean your settings.py and run "pip uninstall H5PP".'
+
+##
+# Handle grades storage for users
+##
+def handleSetFinished(request):
+    # Content parameters
+    contentId = request.POST['contentId']
+    score = request.POST['score']
+    maxScore = request.POST['maxScore']
+    response = {
+        'success': False
+    }
+
+    if contentId.isdigit() and score.isdigit() and maxScore.isdigit():
+        h5p_points.objects.filter(content_id=contentId, uid=request.user.id).update(
+            finished=int(time.time()),
+            points=score,
+            max_points=maxScore
+        )
+        response['success'] = True
+
+    return json.dumps(response)
+    
+
 
 
 ##

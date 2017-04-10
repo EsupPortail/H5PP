@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from h5pp.forms import LibrariesForm, CreateForm
 from h5pp.models import h5p_libraries
-from h5pp.h5p.h5pmodule import includeH5p, h5pSetStarted, h5pGetContentId, h5pGetListContent, h5pLoad, h5pDelete, uninstall
+from h5pp.h5p.h5pmodule import includeH5p, h5pSetStarted, h5pGetContentId, h5pGetListContent, h5pLoad, h5pDelete, handleSetFinished, uninstall
 from h5pp.h5p.h5pclasses import H5PDjango
 from h5pp.h5p.editor.h5peditormodule import h5peditorContent, handleContentUserData
 from h5pp.h5p.editor.h5peditorclasses import H5PDjangoEditor
@@ -161,7 +161,13 @@ def ajax(request):
                 data,
                 content_type='application/json'
             )
-        return HttpResponseRedirect('h5p/create')
+
+        elif 'setFinished' in request.GET:
+            data = handleSetFinished(request)
+            return HttpResponse(
+                data,
+                content_type='application/json'
+            )
 
     if 'content-user-data' in request.GET:
         data = handleContentUserData(request)
