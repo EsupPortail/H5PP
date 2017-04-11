@@ -2,7 +2,7 @@
 # Django module h5p editor
 ##
 from django.conf import settings
-from h5pp.models import h5p_content_user_data, h5p_libraries
+from h5pp.models import h5p_content_user_data, h5p_libraries, h5p_points
 from h5pp.h5p.h5pmodule import h5pAddCoreAssets, h5pAddFilesAndSettings
 from h5pp.h5p.h5pclasses import H5PDjango
 import shutil
@@ -221,7 +221,6 @@ def getLibraryProperty(library, prop='all'):
             return libraryData[prop]
     else:
         return False
-
 
 def ajaxSuccess(data=None):
     response = {

@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from h5pp.forms import LibrariesForm, CreateForm
 from h5pp.models import h5p_libraries
-from h5pp.h5p.h5pmodule import includeH5p, h5pSetStarted, h5pGetContentId, h5pGetListContent, h5pLoad, h5pDelete, handleSetFinished, uninstall
+from h5pp.h5p.h5pmodule import includeH5p, h5pSetStarted, h5pSetFinished, h5pGetContentId, h5pGetListContent, h5pLoad, h5pDelete, getUserScore, uninstall
 from h5pp.h5p.h5pclasses import H5PDjango
 from h5pp.h5p.editor.h5peditormodule import h5peditorContent, handleContentUserData
 from h5pp.h5p.editor.h5peditorclasses import H5PDjangoEditor
@@ -68,20 +68,24 @@ def contentsView(request):
     if 'contentId' in request.GET:
         h5pLoad(request)
         content = includeH5p(request)
+        score = None
 
         if not 'html' in content:
             html = '<div>Sorry, preview of H5P content is not yet available.</div>'
             return render(request, 'h5p/content.html', {'html': html})
         else:
-            h5pSetStarted(request.user, h5pGetContentId(request))
-            return render(request, 'h5p/content.html', {'html': content['html'], 'data': content['data']})
+            if request.user.is_authenticated():
+                score = getUserScore(h5pGetContentId(request), request.user)
+                h5pSetStarted(request.user, h5pGetContentId(request))
+
+            return render(request, 'h5p/content.html', {'html': content['html'], 'data': content['data'], 'score': score[0]})
 
     return HttpResponseRedirect('/h5p/listContents')
 
 
 def listView(request):
     if request.method == 'POST':
-        if request.user.is_authenticated():
+        if request.user.is_superuser():
             h5pDelete(request)
             return HttpResponseRedirect('/h5p/listContents')
 
@@ -163,7 +167,7 @@ def ajax(request):
             )
 
         elif 'setFinished' in request.GET:
-            data = handleSetFinished(request)
+            data = h5pSetFinished(request)
             return HttpResponse(
                 data,
                 content_type='application/json'

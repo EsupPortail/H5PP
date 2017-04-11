@@ -2,6 +2,7 @@
 # Django module h5p.
 ##
 from django.conf import settings
+from django.contrib.auth.models import User
 from h5pp.models import *
 from h5pp.h5p.h5pclasses import H5PDjango
 import collections
@@ -47,6 +48,11 @@ def h5pGetExportPath(content):
 def h5pLibraryDetailsTitle(libraryId):
     result = h5p_libraries.objects.filter(library_id=libraryId).values('title')
     return result[0] if len(result) > 0 else None
+
+##
+# Insert a new content
+##
+
 
 def h5pInsert(request, interface):
     if 'h5p_upload' in request.POST:
@@ -200,21 +206,30 @@ def h5pSetStarted(user, contentId):
         else:
             h5p_points.objects.create(
                 content_id=contentId, uid=user.id, started=int(time.time()))
+
 ##
-# Callback function for storing the users results in the database
+# Handle grades storage for users
 ##
 
 
-def h5pSetFinished(request, user):
-    if not validToken('result', request.POST['token']):
-        return ajaxError('Invalid security token.')
+def h5pSetFinished(request):
+    # Content parameters
+    contentId = request.POST['contentId']
+    score = request.POST['score']
+    maxScore = request.POST['maxScore']
+    response = {
+        'success': False
+    }
 
-    if user.id and request.POST['contentId'].isdigit() and request.POST['score'].isdigit() and request.POST['maxScore'].isdigit():
-        h5p_points.objects.filter(content_id=request.POST['contentId'], uid=user.id).update(
-            finished=int(time.time()), points=request.POST['score'], max_points=request.POST['maxScore'])
-        return ajaxSuccess()
+    if contentId.isdigit() and score.isdigit() and maxScore.isdigit():
+        h5p_points.objects.filter(content_id=contentId, uid=request.user.id).update(
+            finished=int(time.time()),
+            points=score,
+            max_points=maxScore
+        )
+        response['success'] = True
 
-    return ajaxError()
+    return json.dumps(response)
 
 ##
 # Adds content independent scripts, styles and settings
@@ -237,6 +252,10 @@ def h5pAddCoreAssets():
         assets['js'].append(js)
 
     return assets
+
+##
+# H5PIntegration object
+##
 
 
 def h5pGetCoreSettings(user):
@@ -344,6 +363,10 @@ def h5pAddFilesAndSettings(request, embedType):
 
     return {'integration': json.dumps(integration), 'assets': assets, 'filesAssets': filesAssets}
 
+##
+# Get a content by request
+##
+
 
 def h5pGetContent(request):
     interface = H5PDjango(request.user)
@@ -413,6 +436,7 @@ def h5pGetListContent(request):
         result = list()
         for content in interface.loadAllContents():
             load = interface.loadContent(content['content_id'])
+            load['score'] = getUserScore(content['content_id'])
             result.append(load)
         return result
     else:
@@ -512,6 +536,20 @@ def h5pAddIframeAssets(request, integration, contentId, files):
         integration['contents'][
             'cid-' + contentId]['scripts'] = core.getAssetsUrls(files['scripts'])
 
+
+def getUserScore(contentId, user=None):
+    if user != None:
+        score = h5p_points.objects.filter(content_id=contentId, uid=user.id).values('points', 'max_points')
+    else:
+        score = h5p_points.objects.filter(content_id=contentId).extra(select={'user': 'uid'}).values('user', 'points', 'max_points')
+        for user in score:
+            user['user'] = User.objects.get(id=user['user']).username
+
+    if len(score) > 0 :
+        return score
+
+    return None
+
 ##
 # Uninstall H5P
 ##
@@ -532,31 +570,6 @@ def uninstall():
     h5p_counters.objects.all().delete()
 
     return 'H5PP is now uninstalled. Don\'t forget to clean your settings.py and run "pip uninstall H5PP".'
-
-##
-# Handle grades storage for users
-##
-def handleSetFinished(request):
-    # Content parameters
-    contentId = request.POST['contentId']
-    score = request.POST['score']
-    maxScore = request.POST['maxScore']
-    response = {
-        'success': False
-    }
-
-    if contentId.isdigit() and score.isdigit() and maxScore.isdigit():
-        h5p_points.objects.filter(content_id=contentId, uid=request.user.id).update(
-            finished=int(time.time()),
-            points=score,
-            max_points=maxScore
-        )
-        response['success'] = True
-
-    return json.dumps(response)
-    
-
-
 
 ##
 # Get a new H5P security token for the given action

@@ -56,5 +56,11 @@
 	{% endautoescape %}
 	<br>
 </div>
+{% if request.user.is_authenticated %}
+<div class="score">
+	<h5 class="h5p-score-header">Score</h5>
+	Your score on this video : {{score.points}} / {{score.max_points}}
+</div>
+{% endif %}
 <br>
 {% endblock body %}
