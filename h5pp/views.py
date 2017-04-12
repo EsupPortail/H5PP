@@ -75,10 +75,11 @@ def contentsView(request):
             return render(request, 'h5p/content.html', {'html': html})
         else:
             if request.user.is_authenticated():
-                score = getUserScore(h5pGetContentId(request), request.user)
                 h5pSetStarted(request.user, h5pGetContentId(request))
-
-            return render(request, 'h5p/content.html', {'html': content['html'], 'data': content['data'], 'score': score[0]})
+                score = getUserScore(h5pGetContentId(request), request.user)
+                
+                return render(request, 'h5p/content.html', {'html': content['html'], 'data': content['data'], 'score': score[0]})
+            return render(request, 'h5p/content.html', {'html': content['html'], 'data': content['data']})
 
     return HttpResponseRedirect('/h5p/listContents')
 
