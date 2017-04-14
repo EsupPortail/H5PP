@@ -38,7 +38,7 @@ SCRIPTS = [
 
 
 def h5pGetExportPath(content):
-    return settings.MEDIA_ROOT + '/exports/' + ((content['slug'] + '-') if 'slug' in content else '') + str(content['id']) + '.h5p'
+    return settings.MEDIA_ROOT + 'h5pp/exports/' + ((content['slug'] + '-') if 'slug' in content else '') + str(content['id']) + '.h5p'
 
 ##
 # Creates the title for the library details page
@@ -261,7 +261,7 @@ def h5pAddCoreAssets():
 def h5pGetCoreSettings(user):
     coreSettings = {
         'baseUrl': settings.BASE_URL,
-        'url': settings.BASE_URL + settings.MEDIA_URL,
+        'url': settings.BASE_URL + settings.MEDIA_URL + 'h5pp/',
         'postUserStatistics': user.id > 0,
         'ajaxPath': settings.BASE_URL + settings.H5P_URL + 'ajax',
         'ajax': {
@@ -351,12 +351,12 @@ def h5pAddFilesAndSettings(request, embedType):
     }
     if embedType == 'div':
         for script in files['scripts']:
-            url = settings.MEDIA_URL + script['path'] + script['version']
-            filesAssets['js'].append(settings.MEDIA_URL + script['path'])
+            url = settings.MEDIA_URL + 'h5pp/' + script['path'] + script['version']
+            filesAssets['js'].append(settings.MEDIA_URL + 'h5pp/' + script['path'])
             integration['loadedJs'] = url
         for style in files['styles']:
-            url = settings.MEDIA_URL + style['path'] + style['version']
-            filesAssets['css'].append(settings.MEDIA_URL + style['path'])
+            url = settings.MEDIA_URL + 'h5pp/' + style['path'] + style['version']
+            filesAssets['css'].append(settings.MEDIA_URL + 'h5pp/' + style['path'])
             integration['loadedCss'] = url
     elif embedType == 'iframe':
         h5pAddIframeAssets(request, integration, content['id'], files)
@@ -379,7 +379,7 @@ def h5pGetContent(request):
         'library': request.GET['main_library'],
         'embedType': 'div',
         'filtered': request.GET['filtered'],
-        'url': settings.BASE_URL + settings.MEDIA_URL + 'content/' + h5pGetContentId(request),
+        'url': settings.BASE_URL + settings.MEDIA_URL + 'h5pp/content/' + h5pGetContentId(request),
         'displayOptions': '',
         'slug': request.GET['h5p_slug']
     }
@@ -554,10 +554,9 @@ def getUserScore(contentId, user=None):
 # Uninstall H5P
 ##
 def uninstall():
-    basepath = settings.MEDIA_ROOT
-    for directory in ['/tmp', '/libraries', '/content', '/exports']:
-        if os.path.exists(basepath + directory):
-            shutil.rmtree(basepath + directory)
+    basepath = settings.MEDIA_ROOT + '/h5pp'
+    if os.path.exists(basepath):
+        shutil.rmtree(basepath)
 
     h5p_contents_libraries.objects.all().delete()
     h5p_libraries.objects.all().delete()

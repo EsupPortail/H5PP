@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from h5pp.forms import LibrariesForm, CreateForm
-from h5pp.models import h5p_libraries
+from h5pp.models import h5p_libraries, h5p_contents
 from h5pp.h5p.h5pmodule import includeH5p, h5pSetStarted, h5pSetFinished, h5pGetContentId, h5pGetListContent, h5pLoad, h5pDelete, getUserScore, uninstall
 from h5pp.h5p.h5pclasses import H5PDjango
 from h5pp.h5p.editor.h5peditormodule import h5peditorContent, handleContentUserData
@@ -44,7 +44,11 @@ def createView(request, contentId=None):
                 request.POST['contentId'] = contentId
             form = CreateForm(request, request.POST, request.FILES)
             if form.is_valid():
-                return HttpResponseRedirect('/h5p/content/?contentId=' + contentId if contentId != None else request.POST['contentId'])
+                if contentId != None:
+                    return HttpResponseRedirect('/h5p/content/?contentId=' + contentId)
+                else:
+                    newId = h5p_contents.objects.all().order_by('-content_id')[0]
+                    return HttpResponseRedirect('/h5p/content/?contentId=' + str(newId.content_id))
             return render(request, 'h5p/create.html', {'form': form, 'data': editor})
 
         elif contentId != None:

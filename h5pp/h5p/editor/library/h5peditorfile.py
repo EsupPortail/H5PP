@@ -24,7 +24,7 @@ class H5PEditorFile:
         self.result = dict()
         self.field = json.loads(field)
         self.files = files['file']
-        self.path = settings.MEDIA_ROOT + '/tmp/' + self.files.name
+        self.path = settings.MEDIA_ROOT + '/h5pp/tmp/' + self.files.name
 
         # Check if uploaded base64 encoded file
         if 'dataURI' in request.POST and request.POST['dataURI'] != '':

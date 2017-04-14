@@ -71,7 +71,7 @@ def h5peditorContent(request):
 
     contentValidator = framework.h5pGetInstance('contentvalidator')
     editor['editor'] = {
-        'filesPath': settings.MEDIA_URL + 'editor',
+        'filesPath': settings.MEDIA_URL + 'h5pp/editor',
         'fileIcon': {
             'path': settings.BASE_URL + settings.STATIC_URL + 'h5p/h5peditor/images/binary-file.png',
             'width': 50,

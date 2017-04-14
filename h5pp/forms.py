@@ -13,14 +13,14 @@ import os
 
 
 def handleUploadedFile(files, filename):
-    if not os.path.exists(settings.MEDIA_ROOT + '/tmp'):
-        os.mkdir(settings.MEDIA_ROOT + '/tmp')
+    if not os.path.exists(settings.MEDIA_ROOT + '/h5pp/tmp'):
+        os.makedirs(settings.MEDIA_ROOT + '/h5pp/tmp')
 
-    with open(settings.MEDIA_ROOT + '/tmp/' + filename, 'wb+') as destination:
+    with open(settings.MEDIA_ROOT + '/h5pp/tmp/' + filename, 'wb+') as destination:
         for chunk in files.chunks():
             destination.write(chunk)
 
-    return {'folderPath': settings.MEDIA_ROOT + '/tmp', 'path': settings.MEDIA_ROOT + '/tmp/' + filename}
+    return {'folderPath': settings.MEDIA_ROOT + '/h5pp/tmp', 'path': settings.MEDIA_ROOT + '/h5pp/tmp/' + filename}
 
 ##
 # Form for upload/update h5p libraries
@@ -143,6 +143,8 @@ class CreateForm(forms.Form):
                 if not createContent(self.request, content, params):
                     raise forms.ValidationError(
                         'Impossible to create the content')
+
+                return content['id']
 
         return self.cleaned_data
 

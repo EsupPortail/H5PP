@@ -277,7 +277,7 @@ class H5PDefaultStorage:
     ##
     def saveFile(self, files, contentid, pid=None):
         filedata = files.getData()
-        path = settings.MEDIA_ROOT + '/'
+        path = settings.MEDIA_ROOT + '/h5pp/'
         if filedata != None and contentid == '0':
             path = path + 'editor/' + files.getType() + 's/'
             if not os.path.exists(path):
