@@ -1,16 +1,33 @@
-{% extends "base.html" %}
+{% extends "h5p/base.html" %}
+{% block head %}
+	<style>
+		#back {
+			border-radius: 5px;
+			background-color: white;
+			position: relative;
+			top: 5px;
+			padding: 5px;
+			display: inline-block;
+
+		}
+		#form_login {
+			margin: 0;
+			padding: 0;
+		}
+	</style>
+{% endblock head %}
 {% block body %}
 	{% if form.errors %}
 		<p class="error">Sorry, that's not a valid username or password</p>
 	{% endif %}
-	<form action="{% url "login" %}" method="post">
+	<form action="{% url "login" %}" method="post" id="form_login">
 		{% csrf_token %}
 		<label for="username">Username:</label>
 		<input type="text" name="username" value="" id="username">
 		<label for="password">Password:</label>
 		<input type="password" name="password" value="" id="password">
 
-		<input type="submit" value="login" />
+		<input type="submit" id="login" value="Login" />
 		<input type="hidden" name="next" value="{{ next|escape }}" />
 	</form>
 {% endblock body %}

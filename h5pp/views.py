@@ -44,7 +44,7 @@ def createView(request, contentId=None):
                 request.POST['contentId'] = contentId
             form = CreateForm(request, request.POST, request.FILES)
             if form.is_valid():
-                return HttpResponseRedirect('/h5p/listContents')
+                return HttpResponseRedirect('/h5p/content/?contentId=' + contentId if contentId != None else request.POST['contentId'])
             return render(request, 'h5p/create.html', {'form': form, 'data': editor})
 
         elif contentId != None:
@@ -86,9 +86,10 @@ def contentsView(request):
 
 def listView(request):
     if request.method == 'POST':
-        if request.user.is_superuser():
+        if request.user.is_superuser:
             h5pDelete(request)
             return HttpResponseRedirect('/h5p/listContents')
+        return render(request, 'h5p/listContents.html', {'status': 'You do not have the necessary rights to delete a video.'})
 
     listContent = h5pGetListContent(request)
     if listContent > 0:

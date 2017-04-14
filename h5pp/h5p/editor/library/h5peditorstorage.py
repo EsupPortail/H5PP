@@ -50,7 +50,7 @@ class H5PEditorStorage:
 			""" % ("'" + machineName + "'", majorVersion, minorVersion, "'" + language + "'"))
 
         result = self.dictfetchall(cursor)
-        return result if len(result) > 0 else False
+        return result[0]['language_json'] if len(result) > 0 else False
 
     ##
     # Returns all rows from a cursor as a dict
