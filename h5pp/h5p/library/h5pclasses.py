@@ -1155,7 +1155,7 @@ class H5PCore:
 
             # Add URL prefix if not external
             if not '://' in asset['path']:
-                url = '/media' + url
+                url = '/media/h5pp' + url
 
             # Add version/cache buster if set
             if 'version' in asset:

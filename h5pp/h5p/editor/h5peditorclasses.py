@@ -91,7 +91,7 @@ class H5PDjangoEditor:
         self.h5p.aggregateAssets = aggregateAssets
 
         # Create base URL
-        url = settings.BASE_URL + '/media' + prefix
+        url = settings.BASE_URL + '/media/h5pp' + prefix
 
         # JavaScripts
         if 'scripts' in files:

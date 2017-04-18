@@ -81,7 +81,7 @@ def h5peditorContent(request):
         'libraryPath': settings.BASE_URL + settings.STATIC_URL + 'h5p/h5peditor/',
         'copyrightSemantics': contentValidator.getCopyrightSemantics(),
         'assets': assets,
-        'contentRelUrl': '../media/content/'
+        'contentRelUrl': '../media/h5pp/content/'
     }
 
     return {'editor': json.dumps(editor), 'coreAssets': coreAssets, 'assets': assets, 'add': add}
