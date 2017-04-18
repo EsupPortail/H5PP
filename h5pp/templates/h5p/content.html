@@ -66,7 +66,7 @@
 {% if request.user.is_authenticated %}
 <div class="score">
 	<h5 class="h5p-score-header">Score</h5>
-	{% if score %}
+	{% if score and score.points %}
 	Your score on this video : {{score.points}} / {{score.max_points}}
 	{% else %}
 	This is the first time you watch this video
