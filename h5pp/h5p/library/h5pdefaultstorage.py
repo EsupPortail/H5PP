@@ -120,8 +120,12 @@ class H5PDefaultStorage:
         if not self.dirReady(self.path + '/exports'):
             raise Exception('Unable to create directory for H5P export file.')
 
-        if not shutil.copy(source, self.path + '/exports/' + filename):
-            raise Exception('Unable to save H5P export file.')
+        try:
+            shutil.copy(source, self.path + '/exports/' + filename)
+        except IOError, e:
+            print('Unable to copy %s' % e)
+
+        return True
 
     ##
     # Remove given export file.
@@ -273,7 +277,7 @@ class H5PDefaultStorage:
     ##
     def saveFile(self, files, contentid, pid=None):
         filedata = files.getData()
-        path = settings.MEDIA_ROOT + '/'
+        path = settings.MEDIA_ROOT + '/h5pp/'
         if filedata != None and contentid == '0':
             path = path + 'editor/' + files.getType() + 's/'
             if not os.path.exists(path):

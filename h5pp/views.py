@@ -3,8 +3,8 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from h5pp.forms import LibrariesForm, CreateForm
-from h5pp.models import h5p_libraries
-from h5pp.h5p.h5pmodule import includeH5p, h5pSetStarted, h5pGetContentId, h5pGetListContent, h5pLoad, h5pDelete, uninstall
+from h5pp.models import h5p_libraries, h5p_contents
+from h5pp.h5p.h5pmodule import includeH5p, h5pSetStarted, h5pSetFinished, h5pGetContentId, h5pGetListContent, h5pLoad, h5pDelete, getUserScore, uninstall
 from h5pp.h5p.h5pclasses import H5PDjango
 from h5pp.h5p.editor.h5peditormodule import h5peditorContent, handleContentUserData
 from h5pp.h5p.editor.h5peditorclasses import H5PDjangoEditor
@@ -44,7 +44,11 @@ def createView(request, contentId=None):
                 request.POST['contentId'] = contentId
             form = CreateForm(request, request.POST, request.FILES)
             if form.is_valid():
-                return HttpResponseRedirect('/h5p/listContents')
+                if contentId != None:
+                    return HttpResponseRedirect('/h5p/content/?contentId=' + contentId)
+                else:
+                    newId = h5p_contents.objects.all().order_by('-content_id')[0]
+                    return HttpResponseRedirect('/h5p/content/?contentId=' + str(newId.content_id))
             return render(request, 'h5p/create.html', {'form': form, 'data': editor})
 
         elif contentId != None:
@@ -68,12 +72,17 @@ def contentsView(request):
     if 'contentId' in request.GET:
         h5pLoad(request)
         content = includeH5p(request)
+        score = None
 
         if not 'html' in content:
             html = '<div>Sorry, preview of H5P content is not yet available.</div>'
             return render(request, 'h5p/content.html', {'html': html})
         else:
-            h5pSetStarted(request.user, h5pGetContentId(request))
+            if request.user.is_authenticated():
+                h5pSetStarted(request.user, h5pGetContentId(request))
+                score = getUserScore(h5pGetContentId(request), request.user)
+                
+                return render(request, 'h5p/content.html', {'html': content['html'], 'data': content['data'], 'score': score[0]})
             return render(request, 'h5p/content.html', {'html': content['html'], 'data': content['data']})
 
     return HttpResponseRedirect('/h5p/listContents')
@@ -81,9 +90,10 @@ def contentsView(request):
 
 def listView(request):
     if request.method == 'POST':
-        if request.user.is_authenticated():
+        if request.user.is_superuser:
             h5pDelete(request)
             return HttpResponseRedirect('/h5p/listContents')
+        return render(request, 'h5p/listContents.html', {'status': 'You do not have the necessary rights to delete a video.'})
 
     listContent = h5pGetListContent(request)
     if listContent > 0:
@@ -161,7 +171,13 @@ def ajax(request):
                 data,
                 content_type='application/json'
             )
-        return HttpResponseRedirect('h5p/create')
+
+        elif 'setFinished' in request.GET:
+            data = h5pSetFinished(request)
+            return HttpResponse(
+                data,
+                content_type='application/json'
+            )
 
     if 'content-user-data' in request.GET:
         data = handleContentUserData(request)

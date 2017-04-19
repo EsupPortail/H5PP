@@ -13,7 +13,9 @@
 			{% block body %}
 			{% endblock body %}
 			{% block back %}
-			<input type="button" onclick="window.history.back();" value="Back" id="back"/>
+			<a href="{% url 'h5phome' %}">
+				<input type="button" value="Back to home" id="back"/>
+			</a>
 			{% endblock back %}
 		</div>
 	</body>

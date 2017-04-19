@@ -2,9 +2,10 @@
 # Django module h5p editor
 ##
 from django.conf import settings
-from h5pp.models import h5p_content_user_data, h5p_libraries
+from h5pp.models import h5p_content_user_data, h5p_libraries, h5p_points
 from h5pp.h5p.h5pmodule import h5pAddCoreAssets, h5pAddFilesAndSettings
 from h5pp.h5p.h5pclasses import H5PDjango
+import shutil
 import time
 import json
 import os
@@ -70,7 +71,7 @@ def h5peditorContent(request):
 
     contentValidator = framework.h5pGetInstance('contentvalidator')
     editor['editor'] = {
-        'filesPath': settings.MEDIA_URL + 'editor',
+        'filesPath': settings.MEDIA_URL + 'h5pp/editor',
         'fileIcon': {
             'path': settings.BASE_URL + settings.STATIC_URL + 'h5p/h5peditor/images/binary-file.png',
             'width': 50,
@@ -80,7 +81,7 @@ def h5peditorContent(request):
         'libraryPath': settings.BASE_URL + settings.STATIC_URL + 'h5p/h5peditor/',
         'copyrightSemantics': contentValidator.getCopyrightSemantics(),
         'assets': assets,
-        'contentRelUrl': '../media/content/'
+        'contentRelUrl': '../media/h5pp/content/'
     }
 
     return {'editor': json.dumps(editor), 'coreAssets': coreAssets, 'assets': assets, 'add': add}
@@ -198,7 +199,7 @@ def createContent(request, content, params):
         return False
 
     editor.processParameters(contentId, content['library'], params)
-    core = framework.h5pGetInstance('core')
+
     return True
 
 
@@ -220,7 +221,6 @@ def getLibraryProperty(library, prop='all'):
             return libraryData[prop]
     else:
         return False
-
 
 def ajaxSuccess(data=None):
     response = {

@@ -34,6 +34,14 @@
 	#contents tr.header, #contents tr:hover {
 		background-color: #f1f1f1;
 	}
+	#back {
+		border-radius: 5px;
+		background-color: white;
+		position: relative;
+		top: 5px;
+		padding: 5px;
+
+	}
 	.content {
 		background: rgba(102, 178, 255, .4);
 		border-radius: 25px;
@@ -80,23 +88,35 @@
 <div class="wrap">
 	<h3 class="h5p-admin-header">List of contents</h3>
 	<div class="list">
-		<input type="text" id="searchbar" onkeyup="search()" placeholder="Search for contents...">
+		<input type="text" id="searchbar" onkeyup="search()" placeholder="Search by name...">
 		<table id="contents">
 			<tr class="header">
-				<th style="width:60%;">Name</th>
-				<th style="width:40%;">Version</th>
-				<th style="width:40%;">ID</th>
-				{% if request.user %}
-				<th style="width:40%;">Options</th>
+				<th style="width:40%;">Name</th>
+				<th style="width:20%;">Version</th>
+				<th style="width:20%;">Score</th>
+				<th style="width:10%;">ID</th>
+				{% if request.user.is_authenticated %}
+				<th style="width:10%;">Options</th>
 				{% endif %}
 			</tr>
 		{% for content in listContent %}
-			<tr><td>{{content.title}}</td><td>{{content.library_major_version}}.{{content.library_minor_version}}</td><td>{{content.id}}</td>
-			<td><a href="{% url "h5pcontent" %}?contentId={{content.id}}">View</a>
-			{% if request.user %}
-			<a href="{% url "h5pedit" contentId=content.id %}?title={{content.title}}">Edit</a><br><form method="post" action="{% url "h5plistContents" %}?contentId={{content.id}}">{% csrf_token %}<input type="submit" value="Delete"></form>
-			{% endif %}
-			</td></tr>
+			<tr>
+				<td>{{content.title}}</td>
+				<td>{{content.library_major_version}}.{{content.library_minor_version}}</td>
+				<td>
+					<ul>
+					{% for user in content.score %}	
+						<li>{{user.user}} : {{user.points}} / {{user.max_points}}</li>
+					{% endfor %}
+					</ul>
+				</td>
+				<td>{{content.id}}</td>
+				<td><a href="{% url "h5pcontent" %}?contentId={{content.id}}">View</a>
+				{% if request.user.is_superuser %}
+					<a href="{% url "h5pedit" contentId=content.id %}?title={{content.title}}">Edit</a><br><form method="post" action="{% url "h5plistContents" %}?contentId={{content.id}}">{% csrf_token %}<input type="submit" value="Delete"></form>
+				{% endif %}
+				</td>
+			</tr>
 		{% endfor %}
 		</table>
 	</div>

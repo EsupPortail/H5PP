@@ -794,7 +794,7 @@ class H5PExport:
 
         # Update content.json with content from database
         with open(tmpPath + "/content/content.json", "w") as f:
-            f.write(content["params"])
+            f.write(content["params"].encode("utf-8"))
 
         # Make embedType into an array
         embedTypes = content["embedType"].split(", ")
@@ -1155,7 +1155,7 @@ class H5PCore:
 
             # Add URL prefix if not external
             if not '://' in asset['path']:
-                url = '/media' + url
+                url = '/media/h5pp' + url
 
             # Add version/cache buster if set
             if 'version' in asset:

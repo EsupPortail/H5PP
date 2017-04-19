@@ -27,9 +27,6 @@
 			background-color: #ffdddd;
 			border-left: 6px solid #f44336;
 		}
-		input[value=Submit]{
-			margin-left: 49%;
-		}
 		#id_title {
 			display: block;
 			width: 178px;
@@ -48,7 +45,7 @@
 			padding: 10px;
 		}
 
-		input[value=Back] {
+		#back, #view {
 			border-radius: 5px;
 			background-color: white;
 			position: relative;
@@ -77,6 +74,7 @@
 			padding: 14px 0;
 			opacity: 0;
 			cursor: pointer;
+			display: none;
 		}
 		#id_h5p:hover + .file-trigger, #id_h5p:focus + .file-trigger, .file-trigger:hover, .file-trigger:focus {
 			background: #66B2FF;
@@ -111,15 +109,18 @@
 			document.getElementById('id_h5p_type_0').onclick = function() {
 				document.getElementsByTagName('label')[4].style.display = 'inline-block';
 				document.getElementsByTagName('p')[0].style.display = 'inline-block';
+				document.getElementById('id_h5p').style.display = '';
 				document.getElementsByTagName('label')[3].style.display = 'none';
 				document.getElementsByClassName('h5p-editor-iframe')[0].style.display = 'none'
 			}
 			document.getElementById('id_h5p_type_1').onclick = function() {
 				document.getElementsByTagName('label')[4].style.display = 'none';
 				document.getElementsByTagName('p')[0].style.display = 'none';
+				document.getElementById('id_h5p').style.display = 'none';
 				document.getElementsByTagName('label')[3].style.display = 'inline-block';
 				document.getElementsByClassName('h5p-editor-iframe')[0].style.display = 'inline-block';
 			}
+			ns.$('.h5peditor-form').hide();
 
 			var fileInput = document.getElementById("id_h5p"),
 			button = document.getElementsByClassName("file-trigger")[0],
@@ -142,9 +143,11 @@
 {% endblock head %}
 {% block body %}
 <div class="wrap">
-	<h3 class="h5p-admin-header">Interactive Editor</h3>
+	<h3 class="h5p-admin-header">Interactive Editor {% if request.GET.title %}<br>{{request.GET.title}}{% endif %}</h3>
 	<form method="post" enctype="multipart/form-data" id="h5p-content-form">
 		{% csrf_token %}
+		<input type="submit" value="Create">
+		<br><br>
 		<label for="id_title"><b>Title</b></label>
 		{{form.title}}
 		{{form.h5p_type}}
@@ -159,9 +162,19 @@
 			<label for="id_h5p" class="file-trigger" tabindex="0">Select H5P Libraries...</label>
 		</div>
 		<p class="file-return"></p>
-		<br><br>
-		<input type="submit" value="Submit">
 		{{form.non_field_errors}}
 	</form>
 </div>
+<div class="configuration">
+	{% if request.GET.contentId %}
+	<a href="{% url 'h5pcontent' %}?contentId={{request.GET.contentId}}">
+		<input type="submit" id="view" value="View video" />
+	</a>
+	{% endif %}
+	<a href="{% url 'h5phome' %}">
+		<input type="submit" id="back" value="Back to home" />
+	</a>
+</div>
+{% block back %}
+{% endblock back %}
 {% endblock body %}

@@ -23,6 +23,13 @@
 		text-align: center;
 		text-decoration: overline;
 	}
+	.score, .configuration {
+		background : rgba(255,255,255, .4);
+		border-radius: 25px;
+		padding-left: 15px;
+		padding-bottom: 2px;
+		margin: auto;
+	}
 	</style>
 	{% for script in data.assets.js %}
 		<script type="text/javascript" src="{% static script %}"></script>
@@ -50,11 +57,32 @@
 {% endblock head %}
 {% block body %}
 <div class="wrap">
-	<h3 class="h5p-admin-header">Contents</h3>
+	<h3 class="h5p-admin-header">{{request.GET.title}}</h3>
 	{% autoescape off %}
 	{{html}}
 	{% endautoescape %}
 	<br>
 </div>
+{% if request.user.is_authenticated %}
+<div class="score">
+	<h5 class="h5p-score-header">Score</h5>
+	{% if score and score.points %}
+	Your score on this video : {{score.points}} / {{score.max_points}}
+	{% else %}
+	This is the first time you watch this video
+	{% endif %}
+</div>
+<hr />
+<div class="configuration">
+	<a href="{% url 'h5pedit' contentId=request.GET.contentId %}?title={{request.GET.title}}">
+		<input type="submit" id="edit" value="Edit video" />
+	</a>
+	<a href="{% url 'h5phome' %}">
+		<input type="button" value="Back to home" id="back"/>
+	</a>
+	{% block back %}
+	{% endblock back %}
+</div>
+{% endif %}
 <br>
 {% endblock body %}

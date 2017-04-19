@@ -40,7 +40,7 @@ class H5PDjango:
             self.interface.getUploadedH5pPath(h5p)
 
         if not hasattr(self, 'core'):
-            self.core = H5PCore(self.interface, settings.MEDIA_ROOT, settings.BASE_DIR,
+            self.core = H5PCore(self.interface, settings.MEDIA_ROOT + '/h5pp', settings.BASE_DIR,
                                 'en', True if getattr(settings, 'H5P_EXPORT') else False, False)
 
         if typ == 'validator':
@@ -57,7 +57,7 @@ class H5PDjango:
             return self.core
         elif typ == 'editor':
             storage = H5PEditorStorage()
-            return H5PDjangoEditor(self.core, storage, settings.BASE_DIR, settings.MEDIA_URL)
+            return H5PDjangoEditor(self.core, storage, settings.BASE_DIR, settings.MEDIA_URL + 'h5pp/')
 
     ##
     # Returns info for the current platform
@@ -650,6 +650,12 @@ class H5PDjango:
                 '{0}'.format(name): value
             }
             h5p_contents.objects.filter(content_id=pid).update(**query)
+
+    ##
+    # Not implemented yet
+    ##
+    def afterExportCreated(self):
+        return 0
 
     ##
     # Will clear filtered params for all the content that uses the specified
