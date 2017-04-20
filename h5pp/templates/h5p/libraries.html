@@ -81,6 +81,11 @@
 			background: #66B2FF;
 			color: white;
 		}
+		{% if not libraries %}
+		.configuration {
+			display: none;
+		}
+		{% endif %}
 		.file-return {
 			margin: 0;
 			font-style: italic;
@@ -151,9 +156,11 @@
 			</div>
 			<p class="file-return"></p>
 			<br>
-			<label>Update libraries tutorials : {{ form.download }}</label>
-			<br>
-			<label> Uninstall H5P : {{ form.uninstall }}</label><br><br>
+			<div class="configuration">
+				<label>Update libraries tutorials : {{ form.download }}</label>
+				<br>
+				<label> Uninstall H5P : {{ form.uninstall }}</label><br><br>
+			</div>
 			<input type="submit" value="Submit">
 			{{ form.non_field_errors }}
 		</form>

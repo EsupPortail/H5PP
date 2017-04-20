@@ -27,10 +27,12 @@
 {% block body %}
 	<h3 class="h5p-admin-header">Home</h3>
 	<nav class="vertical">
-		<ul>
+		<ul>	
+			{% if H5P_ENABLED %}
 			<li>
-				<a href="{% url "h5phome" %}">Home</a>
+				<a href="/">Home</a>
 			</li>
+			{% endif %}
 			<li>
 				<a href="{% url "login" %}">Login</a>
 			</li>
