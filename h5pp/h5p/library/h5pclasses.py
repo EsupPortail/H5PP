@@ -14,7 +14,7 @@ import time
 import hashlib
 import uuid
 import cgi
-from slugify import slugify
+from django.template.defaultfilters import slugify
 from h5pdevelopment import H5PDevelopment
 from h5pdefaultstorage import H5PDefaultStorage
 

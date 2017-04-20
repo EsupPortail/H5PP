@@ -33,7 +33,7 @@ def librariesView(request):
         form = LibrariesForm(request.user)
         return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries})
 
-    return HttpResponseRedirect('/h5p/login')
+    return HttpResponseRedirect('/h5p/login/?next=/h5p/home/')
 
 
 def createView(request, contentId=None):
@@ -65,7 +65,7 @@ def createView(request, contentId=None):
 
         return render(request, 'h5p/create.html', {'form': form, 'data': editor})
 
-    return HttpResponseRedirect('/h5p/login')
+    return HttpResponseRedirect('/h5p/login/?next=/h5p/home/')
 
 
 def contentsView(request):

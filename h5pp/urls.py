@@ -7,7 +7,7 @@ urlpatterns = [
     url(r'^home/$', 'h5pp.views.home', name='h5phome'),
 
     # Authentification
-    url(r'^login/', login, name='login'),
+    url(r'^login/', login, {'template_name': 'h5p/login.html'}, name='login'),
     url(r'^logout/', logout, {'next_page': '/h5p/home'}, name='logout'),
 
     # Contents and Libraries
