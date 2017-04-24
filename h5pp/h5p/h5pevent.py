@@ -109,5 +109,6 @@ class H5PEvent:
                 type=atype, library_name=self.library_name, library_version=self.library_version, num=1)
         else:
             # Update counter with num+1
-            h5p_counters.objects.filter(type=atype, library_name=self.library_name,
-                                        library_version=self.library_version).update(num=F('num') + 1)
+            counter = h5p_counters.objects.get(type=atype, library_name=self.library_name, library_version=self.library_version)
+            counter.num = F('num') + 1
+            counter.save()

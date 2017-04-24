@@ -86,8 +86,9 @@ class H5PDjango:
     # Set the tutorial URL for a library. All versions of the library is set
     ##
     def setLibraryTutorialUrl(self, machineName, tutorialUrl):
-        h5p_libraries.objects.filter(
-            machine_name=machineName).update(tutorial_url=tutorialUrl)
+        tutorial = h5p_libraries.objects.get(machine_name=machineName)
+        tutorial.tutorial_url = tutorialUrl
+        tutorial.save()
 
     ##
     # Show the user an error message
@@ -278,16 +279,18 @@ class H5PDjango:
                 semantics=libraryData['semantics'])
             libraryData['libraryId'] = libraryId.library_id
         else:
-            h5p_libraries.objects.filter(library_id=libraryData['libraryId']).update(
-                title=libraryData['title'],
-                patch_version=libraryData['patchVersion'],
-                runnable=libraryData['runnable'],
-                fullscreen=libraryData['fullscreen'],
-                embed_types=embedTypes,
-                preloaded_js=preloadedJs,
-                preloaded_css=preloadedCss,
-                drop_library_css=dropLibraryCss,
-                semantics=libraryData['semantics'])
+            library = h5p_libraries.objects.get(library_id=libraryData['libraryId'])
+            library.title = libraryData['title']
+            library.patch_version = libraryData['patchVersion']
+            library.runnable = libraryData['runnable']
+            library.fullscreen = libraryData['fullscreen']
+            library.embed_types = embedTypes
+            library.preloaded_js = preloadedJs
+            library.preloaded_css = preloadedCss
+            library.drop_library_css = dropLibraryCss
+            library.semantics = libraryData['semantics']
+            library.save()
+
             self.deleteLibraryDependencies(libraryData['libraryId'])
 
         # Log library, installed or updated
@@ -316,22 +319,22 @@ class H5PDjango:
     # Delete all dependencies belonging to given library
     ##
     def deleteLibraryDependencies(self, libraryId):
-        h5p_libraries_libraries.objects.filter(library_id=libraryId).delete()
+        if h5p_libraries_libraries.objects.filter(library_id=libraryId).count() > 0:
+            h5p_libraries_libraries.objects.get(library_id=libraryId).delete()
 
     ##
     # Delete a library from database and file system
     ##
     def deleteLibrary(self, libraryId):
-        library = h5p_libraries.objects.filter(library_id=libraryId)
+        library = h5p_libraries.objects.get(library_id=libraryId)
 
         # Delete files
-        self.deleteFileTree(settings.H5P_PATH + '/libraries/' + library[
-                            'machine_name'] + '-' + library['major_version'] + '.' + library['minor_version'])
+        self.deleteFileTree(settings.MEDIA_ROOT + '/h5pp/libraries/' + library.machine_name + '-' + library.major_version + '.' + library.minor_version)
 
         # Delete data in database (won't delete content)
-        h5p_libraries_libraries.objects.filter(library_id=libraryId).delete()
-        h5p_libraries_languages.objects.filter(library_id=libraryId).delete()
-        h5p_libraries.objects.filter(library_id=libraryId).delete()
+        h5p_libraries_libraries.objects.get(library_id=libraryId).delete()
+        h5p_libraries_languages.objects.get(library_id=libraryId).delete()
+        h5p_libraries.objects.get(library_id=libraryId).delete()
 
     ##
     # Save what libraries a library is depending on
@@ -354,13 +357,14 @@ class H5PDjango:
             return
 
         # Update content
-        h5p_contents.objects.filter(content_id=contentId).update(
-            title=content['title'],
-            json_contents=content['params'],
-            embed_type='div',
-            main_library_id=content['library']['libraryId'],
-            filtered='',
-            disable=content['disable'])
+        update = h5p_contents.objects.get(content_id=contentId)
+        update.title = content['title']
+        update.json_contents = content['params']
+        update.embed_type = 'div'
+        update.main_library_id = content['library']['libraryId']
+        update.filtered = ''
+        update.disable = content['disable']
+        update.save()
 
         # Derive library data from string
         if 'h5p_library' in content:
@@ -398,10 +402,12 @@ class H5PDjango:
     # Resets marked user data for the given content
     ##
     def resetContentUserData(self, contentId):
-        # Reset user datas for this content
-        h5p_content_user_data.objects.filter(content_main_id=contentId, delete_on_content_change=1).update(
-            timestamp=int(time.time()), data='RESET')
-
+        if h5p_content_user_data.objects.filter(content_main_id=contentId, delete_on_content_change=1).count() > 0:
+            # Reset user datas for this content
+            userData = h5p_content_user_data.objects.get(content_main_id=contentId, delete_on_content_change=1)
+            userData.timestamp = int(time.time())
+            userData.data = 'RESET'
+            userData.save()
     ##
     # Get file extension whitelist
     # The default extension list is part of h5p, but admins should be allowed to modify it
@@ -417,7 +423,7 @@ class H5PDjango:
     # Give an H5P the same library dependencies as a given H5P
     ##
     def copyLibraryUsage(self, contentId, copyFromId, contentMainId=None):
-        copy = h5p_contents_libraries.objects.filter(content_id=copyFromId)
+        copy = h5p_contents_libraries.objects.get(content_id=copyFromId)
         h5p_contents_libraries.objects.filter(content_id=copyFromId).create(
             content_id=contentId, library_id=copy.library_id, dependency_type=copy.dependency_type, drop_css=copy.drop_css, weight=copy.weight)
 
@@ -425,7 +431,7 @@ class H5PDjango:
     # Deletes content data
     ##
     def deleteContentData(self, contentId):
-        h5p_contents.objects.filter(content_id=contentId).delete()
+        h5p_contents.objects.get(content_id=contentId).delete()
         self.deleteLibraryUsage(contentId)
 
     ##

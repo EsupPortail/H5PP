@@ -105,8 +105,12 @@
 				<td>{{content.library_major_version}}.{{content.library_minor_version}}</td>
 				<td>
 					<ul>
-					{% for user in content.score %}	
-						<li>{{user.user}} : {{user.points}} / {{user.max_points}}</li>
+					{% for user in content.score %}
+						{% if user.points %}	
+						<li>{{user.user}} - {{user.points}} / {{user.max_points}}</li>
+						{% else %}
+						<li>{{user.user}} - Not completed yet</li>
+						{% endif %}
 					{% endfor %}
 					</ul>
 				</td>

@@ -129,7 +129,7 @@ def h5pDeleteH5PContent(request, content):
     storage.deletePackage(content)
 
     # Remove content points
-    h5p_points.objects.filter(content_id=content['id']).delete()
+    h5p_points.objects.get(content_id=content['id']).delete()
 
     # Remove content user data
     h5p_content_user_data.objects.filter(
@@ -167,10 +167,10 @@ def h5pView(request):
 
 
 def h5pUserDelete(user):
-    h5p_points.objects.filter(uid=user.id).delete()
+    h5p_points.objects.get(uid=user.id).delete()
 
     # Remove content user data
-    h5p_content_user_data.objects.filter(user_id=user.id).delete()
+    h5p_content_user_data.objects.get(user_id=user.id).delete()
 
 ##
 # Adds H5P embed code and necessary files
@@ -201,8 +201,11 @@ def h5pSetStarted(user, contentId):
         exist = h5p_points.objects.filter(
             content_id=contentId, uid=user.id).values()
         if len(exist) > 0:
-            h5p_points.objects.filter(content_id=contentId, uid=user.id).update(
-                content_id=contentId, uid=user.id, started=int(time.time()))
+            update = h5p_points.objects.get(content_id=contentId, uid=user.id)
+            update.content_id = contentId
+            update.uid = user.id
+            update.started = int(time.time())
+            update.save()
         else:
             h5p_points.objects.create(
                 content_id=contentId, uid=user.id, started=int(time.time()))
@@ -222,11 +225,11 @@ def h5pSetFinished(request):
     }
 
     if contentId.isdigit() and score.isdigit() and maxScore.isdigit():
-        h5p_points.objects.filter(content_id=contentId, uid=request.user.id).update(
-            finished=int(time.time()),
-            points=score,
-            max_points=maxScore
-        )
+        update = h5p_points.objects.get(content_id=contentId, uid=request.user.id)
+        update.finished = int(time.time())
+        update.points = score
+        update.max_points = maxScore
+        update.save()
         response['success'] = True
 
     return json.dumps(response)
@@ -419,7 +422,7 @@ def h5pGetContentSettings(user, content):
 
 
 def h5pGetResizeUrl():
-    return settings.H5P_PATH + '/library/js/h5p-resizer.js'
+    return settings.H5P_PATH + '/js/h5p-resizer.js'
 
 
 def h5pGetContentId(request):

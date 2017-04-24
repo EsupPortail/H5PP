@@ -58,17 +58,19 @@
 	This is the first time you watch this video
 	{% endif %}
 </div>
+{% endif %}
 <hr />
 <div class="configuration">
+	{% if request.user.is_authenticated %}
 	<a href="{% url 'h5pedit' contentId=request.GET.contentId %}?title={{request.GET.title}}">
 		<input type="submit" id="edit" value="Edit video" />
 	</a>
+	{% endif %}
 	<a href="{% url 'h5phome' %}">
 		<input type="button" value="Back to home" id="back"/>
 	</a>
 	{% block back %}
 	{% endblock back %}
 </div>
-{% endif %}
 <br>
 {% endblock body %}

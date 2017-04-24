@@ -54,7 +54,7 @@ class LibrariesForm(forms.Form):
             storage = interface.h5pGetInstance('storage')
             if not storage.savePackage(None, None, True):
                 raise forms.ValidationError('Error during library save.')
-        elif down != None:
+        elif down != False:
             libraries = h5p_libraries.objects.values()
             if not len(libraries) > 0:
                 raise forms.ValidationError(
@@ -62,7 +62,7 @@ class LibrariesForm(forms.Form):
 
             interface = H5PDjango(self.user)
             interface.updateTutorial()
-        elif unins == None:
+        elif unins == False:
             raise forms.ValidationError(
                 'You need to select a h5p package before uploading.')
 

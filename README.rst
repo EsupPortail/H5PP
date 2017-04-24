@@ -22,6 +22,6 @@ Quick start
 
 3. Run `python manage.py migrate` to create the H5PP models.
 
-4. Start the development server and visit http://127.0.0.1:8000/h5p to acces to the control panel of H5PP. Go to '/h5p/libraries' and install the H5P content libraries.
+4. Start the development server and visit http://127.0.0.1:8000/h5p/home to acces to the control panel of H5PP. Go to '/h5p/libraries' and install the H5P content libraries. You can find official release of H5P at https://h5p.org/update-all-content-types at the end of the document.
 
 5. Visit http://127.0.0.1:8000/h5p/create to create new H5P contents.

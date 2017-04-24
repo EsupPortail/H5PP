@@ -165,15 +165,15 @@ def saveUserData(contentId, subContentId, dataId, preload, invalidate, data, use
         )
     else:
         newDataId = update['id']
-        h5p_content_user_data.objects.filter(id=update['id']).update(
-            user_id=userId,
-            content_main_id=contentId,
-            sub_content_id=subContentId,
-            data_id=dataId,
-            data=data,
-            preloaded=preload,
-            delete_on_content_change=invalidate
-        )
+        userData = h5p_content_user_data.objects.get(id=update['id'])
+        userData.user_id = userId
+        userData.content_main_id = contentId
+        userData.sub_content_id = subContentId
+        userData.data_id = dataId
+        userData.data = data
+        userData.preloaded = preload
+        userData.delete_on_content_change = invalidate
+        userData.save()
 
 ##
 # Delete user data with specific content from database
@@ -181,7 +181,7 @@ def saveUserData(contentId, subContentId, dataId, preload, invalidate, data, use
 
 
 def deleteUserData(contentId, subContentId, dataId, userId):
-    h5p_content_user_data.objects.filter(
+    h5p_content_user_data.objects.get(
         user_id=userId, content_main_id=contentId, sub_content_id=subContentId, data_id=dataId).delete()
 
 ##
