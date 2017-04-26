@@ -146,12 +146,12 @@
 	<h3 class="h5p-admin-header">Interactive Editor {% if request.GET.title %}<br>{{request.GET.title}}{% endif %}</h3>
 	<form method="post" enctype="multipart/form-data" id="h5p-content-form">
 		{% csrf_token %}
-		<input type="submit" value="Create">
+		<input type="submit" id="submit_editor" value="Create">
 		<br><br>
-		<label for="id_title"><b>Title</b></label>
+		<label for="id_title" class="label_form"><b>Title</b></label>
 		{{form.title}}
 		{{form.h5p_type}}
-		<label for="h5p-editor-iframe">Select a new content type :</label>
+		<label for="h5p-editor-iframe" class="label_form">Select a new content type :</label>
 		<div class="h5p-editor">Waiting for javascript...</div>
 		{{form.json_content}}
 		{{form.disable}}
