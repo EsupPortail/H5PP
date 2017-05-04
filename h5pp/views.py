@@ -28,7 +28,7 @@ def librariesView(request):
                 else:
                     status = uninstall()
                     return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries, 'status': status})
-            return render(request, 'h5p/libraries.html', {'form': form})
+            return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries})
 
         form = LibrariesForm(request.user)
         return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries})

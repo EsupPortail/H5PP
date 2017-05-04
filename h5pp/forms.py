@@ -41,7 +41,11 @@ class LibrariesForm(forms.Form):
         h5pfile = self.cleaned_data.get('h5p')
         down = self.cleaned_data.get('download')
         unins = self.cleaned_data.get('uninstall')
+
         if h5pfile != None:
+            if down != False or unins != False:
+                raise forms.ValidationError(
+                    'Too many choices selected.')
             interface = H5PDjango(self.user)
             paths = handleUploadedFile(h5pfile, h5pfile.name)
             validator = interface.h5pGetInstance(
@@ -55,6 +59,9 @@ class LibrariesForm(forms.Form):
             if not storage.savePackage(None, None, True):
                 raise forms.ValidationError('Error during library save.')
         elif down != False:
+            if unins != False:
+                raise forms.ValidationError(
+                    'Too many choices selected.')
             libraries = h5p_libraries.objects.values()
             if not len(libraries) > 0:
                 raise forms.ValidationError(
@@ -64,7 +71,7 @@ class LibrariesForm(forms.Form):
             interface.updateTutorial()
         elif unins == False:
             raise forms.ValidationError(
-                'You need to select a h5p package before uploading.')
+                    'No actions selected.')
 
         return self.cleaned_data
 
