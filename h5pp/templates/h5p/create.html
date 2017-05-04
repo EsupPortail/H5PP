@@ -168,11 +168,11 @@
 <div class="configuration">
 	{% if request.GET.contentId %}
 	<a href="{% url 'h5pcontent' %}?contentId={{request.GET.contentId}}">
-		<input type="submit" id="view" value="View video" />
+		<input type="submit" class="submit_editor" id="view" value="View video" />
 	</a>
 	{% endif %}
 	<a href="{% url 'h5phome' %}">
-		<input type="submit" id="back" value="Back to home" />
+		<input type="submit" class="submit_editor" id="back" value="Back to home" />
 	</a>
 </div>
 {% block back %}

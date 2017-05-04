@@ -38,7 +38,7 @@ SCRIPTS = [
 
 
 def h5pGetExportPath(content):
-    return settings.MEDIA_ROOT + 'h5pp/exports/' + ((content['slug'] + '-') if 'slug' in content else '') + str(content['id']) + '.h5p'
+    return settings.MEDIA_ROOT + '/h5pp/exports/' + ((content['slug'] + '-') if 'slug' in content else '') + str(content['id']) + '.h5p'
 
 ##
 # Creates the title for the library details page
@@ -129,7 +129,7 @@ def h5pDeleteH5PContent(request, content):
     storage.deletePackage(content)
 
     # Remove content points
-    h5p_points.objects.get(content_id=content['id']).delete()
+    h5p_points.objects.filter(content_id=content['id']).delete()
 
     # Remove content user data
     h5p_content_user_data.objects.filter(

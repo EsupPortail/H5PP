@@ -43,11 +43,11 @@ class H5pModuleTestCase(TestCase):
             'slug': 'interactive-video'
         }
         self.assertEqual(
-            '/home/pod/H5PP/media/exports/interactive-video-1.h5p', h5pGetExportPath(content))
+            '/home/pod/H5PP/media/h5pp/exports/interactive-video-1.h5p', h5pGetExportPath(content))
         content = {
             'id': 2
         }
-        self.assertEqual('/home/pod/H5PP/media/exports/2.h5p',
+        self.assertEqual('/home/pod/H5PP/media/h5pp/exports/2.h5p',
                          h5pGetExportPath(content))
         print('test_exportpath ---- Check')
 
@@ -398,15 +398,15 @@ class H5pEditorClassesTestCase(TestCase):
 
         editor.createDirectories(1)
 
-        self.assertTrue(os.path.exists('/home/pod/H5PP/media/content/1/'))
+        self.assertTrue(os.path.exists('/home/pod/H5PP/media/h5pp/content/1/'))
         self.assertTrue(os.path.exists(
-            '/home/pod/H5PP/media/content/1/audios/'))
+            '/home/pod/H5PP/media/h5pp/content/1/audios/'))
         self.assertTrue(os.path.exists(
-            '/home/pod/H5PP/media/content/1/files/'))
+            '/home/pod/H5PP/media/h5pp/content/1/files/'))
         self.assertTrue(os.path.exists(
-            '/home/pod/H5PP/media/content/1/images/'))
+            '/home/pod/H5PP/media/h5pp/content/1/images/'))
         self.assertTrue(os.path.exists(
-            '/home/pod/H5PP/media/content/1/videos/'))
+            '/home/pod/H5PP/media/h5pp/content/1/videos/'))
         print('test_create_directories ---- Check')
 
     ##
