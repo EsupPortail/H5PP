@@ -1,5 +1,5 @@
 from django.conf import settings
-import Image
+from PIL import Image
 import json
 import uuid
 import os

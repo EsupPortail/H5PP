@@ -264,7 +264,7 @@ def h5pAddCoreAssets():
 def h5pGetCoreSettings(user):
     coreSettings = {
         'baseUrl': settings.BASE_URL,
-        'url': settings.BASE_URL + settings.MEDIA_URL + 'h5pp/',
+        'url': settings.BASE_URL + settings.MEDIA_URL + 'h5pp',
         'postUserStatistics': user.id > 0,
         'ajaxPath': settings.BASE_URL + settings.H5P_URL + 'ajax',
         'ajax': {
