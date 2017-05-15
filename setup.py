@@ -15,7 +15,7 @@ setup(
 	description='A Python version of H5P software.',
 	long_description=README,
 	author='OBLED Joel',
-	author_email='obled.joel@gmail.com',
+	author_email='joel.obled@univ-lille1.fr',
 	classifiers=[
 		'Environment :: Web Environment',
 		'Framework :: Django',
