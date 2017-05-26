@@ -1,5 +1,3 @@
-# -*-coding:Latin-1 -*
-
 import os
 import zipfile
 import re
@@ -122,7 +120,7 @@ class H5PDefaultStorage:
 
         try:
             shutil.copy(source, self.path + '/exports/' + filename)
-        except IOError, e:
+        except IOError as e:
             print('Unable to copy %s' % e)
 
         return True
@@ -235,7 +233,7 @@ class H5PDefaultStorage:
             if not self.dirReady(parent):
                 return False
 
-            os.mkdir(path, 0777)
+            os.mkdir(path)
 
         if not os.path.isdir(path):
             raise Exception('Path is not a directory')
@@ -328,6 +326,6 @@ class H5PDefaultStorage:
     # Read file content of given file and then return it
     ##
     def getContent(self, path):
-        content = open(self.path + path)
-        result = content.read()
+        content = open(self.path + path, 'rb')
+        result = content.read().decode('utf8', 'ignore')
         return result

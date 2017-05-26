@@ -300,7 +300,7 @@ class H5PDjango:
         h5p_libraries_languages.objects.filter(
             library_id=libraryData['libraryId']).delete()
         if 'language' in libraryData:
-            for languageCode, languageJson in libraryData['language'].iteritems():
+            for languageCode, languageJson in libraryData['language'].items():
                 pid = h5p_libraries_languages.objects.create(library_id=libraryData[
                                                              'libraryId'], language_code=languageCode, language_json=languageJson)
 
@@ -445,12 +445,12 @@ class H5PDjango:
     ##
     def saveLibraryUsage(self, contentId, librariesInUse):
         dropLibraryCssList = dict()
-        for key, dependency in librariesInUse.iteritems():
+        for key, dependency in librariesInUse.items():
             if 'dropLibraryCss' in dependency['library']:
                 dropLibraryCssList = dropLibraryCssList + \
                     dependency['library']['drop_library_css'].split(', ')
 
-        for key, dependency in librariesInUse.iteritems():
+        for key, dependency in librariesInUse.items():
             dropCss = 1 if dependency['library'][
                 'machine_name'] in dropLibraryCssList else 0
             h5p_contents_libraries.objects.create(
@@ -614,7 +614,7 @@ class H5PDjango:
         response = json.loads(self.fetchExternalData(
             'https://h5p.org/libraries-metadata.json'))
         libraries = h5p_libraries.objects.values()
-        for name, url in response['libraries'].iteritems():
+        for name, url in response['libraries'].items():
             for library in libraries:
                 if library['machine_name'] == name:
                     self.setLibraryTutorialUrl(
@@ -651,7 +651,7 @@ class H5PDjango:
     ##
     def updateContentFields(self, pid, fields):
         cursor = connection.cursor()
-        for name, value in fields.iteritems():
+        for name, value in fields.items():
             query = {
                 '{0}'.format(name): value
             }

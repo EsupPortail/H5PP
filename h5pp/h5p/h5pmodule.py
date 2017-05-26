@@ -579,7 +579,8 @@ def uninstall():
 def createToken(action):
     timeFactor = getTimeFactor()
     h = hashlib.new('md5')
-    h.update(action + str(timeFactor) + str(uuid.uuid1()))
+    md5_string = "{}{}{}".format(action, str(timeFactor), str(uuid.uuid1()))
+    h.update(md5_string.encode("UTF-8"))
     return h.hexdigest()
 
 ##

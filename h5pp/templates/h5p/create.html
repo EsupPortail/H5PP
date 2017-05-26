@@ -3,7 +3,7 @@
 {% block head %}
 	<style type="text/css" media="all">
 	{% for style in data.coreAssets.css %}
-		@import url("{% static style %}");
+		@import url("{{ style }}");
 	{% endfor %}
 	</style>
 	<style>
@@ -96,10 +96,10 @@
 		}
 	</style>
 	{% for script in data.coreAssets.js %}
-		<script type="text/javascript" src="{% static script %}"></script>
+		<script type="text/javascript" src="{{ script }}"></script>
 	{% endfor %}
 	{% for script in data.add %}
-		<script type="text/javascript" src="{% static script %}"></script>
+		<script type="text/javascript" src="{{ script }}"></script>
 	{% endfor %}
 	<script type="text/javascript">
 		H5PIntegration = {% autoescape off %} {{data.editor}} {% endautoescape %}
