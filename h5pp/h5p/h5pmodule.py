@@ -240,7 +240,7 @@ def h5pSetFinished(request):
 
 
 def h5pAddCoreAssets():
-    path = settings.STATIC_URL + 'h5p/'
+    path = "{}h5p/".format(settings.STATIC_URL)
     assets = {
         'css': list(),
         'js': list()
@@ -471,7 +471,7 @@ def determineEmbedType(contentEmbedType, libraryEmbedTypes):
 
 def h5pDependenciesToLibraryList(dependencies):
     libraryList = dict()
-    for key, dependency in dependencies.iteritems():
+    for key, dependency in dependencies.items():
         libraryList[dependency['machine_name']] = {
             'majorVersion': dependency['major_version'],
             'minorVersion': dependency['minor_version']
