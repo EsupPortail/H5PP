@@ -81,7 +81,7 @@ def contentsView(request):
             if request.user.is_authenticated():
                 h5pSetStarted(request.user, h5pGetContentId(request))
                 score = getUserScore(h5pGetContentId(request), request.user)
-                
+
                 return render(request, 'h5p/content.html', {'html': content['html'], 'data': content['data'], 'score': score[0]})
             return render(request, 'h5p/content.html', {'html': content['html'], 'data': content['data']})
 
@@ -96,7 +96,7 @@ def listView(request):
         return render(request, 'h5p/listContents.html', {'status': 'You do not have the necessary rights to delete a video.'})
 
     listContent = h5pGetListContent(request)
-    if listContent > 0:
+    if len(listContent) > 0:
         return render(request, 'h5p/listContents.html', {'listContent': listContent})
 
     return render(request, 'h5p/listContents.html', {'status': 'No contents installed.'})
