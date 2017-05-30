@@ -31,7 +31,7 @@ class H5PDjangoEditor:
     ##
     def getLibraries(self, request):
         if 'libraries[]' in request.POST:
-            lib = dict(request.POST.iterlists())
+            lib = dict(request.POST.lists())
             liblist = list()
             for name in lib['libraries[]']:
                 liblist.append(name)
