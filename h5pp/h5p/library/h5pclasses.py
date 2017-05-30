@@ -14,6 +14,8 @@ import time
 import hashlib
 import uuid
 import cgi
+
+from django.conf import settings
 from django.template.defaultfilters import slugify
 from h5pp.h5p.library.h5pdevelopment import H5PDevelopment
 from h5pp.h5p.library.h5pdefaultstorage import H5PDefaultStorage
@@ -793,7 +795,7 @@ class H5PExport:
             return False
 
         # Update content.json with content from database
-        with open(tmpPath + "/content/content.json", "w") as f:
+        with open(tmpPath + "/content/content.json", "ab") as f:
             f.write(content["params"].encode("utf-8"))
 
         # Make embedType into an array
@@ -1155,13 +1157,14 @@ class H5PCore:
 
             # Add URL prefix if not external
             if not '://' in asset['path']:
-                url = '/media/h5pp' + url
+                url = "{}{}{}".format(settings.MEDIA_URL, 'h5pp', url)
+                urls.append(url)
 
             # Add version/cache buster if set
-            if 'version' in asset:
-                url = url + asset['version']
+            #if 'version' in asset:
+            #    url = url + asset['version']
 
-            urls.append(url)
+            # urls.append(url)
 
         return urls
 
@@ -1772,15 +1775,18 @@ class H5PContentValidator:
     # Validate select values
     ##
     def validateSelect(self, select, semantics):
-        optional = semantics.optional and semantics.optional
+        if "optional" in semantics:
+            optional = semantics["optional"] and semantics["optional"]
+        else:
+            optional = False
         strict = False
-        if semantics.options and not empty(semantics.options):
+        if "options" in semantics and semantics["options"] and not empty(semantics["options"]):
             # We have a strict set of options to choose from.
             strict = True
-            for option in semantics.options:
+            for option in semantics["options"]:
                 options[option.value] = True
 
-        if semantics.multiple and semantics.multiple:
+        if "multiple" in semantics and semantics["multiple"] and semantics["multiple"]:
             # Multi-choice generates array of values. Test each one against valid
             # options, if we are strict. First make sure we are working on an
             # array.
@@ -1803,7 +1809,7 @@ class H5PContentValidator:
             if strict and not optional and not options[select]:
                 print(
                     "Invalid selected option in select.")
-                select = semantics.options[0].value
+                select = semantics["options"][0].value
 
             select = cgi.escape(select, True)
 

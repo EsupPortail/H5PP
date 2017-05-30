@@ -287,14 +287,14 @@ class H5PDefaultStorage:
                 str(contentid) + '/' + files.getType() + 's/'
             if not os.path.exists(path):
                 os.makedirs(path)
-            with open(path + files.getName(), 'w+') as f:
+            with open(path + files.getName(), 'ab') as f:
                 f.write(filedata)
         elif contentid == '0':
             path = path + 'editor/' + files.getType() + 's/'
             content = files.getFile()
             if not os.path.exists(path):
                 os.makedirs(path)
-            with open(path + files.getName(), 'w+') as f:
+            with open(path + files.getName(), 'ab') as f:
                 for chunk in content.chunks():
                     f.write(chunk)
         else:
@@ -303,7 +303,7 @@ class H5PDefaultStorage:
             content = files.getFile()
             if not os.path.exists(path):
                 os.makedirs(path)
-            with open(path + files.getName(), 'w+') as f:
+            with open(path + files.getName(), 'ab') as f:
                 for chunk in content.chunks():
                     f.write(chunk)
 
