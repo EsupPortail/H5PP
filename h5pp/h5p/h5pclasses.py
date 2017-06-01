@@ -456,7 +456,7 @@ class H5PDjango:
             h5p_contents_libraries.objects.create(
                 content_id=contentId,
                 library_id=dependency['library']['library_id'],
-                dependency_type=dependency['type'],
+                dependency_type=dependency['type'].replace("'", ""),
                 drop_css=dropCss,
                 weight=dependency['weight'])
 
