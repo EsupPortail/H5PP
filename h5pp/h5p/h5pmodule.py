@@ -344,7 +344,7 @@ def h5pAddFilesAndSettings(request, embedType):
         str('cid-' + content['id'])] = h5pGetContentSettings(request.user, content)
 
     core = interface.h5pGetInstance('core')
-    preloadedDependencies = core.loadContentDependencies(content['id'])
+    preloadedDependencies = core.loadContentDependencies(content['id'], 'preloaded')
     files = core.getDependenciesFiles(preloadedDependencies)
     libraryList = h5pDependenciesToLibraryList(preloadedDependencies)
 
