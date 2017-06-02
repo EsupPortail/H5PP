@@ -1696,7 +1696,7 @@ class H5PContentValidator:
 
             stylePatterns.append('(?i)^text-align: *(center|left|right);?$')
 
-            text = self.filterXss(text, tags, stylePatterns)
+            #text = self.filterXss(text, tags, stylePatterns)
         else:
             text = cgi.escape(text, True)
 
@@ -1744,26 +1744,26 @@ class H5PContentValidator:
     ##
     def validateNumber(self, number, semantics):
         # Validate that number is indeed a number
-        if not number.isdigit():
+        if not isinstance(number,int):
             number = 0
 
         # Check if number is within valid bounds. Move withing bounds if not.
-        if semantics.min and number < semantics.min:
-            number = semantics.min
-        if semantics.max and number > semantics.max:
-            number = semantics.max
+        if 'min' in semantics and number < semantics['min']:
+            number = semantics['min']
+        if 'max' in semantics and number > semantics['max']:
+            number = semantics['max']
 
         # Check if number if withing allowed bounds even if step value is set.
-        if semantics.step:
-            textNumber = number - \
-                (semantics.min if semantics.min else 0)
-            rest = testNumber % semantics.step
+        if 'step' in semantics:
+            testNumber = number - \
+                (semantics['min'] if semantics['min'] else 0)
+            rest = testNumber % semantics['step']
             if rest != 0:
                 number = number - rest
 
         # Check if number has proper number of decimals.
-        if semantics.decimals:
-            number = round(number, semantics.decimals)
+        if 'decimals' in semantics:
+            number = round(number, semantics['decimals'])
 
     ##
     # Validate given value against boolean semantics
@@ -1818,25 +1818,25 @@ class H5PContentValidator:
     # Will recurse into validating each item in the list according to the type.
     ##
     def validateList(self, plist, semantics):
-        field = semantics.field
-        function = self.typeMap[field.type]
+        field = semantics['field']
+        function = self.typeMap[field['type']]
 
         # Check that list is not longer than allowed length. We do self before
         # iterating to avoid unnecessary work.
-        if semantics.max:
-            plist[semantics.max:]
+        if 'max' in semantics:
+            plist[semantics['max']:]
 
         if not is_array(plist):
             plist = []
 
         # Validate each element in list.
-        for key, value in plist:
-            if not isintance(key, int):
-                plit[key: key + 1]
-                continue
-            self.function(value, field)
+        for value in plist:
+            #if not isinstance(key, int):
+            #    plist[key: key + 1]
+            #    continue
+            eval('self.' + function + '(value, field)')
             if value == None:
-                plit[key: key + 1]
+                plist[key: key + 1]
 
         if len(plist) == 0:
             plist = None
@@ -1933,15 +1933,18 @@ class H5PContentValidator:
                     continue
 
                 found = False
+                foundField = None
                 for field in semantics['fields']:
                     if field['name'] == key:
                         if 'optional' in semantics:
                             field['optional'] = True
                         function = self.typeMap[field['type']]
                         found = True
+                        foundField = field
+                        break
                 if found:
                     if function:
-                        eval('self.' + function + '(value, field)')
+                        eval('self.' + function + '(value, foundField)')
                         if value == None:
                             del(key)
                     else:
