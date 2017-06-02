@@ -5,6 +5,10 @@
 	{% for style in data.assets.css %}
 		@import url("{{ style }}");
 	{% endfor %}
+	{% for style in data.filesAssets.css %}
+		@import url("{{ style }}");
+	{% endfor %}
+        
 	</style>
 	<style>
 	.content {
