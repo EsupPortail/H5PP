@@ -1956,10 +1956,9 @@ class H5PContentValidator:
                 return
 
             for field in semantics['fields']:
-                if not 'optional' in field:
-                    if not 'group' in field['name']:
-                        print('No value given for mandatory field : %s' %
-                              field['name'])
+                if 'optional' not in field:
+                    if field['name'] not in group:
+                        print('No value given for mandatory field : {}'.format(field['name'])
 
     ##
     # Validate given library value against library semantics.
