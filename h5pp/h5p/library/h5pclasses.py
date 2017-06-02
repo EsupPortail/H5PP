@@ -39,8 +39,8 @@ def substr_replace(subject, replace, start, length):
 
 
 def mb_substr(s, start, length=None, encoding="UTF-8"):
-    u_s = s.decode(encoding)
-    return (u_s[start:(start + length)] if length else u_s[start:]).encode(encoding)
+    u_s = s
+    return (u_s[start:(start + length)] if length else u_s[start:])
 
 
 def file_get_contents(filename, use_include_path=0, context=None, offset=-1, maxlen=-1):
@@ -1854,7 +1854,7 @@ class H5PContentValidator:
             plist = []
 
         # Validate each element in list.
-        for value in plist:
+        for key, value in enumerate(plist):
             #if not isinstance(key, int):
             #    plist[key: key + 1]
             #    continue
@@ -1871,42 +1871,44 @@ class H5PContentValidator:
     def _validateFilelike(self, f, semantics, typeValidKeys=[]):
         # Do not allow to use files from other content folders.
         matches = []
-        if re.search(self.h5pC.relativePathRegExp, f.path, matches):
-            f.path = matches[5]
+        # DAVEB This probably doesn't do what we need it to
+        match = re.search(self.h5pC.relativePathRegExp, f['path'])
+        if match:
+            f['path'] = match.group(5)
 
         # Make sure path and mime does not have any special chars
-        f.path = cgi.escape(f.path, True)
-        if f.mime:
-            f.mime = cgi.escape(f.mime, True)
+        f['path'] = cgi.escape(f['path'], True)
+        if 'mime' in f:
+            f['mime'] = cgi.escape(f['mime'], True)
 
         # Remove attributes that should not exist, they may contain JSON escape
         # code.
         validKeys = ["path", "mime", "copyright"] + typeValidKeys
-        if semantics.extraAttributes:
-            validKeys = validKeys + semantics.extraAttributes
+        if 'extraAttributes' in semantics:
+            validKeys = validKeys + semantics['extraAttributes']
 
         self.filterParams(f, validKeys)
 
-        if f.width:
-            f.width = int(f.width)
+        if 'width' in f:
+            f['width'] = int(f['width'])
 
-        if f.height:
-            f.height = int(f.height)
+        if 'height' in f:
+            f['height'] = int(f['height'])
 
-        if f.codecs:
-            f.codecs = cgi.escape(f.codecs, True)
+        if 'codecs' in f:
+            f['codecs'] = cgi.escape(f['codecs'], True)
 
-        if f.quality:
-            if (not isintance(f.quality, object) or not f.quality.level or
-                    not f.quality.label):
-                del f.quality
+        if 'quality' in f:
+            if (not isintance(f['quality'], object) or level not in  f['quality'] or
+                    not label not in f['quality']):
+                del f['quality']
             else:
-                self.filterParams(f.quality, ["level", "label"])
-                f.quality.level = int(f.quality.level)
-                f.quality.label = cgi.escape(f.equality.label, True)
+                self.filterParams(f['quality'], ["level", "label"])
+                f['quality']['level'] = int(f['quality']['level'])
+                f['quality']['label'] = cgi.escape(f['quality']['label'], True)
 
-        if f.copyright:
-            self.validateGroup(f.copyright, self.getCopyrightSemantics())
+        if copyright in f:
+            self.validateGroup(f['copyright'], self.getCopyrightSemantics())
 
     ##
     # Validate given file data
