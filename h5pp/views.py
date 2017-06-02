@@ -4,10 +4,23 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from h5pp.forms import LibrariesForm, CreateForm
 from h5pp.models import h5p_libraries, h5p_contents
-from h5pp.h5p.h5pmodule import includeH5p, h5pSetStarted, h5pSetFinished, h5pGetContentId, h5pGetListContent, h5pLoad, h5pDelete, getUserScore, uninstall
+from h5pp.h5p.h5pmodule import (
+    includeH5p,
+    h5pSetStarted,
+    h5pSetFinished,
+    h5pGetContentId,
+    h5pGetListContent,
+    h5pLoad,
+    h5pDelete,
+    getUserScore,
+    uninstall
+)
 from h5pp.h5p.h5pclasses import H5PDjango
-from h5pp.h5p.editor.h5peditormodule import h5peditorContent, handleContentUserData
-from h5pp.h5p.editor.h5peditorclasses import H5PDjangoEditor
+from h5pp.h5p.editor.h5peditormodule import (
+    h5peditorContent,
+    handleContentUserData
+)
+#from h5pp.h5p.editor.h5peditorclasses import H5PDjangoEditor
 from h5pp.h5p.editor.library.h5peditorfile import H5PEditorFile
 
 
@@ -21,17 +34,37 @@ def librariesView(request):
         if request.method == 'POST':
             form = LibrariesForm(request.user, request.POST, request.FILES)
             if form.is_valid():
-                if 'h5p' in request.FILES and request.FILES['h5p'] != None:
-                    return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries, 'status': 'Upload complete'})
+                if 'h5p' in request.FILES and request.FILES['h5p'] is not None:
+                    return render(
+                        request,
+                        'h5p/libraries.html',
+                        {'form': form, 'libraries': libraries, 'status': 'Upload complete'}
+                    )
                 elif 'download' in request.POST:
-                    return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries, 'status': 'Update complete'})
+                    return render(
+                        request,
+                        'h5p/libraries.html',
+                        {'form': form, 'libraries': libraries, 'status': 'Update complete'}
+                    )
                 else:
                     status = uninstall()
-                    return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries, 'status': status})
-            return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries})
+                    return render(
+                        request,
+                        'h5p/libraries.html',
+                        {'form': form, 'libraries': libraries, 'status': status}
+                    )
+            return render(
+                request,
+                'h5p/libraries.html',
+                {'form': form, 'libraries': libraries}
+            )
 
         form = LibrariesForm(request.user)
-        return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries})
+        return render(
+            request,
+            'h5p/libraries.html',
+            {'form': form, 'libraries': libraries}
+        )
 
     return HttpResponseRedirect('/h5p/login/?next=/h5p/home/')
 
@@ -40,18 +73,26 @@ def createView(request, contentId=None):
     if request.user.is_authenticated():
         editor = h5peditorContent(request)
         if request.method == 'POST':
-            if contentId != None:
+            if contentId is not None:
                 request.POST['contentId'] = contentId
             form = CreateForm(request, request.POST, request.FILES)
             if form.is_valid():
-                if contentId != None:
-                    return HttpResponseRedirect('/h5p/content/?contentId=' + contentId)
+                if contentId is not None:
+                    return HttpResponseRedirect(
+                        '/h5p/content/?contentId=' + contentId
+                    )
                 else:
                     newId = h5p_contents.objects.all().order_by('-content_id')[0]
-                    return HttpResponseRedirect('/h5p/content/?contentId=' + str(newId.content_id))
-            return render(request, 'h5p/create.html', {'form': form, 'data': editor})
+                    return HttpResponseRedirect(
+                        '/h5p/content/?contentId=' + str(newId.content_id)
+                    )
+            return render(
+                request,
+                'h5p/create.html',
+                {'form': form, 'data': editor}
+            )
 
-        elif contentId != None:
+        elif contentId is not None:
             framework = H5PDjango(request.user)
             edit = framework.loadContent(contentId)
             request.GET = request.GET.copy()
@@ -63,7 +104,11 @@ def createView(request, contentId=None):
 
         form = CreateForm(request)
 
-        return render(request, 'h5p/create.html', {'form': form, 'data': editor})
+        return render(
+            request,
+            'h5p/create.html',
+            {'form': form, 'data': editor}
+        )
 
     return HttpResponseRedirect('/h5p/login/?next=/h5p/home/')
 
@@ -74,7 +119,7 @@ def contentsView(request):
         content = includeH5p(request)
         score = None
 
-        if not 'html' in content:
+        if "html" not in content:
             html = '<div>Sorry, preview of H5P content is not yet available.</div>'
             return render(request, 'h5p/content.html', {'html': html})
         else:
@@ -82,8 +127,20 @@ def contentsView(request):
                 h5pSetStarted(request.user, h5pGetContentId(request))
                 score = getUserScore(h5pGetContentId(request), request.user)
 
-                return render(request, 'h5p/content.html', {'html': content['html'], 'data': content['data'], 'score': score[0]})
-            return render(request, 'h5p/content.html', {'html': content['html'], 'data': content['data']})
+                return render(
+                    request,
+                    'h5p/content.html',
+                    {
+                        'html': content['html'],
+                        'data': content['data'],
+                        'score': score[0]
+                    }
+                )
+            return render(
+                request,
+                'h5p/content.html',
+                {'html': content['html'], 'data': content['data']}
+            )
 
     return HttpResponseRedirect('/h5p/listContents')
 
@@ -93,13 +150,25 @@ def listView(request):
         if request.user.is_superuser:
             h5pDelete(request)
             return HttpResponseRedirect('/h5p/listContents')
-        return render(request, 'h5p/listContents.html', {'status': 'You do not have the necessary rights to delete a video.'})
+        return render(
+            request,
+            'h5p/listContents.html',
+            {'status': 'You do not have the necessary rights to delete a video.'}
+        )
 
     listContent = h5pGetListContent(request)
-    if len(listContent) > 0:
-        return render(request, 'h5p/listContents.html', {'listContent': listContent})
+    if listContent > 0:
+        return render(
+            request,
+            'h5p/listContents.html',
+            {'listContent': listContent}
+        )
 
-    return render(request, 'h5p/listContents.html', {'status': 'No contents installed.'})
+    return render(
+        request,
+        'h5p/listContents.html',
+        {'status': 'No contents installed.'}
+    )
 
 
 @csrf_exempt
