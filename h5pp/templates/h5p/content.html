@@ -34,12 +34,15 @@
 	{% for script in data.assets.js %}
 		<script type="text/javascript" src="{{ script }}"></script>
 	{% endfor %}
+
 	{% for script in data.filesAssets.js %}
 		<script type="text/javascript" src="{{ script }}"></script>
 	{% endfor %}
+
 	<script type="text/javascript">
 		H5PIntegration = {% autoescape off %} {{data.integration}} {% endautoescape %}
 	</script>
+
 {% endblock head %}
 {% block body %}
 <div class="wrap">
