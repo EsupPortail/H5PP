@@ -1796,6 +1796,7 @@ class H5PContentValidator:
     # Validate select values
     ##
     def validateSelect(self, select, semantics):
+        options = {}
         if "optional" in semantics:
             optional = semantics["optional"] and semantics["optional"]
         else:
@@ -1806,7 +1807,7 @@ class H5PContentValidator:
             # We have a strict set of options to choose from.
             strict = True
             for option in semantics["options"]:
-                options[option.value] = True
+                options[option["value"]] = True
 
         if ("multiple" in semantics and semantics["multiple"] and
                 semantics["multiple"]):
@@ -2038,7 +2039,7 @@ class H5PContentValidator:
 
         if ("subContentId" in value and not re.search(
                 '(?i)^\{?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\}?$',
-                value["subContentId"]):
+                value["subContentId"])):
             del(value["subContentId"])
 
         depKey = 'preloaded-' + library['machine_name']
