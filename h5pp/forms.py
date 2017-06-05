@@ -1,18 +1,21 @@
+import json
+import os
+
 from django import forms
 from django.conf import settings
+
 from h5pp.h5p.h5pclasses import H5PDjango
 from h5pp.h5p.h5pmodule import h5pInsert, h5pGetContent
 from h5pp.h5p.editor.h5peditormodule import createContent
 from h5pp.models import h5p_libraries
-import json
-import os
-
-##
-# Function who handle uploading h5p file
-##
 
 
 def handleUploadedFile(files, filename):
+    """
+    Function to handle uploading h5p file
+
+    """
+
     if not os.path.exists(settings.MEDIA_ROOT + '/h5pp/tmp'):
         os.makedirs(settings.MEDIA_ROOT + '/h5pp/tmp')
 
@@ -22,12 +25,13 @@ def handleUploadedFile(files, filename):
 
     return {'folderPath': settings.MEDIA_ROOT + '/h5pp/tmp', 'path': settings.MEDIA_ROOT + '/h5pp/tmp/' + filename}
 
-##
-# Form for upload/update h5p libraries
-##
-
 
 class LibrariesForm(forms.Form):
+    """
+    Form for uploading and updating h5p libraries
+
+    """
+
     h5p = forms.FileField(required=False)
     download = forms.BooleanField(widget=forms.CheckboxInput(), required=False)
     uninstall = forms.BooleanField(
@@ -75,14 +79,17 @@ class LibrariesForm(forms.Form):
 
         return self.cleaned_data
 
-##
-# Form for upload h5p file
-##
+
 CHOICES = [('upload', 'Upload'),
            ('create', 'Create')]
 
 
 class CreateForm(forms.Form):
+    """
+    Form for upload h5p file
+
+    """
+
     title = forms.CharField(label='Title ')
     h5p_type = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect())
     h5p = forms.FileField(label='HTML 5 Package ', help_text='Select a .h5p file to upload and create interactive content from. You may start with the <a href="http://h5p.org/content-types-and-applications" target="_blank">example files</a> on H5P.org', required=False)

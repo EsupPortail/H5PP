@@ -10,7 +10,7 @@ from h5pp.views import (
     ajax
 )
 
-# app_name = 'h5pp'
+
 urlpatterns = [
     # Base
     url(r'^home/$', home, name="h5phome"),
