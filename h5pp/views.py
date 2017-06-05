@@ -157,7 +157,7 @@ def listView(request):
         )
 
     listContent = h5pGetListContent(request)
-    if listContent > 0:
+    if len(listContent) > 0:
         return render(
             request,
             'h5p/listContents.html',
