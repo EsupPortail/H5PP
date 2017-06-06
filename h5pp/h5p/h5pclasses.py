@@ -40,7 +40,7 @@ class H5PDjango:
             self.interface.getUploadedH5pPath(h5p)
 
         if not hasattr(self, 'core'):
-            self.core = H5PCore(self.interface, settings.MEDIA_ROOT + '/h5pp', settings.BASE_DIR,
+            self.core = H5PCore(self.interface, os.path.join(settings.MEDIA_ROOT, 'h5pp'), settings.BASE_DIR,
                                 'en', True if getattr(settings, 'H5P_EXPORT') else False, False)
 
         if typ == 'validator':
@@ -279,7 +279,8 @@ class H5PDjango:
                 semantics=libraryData['semantics'])
             libraryData['libraryId'] = libraryId.library_id
         else:
-            library = h5p_libraries.objects.get(library_id=libraryData['libraryId'])
+            library = h5p_libraries.objects.get(
+                library_id=libraryData['libraryId'])
             library.title = libraryData['title']
             library.patch_version = libraryData['patchVersion']
             library.runnable = libraryData['runnable']
@@ -329,7 +330,8 @@ class H5PDjango:
         library = h5p_libraries.objects.get(library_id=libraryId)
 
         # Delete files
-        self.deleteFileTree(settings.MEDIA_ROOT + '/h5pp/libraries/' + library.machine_name + '-' + library.major_version + '.' + library.minor_version)
+        self.deleteFileTree(os.path.join(settings.MEDIA_ROOT, 'h5pp', 'libraries',
+                                         library.machine_name + '-' + library.major_version + '.' + library.minor_version))
 
         # Delete data in database (won't delete content)
         h5p_libraries_libraries.objects.get(library_id=libraryId).delete()
@@ -404,7 +406,8 @@ class H5PDjango:
     def resetContentUserData(self, contentId):
         if h5p_content_user_data.objects.filter(content_main_id=contentId, delete_on_content_change=1).count() > 0:
             # Reset user datas for this content
-            userData = h5p_content_user_data.objects.get(content_main_id=contentId, delete_on_content_change=1)
+            userData = h5p_content_user_data.objects.get(
+                content_main_id=contentId, delete_on_content_change=1)
             userData.timestamp = int(time.time())
             userData.data = 'RESET'
             userData.save()
@@ -412,6 +415,7 @@ class H5PDjango:
     # Get file extension whitelist
     # The default extension list is part of h5p, but admins should be allowed to modify it
     ##
+
     def getWhitelist(self, isLibrary, defaultContentWhitelist, defaultLibraryWhitelist):
         global h5pWhitelist, h5pWhitelistExtras
         whitelist = h5pWhitelist
@@ -502,8 +506,8 @@ class H5PDjango:
         return library
 
     def getSemanticsFromFile(self, machineName, majorVersion, minorVersion):
-        semanticsPath = settings.H5P_PATH + '/libraries/' + machineName + '-' + \
-            str(majorVersion) + '.' + str(minorVersion) + '/semantics.json'
+        semanticsPath = os.path.join(settings.H5P_PATH, 'libraries', machineName + '-' +
+                                     str(majorVersion) + '.' + str(minorVersion), 'semantics.json')
         if os.path.exists(semanticsPath):
             semantics = semanticsPath.read()
             if not json.loads(semantics):

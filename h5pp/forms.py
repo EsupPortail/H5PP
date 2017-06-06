@@ -1,9 +1,9 @@
 from django import forms
 from django.conf import settings
+from h5pp.models import h5p_libraries
 from h5pp.h5p.h5pclasses import H5PDjango
 from h5pp.h5p.h5pmodule import h5pInsert, h5pGetContent
 from h5pp.h5p.editor.h5peditormodule import createContent
-from h5pp.models import h5p_libraries
 import json
 import os
 
@@ -13,14 +13,16 @@ import os
 
 
 def handleUploadedFile(files, filename):
-    if not os.path.exists(settings.MEDIA_ROOT + '/h5pp/tmp'):
-        os.makedirs(settings.MEDIA_ROOT + '/h5pp/tmp')
+    tmpdir = os.path.join(settings.MEDIA_ROOT, 'h5pp', 'tmp')
 
-    with open(settings.MEDIA_ROOT + '/h5pp/tmp/' + filename, 'wb+') as destination:
+    if not os.path.exists(tmpdir):
+        os.makedirs(tmpdir)
+
+    with open(os.path.join(tmpdir, filename), 'wb+') as destination:
         for chunk in files.chunks():
             destination.write(chunk)
 
-    return {'folderPath': settings.MEDIA_ROOT + '/h5pp/tmp', 'path': settings.MEDIA_ROOT + '/h5pp/tmp/' + filename}
+    return {'folderPath': tmpdir, 'path': os.path.join(tmpdir, filename)}
 
 ##
 # Form for upload/update h5p libraries
@@ -71,7 +73,7 @@ class LibrariesForm(forms.Form):
             interface.updateTutorial()
         elif unins == False:
             raise forms.ValidationError(
-                    'No actions selected.')
+                'No actions selected.')
 
         return self.cleaned_data
 

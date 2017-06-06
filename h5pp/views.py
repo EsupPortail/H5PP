@@ -38,7 +38,7 @@ def librariesView(request):
 
 def createView(request, contentId=None):
     if request.user.is_authenticated():
-        editor = h5peditorContent(request)
+        editor = h5peditorContent(request, contentId)
         if request.method == 'POST':
             if contentId != None:
                 request.POST['contentId'] = contentId
@@ -47,7 +47,8 @@ def createView(request, contentId=None):
                 if contentId != None:
                     return HttpResponseRedirect('/h5p/content/?contentId=' + contentId)
                 else:
-                    newId = h5p_contents.objects.all().order_by('-content_id')[0]
+                    newId = h5p_contents.objects.all(
+                    ).order_by('-content_id')[0]
                     return HttpResponseRedirect('/h5p/content/?contentId=' + str(newId.content_id))
             return render(request, 'h5p/create.html', {'form': form, 'data': editor})
 
@@ -81,7 +82,7 @@ def contentsView(request):
             if request.user.is_authenticated():
                 h5pSetStarted(request.user, h5pGetContentId(request))
                 score = getUserScore(h5pGetContentId(request), request.user)
-                
+
                 return render(request, 'h5p/content.html', {'html': content['html'], 'data': content['data'], 'score': score[0]})
             return render(request, 'h5p/content.html', {'html': content['html'], 'data': content['data']})
 

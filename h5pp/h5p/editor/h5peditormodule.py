@@ -42,7 +42,7 @@ SCRIPTS = [
     "ckeditor/ckeditor.js"]
 
 
-def h5peditorContent(request):
+def h5peditorContent(request, contentId=None):
     assets = h5pAddCoreAssets()
     coreAssets = h5pAddCoreAssets()
     editor = h5pAddFilesAndSettings(request, True)
@@ -71,7 +71,7 @@ def h5peditorContent(request):
 
     contentValidator = framework.h5pGetInstance('contentvalidator')
     editor['editor'] = {
-        'filesPath': settings.MEDIA_URL + 'h5pp/editor',
+        'filesPath': (settings.MEDIA_URL + 'h5pp/editor') if not contentId else settings.MEDIA_URL + 'h5pp/content/%s' % contentId,
         'fileIcon': {
             'path': settings.BASE_URL + settings.STATIC_URL + 'h5p/h5peditor/images/binary-file.png',
             'width': 50,
@@ -221,6 +221,7 @@ def getLibraryProperty(library, prop='all'):
             return libraryData[prop]
     else:
         return False
+
 
 def ajaxSuccess(data=None):
     response = {
