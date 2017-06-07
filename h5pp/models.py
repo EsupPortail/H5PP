@@ -82,6 +82,7 @@ class h5p_contents(models.Model):
 
     class Meta:
         db_table = 'h5p_contents'
+        abstract = True
 
 # Stores user statistics
 
