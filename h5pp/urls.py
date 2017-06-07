@@ -1,34 +1,34 @@
 from django.conf.urls import url
-from django.contrib.auth.views import login, logout
+from django.contrib.auth.decorators import login_required
+from django.views.generic import TemplateView
+
 from h5pp.views import (
-    home,
+    LibrariesListView,
+    CreateContentView,
+    UpdateContentView,
+    ContentDetailView,
     createView,
     editorAjax,
-    librariesView,
     listView,
-    contentsView,
     ajax
 )
 
 
 urlpatterns = [
     # Base
-    url(r'^home/$', home, name="h5phome"),
-
-    # Authentification
-    url(r'^login/', login, {'template_name': 'h5p/login.html'}, name='login'),
-    url(r'^logout/', logout, {'next_page': '/h5p/home'}, name='logout'),
+    url(r'^home/$', TemplateView.as_view(template_name="h5p/home.html"), name="h5phome"),
 
     # Contents and Libraries
-    url(r'^libraries/$', librariesView, name='h5plibraries'),
-    url(r'^listContents/$', listView, name='h5plistContents'),
-    url(r'^content/$', contentsView, name='h5pcontent'),
+    url(r'^libraries/$', login_required(LibrariesListView.as_view()), name="h5plibraries"),
+    url(r'^listContents/$', listView, name="h5plistContents"),
+    url(r'^content/(?P<content_id>\d+)/$', login_required(ContentDetailView.as_view()), name="h5pcontent"),
 
     # Contents creation / upload
-    url(r'^create/$', createView, name='h5pcreate'),
+    url(r'^create/$', login_required(CreateContentView.as_view()), name="h5pcreate"),
+    # url(r'^update/(?P<content_id>\d+)/$', login_required(UpdateContentView.as_view()), name="h5pedit"),
     url(r'^create/(?P<contentId>\d+)/$', createView, name='h5pedit'),
 
     # Ajax
-    url(r'^ajax/$', ajax, name='h5pajax'),
-    url(r'^editorajax/(?P<contentId>\d+)/$', editorAjax, name='h5peditorAjax'),
+    url(r'^ajax/$', ajax, name="h5pajax"),
+    url(r'^editorajax/(?P<contentId>\d+)/$', editorAjax, name="h5peditorAjax"),
 ]

@@ -95,12 +95,16 @@
 			font-weight: normal;
 		}
 	</style>
+	<!-- this is core assets -->
 	{% for script in data.coreAssets.js %}
 		<script type="text/javascript" src="{{ script }}"></script>
 	{% endfor %}
+
+	<!-- this is data assets -->
 	{% for script in data.add %}
 		<script type="text/javascript" src="{{ script }}"></script>
 	{% endfor %}
+
 	<script type="text/javascript">
 		H5PIntegration = {% autoescape off %} {{data.editor}} {% endautoescape %}
 	</script>
@@ -167,7 +171,7 @@
 </div>
 <div class="configuration">
 	{% if request.GET.contentId %}
-	<a href="{% url 'h5pcontent' %}?contentId={{request.GET.contentId}}">
+	<a href="{% url 'h5pcontent' request.GET.contentId %}">
 		<input type="submit" class="submit_editor" id="view" value="View video" />
 	</a>
 	{% endif %}

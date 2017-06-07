@@ -1,7 +1,16 @@
 from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.contrib import messages
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import (
+    FormView,
+    CreateView,
+    UpdateView,
+    TemplateView
+)
+
 from h5pp.forms import LibrariesForm, CreateForm
 from h5pp.models import h5p_libraries, h5p_contents
 from h5pp.h5p.h5pmodule import (
@@ -20,53 +29,130 @@ from h5pp.h5p.editor.h5peditormodule import (
     h5peditorContent,
     handleContentUserData
 )
-#from h5pp.h5p.editor.h5peditorclasses import H5PDjangoEditor
 from h5pp.h5p.editor.library.h5peditorfile import H5PEditorFile
 
 
-def home(request):
-    return render(request, 'h5p/home.html')
+class LibrariesListView(FormView):
+    template_name = "h5p/libraries.html"
+    success_url = "h5plibraries"
+    form_class = LibrariesForm
+
+    def get_form_kwargs(self):
+        kwargs = {
+            'user': self.request.user,
+        }
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        """
+        Get libraries for the template list
+
+        """
+        ctx = super(LibrariesListView, self).get_context_data(**kwargs)
+        ctx["libraries"] = h5p_libraries.objects.all()
+
+        return ctx
+
+    def form_valid(self, form):
+        if "h5p" in self.request.FILES and self.request.FILES["h5p"] is not None:
+            messages.success(self.request, "Upload complete")
+        elif 'download' in self.request.POST:
+            messages.success(self.request, "Update complete")
+        else:
+            status = uninstall()
+            messages.success(self.request, status)
 
 
-def librariesView(request):
-    if request.user.is_authenticated():
-        libraries = h5p_libraries.objects.all()
-        if request.method == 'POST':
-            form = LibrariesForm(request.user, request.POST, request.FILES)
-            if form.is_valid():
-                if 'h5p' in request.FILES and request.FILES['h5p'] is not None:
-                    return render(
-                        request,
-                        'h5p/libraries.html',
-                        {'form': form, 'libraries': libraries, 'status': 'Upload complete'}
-                    )
-                elif 'download' in request.POST:
-                    return render(
-                        request,
-                        'h5p/libraries.html',
-                        {'form': form, 'libraries': libraries, 'status': 'Update complete'}
-                    )
-                else:
-                    status = uninstall()
-                    return render(
-                        request,
-                        'h5p/libraries.html',
-                        {'form': form, 'libraries': libraries, 'status': status}
-                    )
-            return render(
-                request,
-                'h5p/libraries.html',
-                {'form': form, 'libraries': libraries}
-            )
+class CreateContentView(CreateView):
+    template_name = "h5p/create.html"
+    success_url = "h5pcontent"
+    form_class = CreateForm
 
-        form = LibrariesForm(request.user)
-        return render(
-            request,
-            'h5p/libraries.html',
-            {'form': form, 'libraries': libraries}
+    def get_form_kwargs(self):
+        kwargs = {
+            'request': self.request,
+        }
+        return kwargs
+
+    def get_success_url(self, pk):
+        return reverse("h5pcontent", args=[pk])
+
+    def get_context_data(self, **kwargs):
+        """
+        Get the editor for the template
+
+        """
+        ctx = super(CreateContentView, self).get_context_data(**kwargs)
+        ctx["data"] = h5peditorContent(self.request)
+
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        form = CreateForm(self.request, self.request.POST, self.request.FILES)
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        # this is hacky and needs to be corrected in the form.
+        newId = h5p_contents.objects.all().order_by('-content_id')[0]
+
+        return HttpResponseRedirect(
+            self.get_success_url(str(newId.content_id))
         )
 
-    return HttpResponseRedirect('/h5p/login/?next=/h5p/home/')
+
+class UpdateContentView(FormView):
+    template_name = "h5p/create.html"
+    success_url = "h5pcontent"
+    form_class = CreateForm
+
+    def get_form_kwargs(self):
+        framework = H5PDjango(self.request.user)
+        edit = framework.loadContent(self.kwargs.get("content_id"))
+        self.request.GET = self.request.GET.copy()
+        self.request.GET['contentId'] = self.kwargs.get("content_id")
+        self.request.GET["title"] = edit["title"]
+        self.request.GET["language"] = "en"
+        self.request.GET["filtered"] = edit['filtered']
+        self.request.GET['json_content'] = edit['params']
+        self.request.GET['h5p_slug'] = edit['slug']
+        self.request.GET['h5p_library'] = edit['library_name'] + ' ' + \
+            str(edit['library_major_version']) + '.' + \
+            str(edit['library_minor_version'])
+        #self.request.GET['main_library'] = self.request.GET["h5p_library"]
+
+        kwargs = {
+            'request': self.request,
+        }
+        return kwargs
+
+    def get_success_url(self, pk):
+        return reverse("h5pcontent", args=[pk])
+
+    def get_context_data(self, **kwargs):
+        """
+        Get the editor for the template
+
+        """
+        ctx = super(UpdateContentView, self).get_context_data(**kwargs)
+        ctx["data"] = h5peditorContent(self.request)
+
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        form = CreateForm(self.request, self.request.POST, self.request.FILES)
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+
+        return HttpResponseRedirect(
+            self.get_success_url(self.pk_url_kwarg)
+        )
 
 
 def createView(request, contentId=None):
@@ -111,6 +197,32 @@ def createView(request, contentId=None):
         )
 
     return HttpResponseRedirect('/h5p/login/?next=/h5p/home/')
+
+
+class ContentDetailView(TemplateView):
+    template_name = "h5p/content.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super(ContentDetailView, self).get_context_data(**kwargs)
+
+        self.request.GET = self.request.GET.copy()
+        self.request.GET["contentId"] = self.kwargs.get("content_id")
+        h5pLoad(self.request)
+        content = includeH5p(self.request)
+        h5pSetStarted(self.request.user, self.kwargs.get("content_id"))
+        score = getUserScore(self.kwargs.get("content_id"), self.request.user)
+
+        if "html" not in content:
+            ctx["html"] = "<div>Sorry, preview of H5P content is not yet available.</div>"
+        else:
+            ctx["html"] = content["html"]
+
+        ctx["html"] = content["html"]
+        ctx["data"] = content["data"]
+        ctx["score"] = score[0]
+        ctx["content_id"] = self.kwargs.get("content_id")
+
+        return ctx
 
 
 def contentsView(request):

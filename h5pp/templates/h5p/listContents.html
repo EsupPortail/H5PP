@@ -106,7 +106,7 @@
 				<td>
 					<ul>
 					{% for user in content.score %}
-						{% if user.points %}	
+						{% if user.points %}
 						<li>{{user.user}} - {{user.points}} / {{user.max_points}}</li>
 						{% else %}
 						<li>{{user.user}} - Not completed yet</li>
@@ -115,7 +115,7 @@
 					</ul>
 				</td>
 				<td>{{content.id}}</td>
-				<td><a href="{% url "h5pcontent" %}?contentId={{content.id}}">View</a>
+				<td><a href="{% url "h5pcontent" content.id %}">View</a>
 				{% if request.user.is_superuser %}
 					<a href="{% url "h5pedit" contentId=content.id %}?title={{content.title}}">Edit</a><br><form method="post" action="{% url "h5plistContents" %}?contentId={{content.id}}">{% csrf_token %}<input type="submit" value="Delete"></form>
 				{% endif %}
