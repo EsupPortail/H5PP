@@ -1,60 +1,35 @@
 {% extends "h5p/base.html" %}
 {% block head %}
-	<style>
-		.content {
-					background: rgba(102, 178, 255, .4);
-					border-radius: 25px;
-					padding: 20px;
-					max-width: 1000px;
-					margin: auto;
-				}
-		.h5p-admin-header {
-			font-family: 'Raleway', sans-serif;
-			font-size: 25px;
-			font-weight: 800;
-			line-height: 36px;
-			margin: 0 0 24px;
-			text-align: center;
-			text-decoration: overline;
-		}
-		p {
-			background-color: #ffdddd;
-			border-left: 6px solid #f44336;
-		}
-	</style>
-
 {% endblock head %}
 {% block body %}
-	<h3 class="h5p-admin-header">Home</h3>
-	<nav class="vertical">
-		<ul>	
-			{% if H5P_ENABLED %}
-			<li>
-				<a href="/">Home</a>
-			</li>
-			{% endif %}
-			<li>
-				<a href="{% url "login" %}?next=/h5p/home/">Login</a>
-			</li>
-			<li>
-				<a href="{% url "logout" %}">Logout</a>
-			</li>
-			<li>
-				<a href="{% url "h5plibraries" %}">Libraries</a>
-			</li>
-			<li>
-				<a href="{% url "h5pcreate" %}">Create</a>
-			</li>
-			<li>
-				<a href="{% url "h5plistContents" %}">Contents</a>
-			</li>
-		</ul>
-	</nav>
-	{% if request.user.username %}
-		<p>You are connected :<br><b>User </b>: {{ request.user.username }}<br><b>ID</b> : {{ request.user.id }}</p>
-	{% endif %}
-	{% if status %}
-		<p>{{ status }}</p>
-	{% endif %}
+	<h1 class="page-title">Home</h3>
+	<h4 class="section-title">Welcome to the H5PP Plugin Control Panel</h4>
+	<div class="well">
+		<div class="alert alert-success">
+			<p>
+				With the navigation bar at the top of the page you can access the features of the plugin.
+			</p>
+		</div>
+		<div class="info">
+			<div class="info-body">
+				<h4 class="info-heading">Libraries</h4>
+				<p>
+					To use H5PP you need a set of files named "libraries" that contains the necessary to create different types of content.<br>
+					You can find the official release of H5P, containing many content types, at this adress :<br>
+					<a href="https://h5p.org/sites/default/files/official-h5p-release-20170301.h5p">Official release</a>
+				</p>
+				<h4 class="info-heading">Editor</h4>
+				<p>
+					To create or edit a content you need to use the editor provided by H5P.<br>
+					All content is identified by a title, set during creation, and a identifier (ID) created automatically after the creation.<br>
+					Everybody can view a content, but only authenticated users can create and edit contents. Finally, only superuser can delete content.
+				</p>
+				<h4 class="info-heading">Contents</h4>
+				<p>
+					Anytime, you can consult the list of created contents.<br>
+					It is through this list that you can view the contents.
+				</p>
+			</div>
+		</div>
+	</div>
 {% endblock body %}
-{% block back %}{% endblock back %}
