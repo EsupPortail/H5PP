@@ -1088,7 +1088,7 @@ class H5PCore:
                 content["slug"] = self.generateContentSlug(content)
 
                 # Remove old export file
-                self.fs.deleteExport(content["id"] + ".h5p")
+                self.fs.deleteExport(str(content["id"]) + ".h5p")
 
             if self.exportEnabled:
                 # Recreate export file
