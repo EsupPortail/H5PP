@@ -272,7 +272,6 @@ class H5PDjangoEditor:
                 self.basePath, self.contentDirectory, params['path'])
             if not os.path.exists(newPath) and os.path.exists(oldPath):
                 shutil.copy(oldPath, newPath)
-                os.remove(oldPath)
 
         files.append(params['path'])
 

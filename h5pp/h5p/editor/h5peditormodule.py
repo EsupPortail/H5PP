@@ -71,7 +71,7 @@ def h5peditorContent(request, contentId=None):
 
     contentValidator = framework.h5pGetInstance('contentvalidator')
     editor['editor'] = {
-        'filesPath': (settings.MEDIA_URL + 'h5pp/editor') if not contentId else settings.MEDIA_URL + 'h5pp/content/%s' % contentId,
+        'filesPath': os.path.join(settings.MEDIA_URL, 'h5pp', 'editor'),
         'fileIcon': {
             'path': settings.BASE_URL + settings.STATIC_URL + 'h5p/h5peditor/images/binary-file.png',
             'width': 50,
@@ -122,12 +122,12 @@ def handleContentUserData(request):
         # Fetch user data
         userData = getUserData(contentId, subContentId,
                                dataId, request.user.id)
-        if userData == False:
+        if not userData:
             # Did not find data, return nothing
             return ajaxSuccess()
         else:
             # Found data, return encoded data
-            return ajaxSuccess(userData['data'])
+            return ajaxSuccess(userData.data)
 
     return
 
@@ -137,9 +137,13 @@ def handleContentUserData(request):
 
 
 def getUserData(contentId, subContentId, dataId, userId):
-    result = h5p_content_user_data.objects.filter(
-        user_id=userId, content_main_id=contentId, sub_content_id=subContentId, data_id=dataId).values()
-    return result[0] if len(result) > 0 else False
+    try:
+        result = h5p_content_user_data.objects.get(
+            user_id=userId, content_main_id=contentId, sub_content_id=subContentId, data_id=dataId)
+    except:
+        result = False
+
+    return result
 
 ##
 # Save user data for specific content in database
@@ -164,16 +168,14 @@ def saveUserData(contentId, subContentId, dataId, preload, invalidate, data, use
             delete_on_content_change=invalidate
         )
     else:
-        newDataId = update['id']
-        userData = h5p_content_user_data.objects.get(id=update['id'])
-        userData.user_id = userId
-        userData.content_main_id = contentId
-        userData.sub_content_id = subContentId
-        userData.data_id = dataId
-        userData.data = data
-        userData.preloaded = preload
-        userData.delete_on_content_change = invalidate
-        userData.save()
+        update.user_id = userId
+        update.content_main_id = contentId
+        update.sub_content_id = subContentId
+        update.data_id = dataId
+        update.data = data
+        update.preloaded = preload
+        update.delete_on_content_change = invalidate
+        update.save()
 
 ##
 # Delete user data with specific content from database
