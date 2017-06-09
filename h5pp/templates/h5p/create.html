@@ -52,16 +52,20 @@
 {% endblock head %}
 {% block body %}
 <div class="wrap">
-	<h1 class="page-title">Editor {% if request.GET.title %}<br>{{request.GET.title}}{% endif %}</h3>
+	{% if not request.GET.is_iframe %}
+		<h1 class="page-title">Editor {% if request.GET.title %}<br>{{request.GET.title}}{% endif %}</h3>
+	{% endif %}
 	<div class="well">
-		<h4 class="section-title">Create new content</h4>
-		<div class="alert alert-success">
-			<p>
-				You can create, upload or edit contents with this editor.<br>
-				To create a content start by giving it a title. Select 'create' and choose a content type from the dropdown list. The content type depends on the installed libraries.<br>
-				When you're done click on the button below.
-			</p>
-		</div>
+		{% if not request.GET.is_iframe %}
+			<h4 class="section-title">Create new content</h4>
+			<div class="alert alert-success">
+				<p>
+					You can create, upload or edit contents with this editor.<br>
+					To create a content start by giving it a title. Select 'create' and choose a content type from the dropdown list. The content type depends on the installed libraries.<br>
+					When you're done click on the button below.
+				</p>
+			</div>
+		{% endif %}
 		<form method="post" enctype="multipart/form-data" id="h5p-content-form">
 			{% csrf_token %}
 			{% if not request.GET.contentId %}
@@ -95,11 +99,13 @@
 		</form>
 	</div>
 </div>
-<div class="configuration">
-	{% if request.GET.contentId %}
-	<a href="{% url 'h5pcontent' %}?contentId={{request.GET.contentId}}">
-		<input type="submit" class="btn btn-default submit_editor" id="view" value="View video" />
-	</a>
-	{% endif %}
-</div>
+{% if not request.GET.is_iframe %}
+	<div class="configuration">
+		{% if request.GET.contentId %}
+		<a href="{% url 'h5pcontent' %}?contentId={{request.GET.contentId}}">
+			<input type="submit" class="btn btn-default submit_editor" id="view" value="View video" />
+		</a>
+		{% endif %}
+	</div>
+{% endif %}
 {% endblock body %}

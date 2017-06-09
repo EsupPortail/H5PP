@@ -12,36 +12,38 @@
 		{% block head %}{% endblock head %}
 	</head>
 	<body>
-		<header id="header">
-			<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-				<div class="container-fluid">
-					<div class="navbar-header">
-						<a class="navbar-brand" href="#">H5PP</a>
+		{% if not request.GET.is_iframe %}
+			<header id="header">
+				<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+					<div class="container-fluid">
+						<div class="navbar-header">
+							<a class="navbar-brand" href="#">H5PP</a>
+						</div>
+						<ul class="nav navbar-nav">
+							<li><a href="{% url 'h5phome' %}">Home</a></li>
+							<li><a href="{% url 'h5plibraries' %}">Libraries</a></li>
+							<li><a href="{% url 'h5pcreate' %}">Editor</a></li>
+							<li><a href="{% url 'h5plistContents' %}">Contents</a></li>
+						</ul>
+						{% if not request.user.is_authenticated %}
+							<a href="{% url 'login' %}?next=/h5p/home/" class="btn btn-success navbar-btn navbar-right user">
+								<span class="glyphicon glyphicon-door"></span>
+								Login
+							</a>
+						{% else %}
+							<a href="{% url 'logout' %}" class="btn btn-danger navbar-btn navbar-right user">
+								<span class="glyphicon glyphicon-exit"></span>
+								Log out
+							</a>
+							<p class="navbar-text navbar-right" id="user-info">
+								<span class="glyphicon glyphicon-user"></span>
+								{{ request.user.username }}
+							</p>
+						{% endif %}
 					</div>
-					<ul class="nav navbar-nav">
-						<li><a href="{% url 'h5phome' %}">Home</a></li>
-						<li><a href="{% url 'h5plibraries' %}">Libraries</a></li>
-						<li><a href="{% url 'h5pcreate' %}">Editor</a></li>
-						<li><a href="{% url 'h5plistContents' %}">Contents</a></li>
-					</ul>
-					{% if not request.user.is_authenticated %}
-						<a href="{% url 'login' %}?next=/h5p/home/" class="btn btn-success navbar-btn navbar-right user">
-							<span class="glyphicon glyphicon-door"></span>
-							Login
-						</a>
-					{% else %}
-						<a href="{% url 'logout' %}" class="btn btn-danger navbar-btn navbar-right user">
-							<span class="glyphicon glyphicon-exit"></span>
-							Log out
-						</a>
-						<p class="navbar-text navbar-right" id="user-info">
-							<span class="glyphicon glyphicon-user"></span>
-							{{ request.user.username }}
-						</p>
-					{% endif %}
-				</div>
-			</nav>
-		</header>
+				</nav>
+			</header>
+		{% endif %}
 		<div class="content">
 			{% block body %}
 			{% endblock body %}

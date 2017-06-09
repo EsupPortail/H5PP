@@ -27,19 +27,21 @@
 {% endblock head %}
 {% block body %}
 <div class="wrap">
-	<h3 class="page-title">{{request.GET.title}}</h3>
+	{% if not request.GET.is_iframe %}
+		<h3 class="page-title">{{request.GET.title}}</h3>
+	{% endif %}
 	<div class="well">
 		{% autoescape off %}
 			{{html}}
 		{% endautoescape %}
-		{% if request.user.is_authenticated %}
+		{% if request.user.is_authenticated and not request.GET.is_iframe %}
 			<a href="{% url 'h5pedit' contentId=request.GET.contentId %}?title={{request.GET.title}}">
 				<input type="submit" class="btn btn-default edit-button" id="edit" value="Edit video" />
 			</a>
 		{% endif %}
 	</div>
 </div>
-{% if request.user.is_authenticated %}
+{% if request.user.is_authenticated and not request.GET.is_iframe %}
 	<div class="well score">
 		<h5 class="h5p-score-header">Score</h5>
 		{% if score and score.points %}
@@ -49,5 +51,4 @@
 		{% endif %}
 	</div>
 {% endif %}
-<hr />
 {% endblock body %}
