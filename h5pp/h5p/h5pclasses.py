@@ -406,11 +406,12 @@ class H5PDjango:
     def resetContentUserData(self, contentId):
         if h5p_content_user_data.objects.filter(content_main_id=contentId, delete_on_content_change=1).count() > 0:
             # Reset user datas for this content
-            userData = h5p_content_user_data.objects.get(
+            userData = h5p_content_user_data.objects.filter(
                 content_main_id=contentId, delete_on_content_change=1)
-            userData.timestamp = int(time.time())
-            userData.data = 'RESET'
-            userData.save()
+            for user in userData:
+                user.timestamp = int(time.time())
+                user.data = 'RESET'
+                user.save()
     ##
     # Get file extension whitelist
     # The default extension list is part of h5p, but admins should be allowed to modify it
