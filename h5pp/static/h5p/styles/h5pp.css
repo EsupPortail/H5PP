@@ -163,6 +163,13 @@ label[for='id_title'] {
 	margin-left: 45%;
 	margin-top: 10px;
 }
+.score {
+	background : rgba(255,255,255, .4);
+	border-radius: 25px;
+	padding-left: 15px;
+	padding-bottom: 2px;
+	margin: auto;
+}
 
 /* Login */
 #form_login {

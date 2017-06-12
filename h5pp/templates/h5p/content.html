@@ -5,15 +5,12 @@
 	{% for style in data.assets.css %}
 		@import url("{% static style %}");
 	{% endfor %}
-	</style>
-	<style>
-	.score, .configuration {
-		background : rgba(255,255,255, .4);
-		border-radius: 25px;
-		padding-left: 15px;
-		padding-bottom: 2px;
-		margin: auto;
-	}
+	{% if request.GET.is_iframe %}
+		.content {
+			padding: 0px !important;
+			max-width: 900px !important;
+		}
+	{% endif %}
 	</style>
 	{% for script in data.assets.js %}
 		<script type="text/javascript" src="{% static script %}"></script>
@@ -29,8 +26,10 @@
 <div class="wrap">
 	{% if not request.GET.is_iframe %}
 		<h3 class="page-title">{{request.GET.title}}</h3>
-	{% endif %}
 	<div class="well">
+	{% else %}
+		<div class="html-content">
+	{% endif %}
 		{% autoescape off %}
 			{{html}}
 		{% endautoescape %}
