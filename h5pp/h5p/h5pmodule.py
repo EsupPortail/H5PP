@@ -21,6 +21,8 @@ STYLES = [
     "styles/h5p-core-button.css"
 ]
 
+OVERRIDE_STYLES = '/static/h5p/styles/h5pp.css'
+
 SCRIPTS = [
     "js/jquery.js",
     "js/h5p.js",
@@ -38,7 +40,7 @@ SCRIPTS = [
 
 
 def h5pGetExportPath(content):
-    return settings.MEDIA_ROOT + '/h5pp/exports/' + ((content['slug'] + '-') if 'slug' in content else '') + str(content['id']) + '.h5p'
+    return os.path.join(settings.MEDIA_ROOT, 'h5pp', 'exports', ((content['slug'] + '-') if 'slug' in content else ''), str(content['id']) + '.h5p')
 
 ##
 # Creates the title for the library details page
@@ -225,7 +227,8 @@ def h5pSetFinished(request):
     }
 
     if contentId.isdigit() and score.isdigit() and maxScore.isdigit():
-        update = h5p_points.objects.get(content_id=contentId, uid=request.user.id)
+        update = h5p_points.objects.get(
+            content_id=contentId, uid=request.user.id)
         update.finished = int(time.time())
         update.points = score
         update.max_points = maxScore
@@ -354,13 +357,21 @@ def h5pAddFilesAndSettings(request, embedType):
     }
     if embedType == 'div':
         for script in files['scripts']:
-            url = settings.MEDIA_URL + 'h5pp/' + script['path'] + script['version']
-            filesAssets['js'].append(settings.MEDIA_URL + 'h5pp/' + script['path'])
+            url = settings.MEDIA_URL + 'h5pp/' + \
+                script['path'] + script['version']
+            filesAssets['js'].append(
+                settings.MEDIA_URL + 'h5pp/' + script['path'])
             integration['loadedJs'] = url
         for style in files['styles']:
-            url = settings.MEDIA_URL + 'h5pp/' + style['path'] + style['version']
-            filesAssets['css'].append(settings.MEDIA_URL + 'h5pp/' + style['path'])
+            url = settings.MEDIA_URL + 'h5pp/' + \
+                style['path'] + style['version']
+            filesAssets['css'].append(
+                settings.MEDIA_URL + 'h5pp/' + style['path'])
             integration['loadedCss'] = url
+        #Override CSS
+        filesAssets['css'].append(OVERRIDE_STYLES)
+        integration['loadedCss'] = OVERRIDE_STYLES
+
     elif embedType == 'iframe':
         h5pAddIframeAssets(request, integration, content['id'], files)
 
@@ -414,7 +425,7 @@ def h5pGetContentSettings(user, content):
         'embedCode': str('<iframe src="' + settings.BASE_URL + settings.H5P_URL + 'embed/' + content['id'] + '" width=":w" height=":h" frameborder="0" allowFullscreen="allowfullscreen"></iframe>'),
         'mainId': content['id'],
         'url': str(content['url']),
-        'title': str(content['title']),
+        'title': str(content['title'].encode('utf-8')),
         'contentUserData': contentUserData,
         'displayOptions': content['displayOptions']
     }
@@ -496,8 +507,8 @@ def h5pAddIframeAssets(request, integration, contentId, files):
     # Temp
     writable = False
     if writable:
-        if not os.path.exists(settings.H5P_PATH + '/files'):
-            os.mkdir(settings.H5P_PATH + '/files')
+        if not os.path.exists(os.path.join(settings.H5P_PATH, 'files')):
+            os.mkdir(os.path.join(settings.H5P_PATH, 'files'))
 
         styles = list()
         externalStyles = list()
@@ -515,10 +526,12 @@ def h5pAddIframeAssets(request, integration, contentId, files):
     else:
         integration['contents'][
             'cid-' + contentId]['styles'] = core.getAssetsUrls(files['styles'])
+        #Override Css
+        integration['contents']['cid-' + contentId]['styles'].append(OVERRIDE_STYLES)
 
     if writable:
-        if not os.path.exists(settings.H5P_PATH + '/files'):
-            os.mkdir(settings.H5P_PATH + '/files')
+        if not os.path.exists(os.path.join(settings.H5P_PATH, 'files')):
+            os.mkdir(os.path.join(settings.H5P_PATH, 'files'))
 
         scripts = dict()
         externalScripts = dict()
@@ -542,13 +555,15 @@ def h5pAddIframeAssets(request, integration, contentId, files):
 
 def getUserScore(contentId, user=None):
     if user != None:
-        score = h5p_points.objects.filter(content_id=contentId, uid=user.id).values('points', 'max_points')
+        score = h5p_points.objects.filter(
+            content_id=contentId, uid=user.id).values('points', 'max_points')
     else:
-        score = h5p_points.objects.filter(content_id=contentId).extra(select={'user': 'uid'}).values('user', 'points', 'max_points')
+        score = h5p_points.objects.filter(content_id=contentId).extra(
+            select={'user': 'uid'}).values('user', 'points', 'max_points')
         for user in score:
             user['user'] = User.objects.get(id=user['user']).username
 
-    if len(score) > 0 :
+    if len(score) > 0:
         return score
 
     return None
@@ -556,6 +571,8 @@ def getUserScore(contentId, user=None):
 ##
 # Uninstall H5P
 ##
+
+
 def uninstall():
     basepath = settings.MEDIA_ROOT + '/h5pp'
     if os.path.exists(basepath):
@@ -576,6 +593,8 @@ def uninstall():
 ##
 # Get a new H5P security token for the given action
 ##
+
+
 def createToken(action):
     timeFactor = getTimeFactor()
     h = hashlib.new('md5')

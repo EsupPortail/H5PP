@@ -22,9 +22,9 @@ class H5PDjangoEditor:
         self.h5p = h5p
         self.storage = storage
         self.basePath = basePath
-        self.contentFilesDir = filesDir + 'content'
-        self.editorFilesDir = (filesDir if editorFilesDir ==
-                               None else editorFilesDir) + 'editor'
+        self.contentFilesDir = os.path.join(filesDir, 'content')
+        self.editorFilesDir = os.path.join(filesDir if editorFilesDir ==
+                                           None else editorFilesDir, 'editor')
 
     ##
     # This does alot of the same as getLibraries in library/h5pclasses.py. Use that instead ?
@@ -169,16 +169,16 @@ class H5PDjangoEditor:
     # Create directories for uploaded content
     ##
     def createDirectories(self, contentId):
-        self.contentDirectory = self.contentFilesDir + \
-            '/' + str(contentId) + '/'
-        if not os.path.isdir(self.basePath + self.contentFilesDir):
-            os.mkdir(self.basePath + self.contentFilesDir, 0777)
+        self.contentDirectory = os.path.join(
+            self.contentFilesDir, str(contentId))
+        if not os.path.isdir(self.contentFilesDir):
+            os.mkdir(os.path.join(self.basePath, self.contentFilesDir), 0777)
 
         subDirectories = ['', 'files', 'images', 'videos', 'audios']
         for subDirectory in subDirectories:
-            subDirectory = self.contentDirectory + subDirectory
-            if not os.path.isdir(self.basePath + subDirectory):
-                os.mkdir(self.basePath + subDirectory)
+            subDirectory = os.path.join(self.contentDirectory, subDirectory)
+            if not os.path.isdir(subDirectory):
+                os.mkdir(subDirectory)
 
         return True
 
@@ -255,20 +255,21 @@ class H5PDjangoEditor:
         return
 
     def processFile(self, params, files):
-        editorPath = self.editorFilesDir + '/'
+        editorPath = self.editorFilesDir
 
         matches = re.search(self.h5p.relativePathRegExp, params['path'])
         if matches:
-            source = self.contentDirectory + \
-                matches.group(1) + matches.group(4) + '/' + matches.group(5)
-            dest = self.contentDirectory + matches.group(5)
+            source = os.path.join(self.contentDirectory, matches.group(
+                1), matches.group(4), matches.group(5))
+            dest = os.path.join(self.contentDirectory, matches.group(5))
             if os.path.exists(source) and not os.path.exists(dest):
                 shutil.copy(source, dest)
 
             params['path'] = matches.group(5)
         else:
-            oldPath = self.basePath + editorPath + params['path']
-            newPath = self.basePath + self.contentDirectory + params['path']
+            oldPath = os.path.join(self.basePath, editorPath, params['path'])
+            newPath = os.path.join(
+                self.basePath, self.contentDirectory, params['path'])
             if not os.path.exists(newPath) and os.path.exists(oldPath):
                 shutil.copy(oldPath, newPath)
 
