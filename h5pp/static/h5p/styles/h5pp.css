@@ -178,7 +178,7 @@ label[for='id_title'] {
 	padding: 0;
 }
 
-/* bootstrap overide */
+/* bootstrap override */
 .btn:focus, .btn:active {
 	outline-color: #25AA2E !important;
 }
@@ -187,4 +187,9 @@ label[for='id_title'] {
 }
 .navbar .navbar-brand:hover {
 	color: #3ab242;
+}
+
+/* h5p override */
+.h5p-interactive-video .h5p-video {
+	height: 500px !important;
 }

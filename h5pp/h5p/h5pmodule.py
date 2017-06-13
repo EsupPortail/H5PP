@@ -21,6 +21,8 @@ STYLES = [
     "styles/h5p-core-button.css"
 ]
 
+OVERRIDE_STYLES = '/static/h5p/styles/h5pp.css'
+
 SCRIPTS = [
     "js/jquery.js",
     "js/h5p.js",
@@ -334,6 +336,7 @@ def h5pAddFilesAndSettings(request, embedType):
     assets = h5pAddCoreAssets()
 
     if not 'json_content' in request.GET or not 'contentId' in request.GET:
+        print("passe")
         return integration
 
     content = h5pGetContent(request)
@@ -366,6 +369,10 @@ def h5pAddFilesAndSettings(request, embedType):
             filesAssets['css'].append(
                 settings.MEDIA_URL + 'h5pp/' + style['path'])
             integration['loadedCss'] = url
+        #Override CSS
+        filesAssets['css'].append(OVERRIDE_STYLES)
+        integration['loadedCss'] = OVERRIDE_STYLES
+
     elif embedType == 'iframe':
         h5pAddIframeAssets(request, integration, content['id'], files)
 
@@ -520,6 +527,8 @@ def h5pAddIframeAssets(request, integration, contentId, files):
     else:
         integration['contents'][
             'cid-' + contentId]['styles'] = core.getAssetsUrls(files['styles'])
+        #Override Css
+        integration['contents']['cid-' + contentId]['styles'].append(OVERRIDE_STYLES)
 
     if writable:
         if not os.path.exists(os.path.join(settings.H5P_PATH, 'files')):
