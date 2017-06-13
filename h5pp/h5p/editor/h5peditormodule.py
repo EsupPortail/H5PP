@@ -14,6 +14,8 @@ import re
 STYLES = ["libs/darkroom.css",
           "styles/css/application.css"]
 
+OVERRIDE_STYLES = '/static/h5p/styles/h5pp.css'
+
 SCRIPTS = [
     "scripts/h5peditor.js",
     "scripts/h5peditor-semantic-structure.js",
@@ -52,6 +54,9 @@ def h5peditorContent(request, contentId=None):
     for style in STYLES:
         css = settings.STATIC_URL + 'h5p/h5peditor/' + style
         assets['css'].append(css)
+
+    #Override Css
+    assets['css'].append(OVERRIDE_STYLES)
 
     for script in SCRIPTS:
         if script != 'scripts/h5peditor-editor.js':

@@ -336,7 +336,6 @@ def h5pAddFilesAndSettings(request, embedType):
     assets = h5pAddCoreAssets()
 
     if not 'json_content' in request.GET or not 'contentId' in request.GET:
-        print("passe")
         return integration
 
     content = h5pGetContent(request)
