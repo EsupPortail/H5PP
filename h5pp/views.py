@@ -32,35 +32,25 @@ from h5pp.h5p.editor.h5peditormodule import (
 from h5pp.h5p.editor.library.h5peditorfile import H5PEditorFile
 
 
-class LibrariesListView(FormView):
-    template_name = "h5p/libraries.html"
-    success_url = "h5plibraries"
-    form_class = LibrariesForm
+def librariesView(request):
+    if request.user.is_authenticated():
+        libraries = h5p_libraries.objects.all()
+        if request.method == 'POST':
+            form = LibrariesForm(request.user, request.POST, request.FILES)
+            if form.is_valid():
+                if 'h5p' in request.FILES and request.FILES['h5p'] != None:
+                    return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries, 'status': 'Upload complete'})
+                elif 'download' in request.POST:
+                    return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries, 'status': 'Update complete'})
+                else:
+                    status = uninstall()
+                    return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries, 'status': status})
+            return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries})
 
-    def get_form_kwargs(self):
-        kwargs = {
-            'user': self.request.user,
-        }
-        return kwargs
+        form = LibrariesForm(request.user)
+        return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries})
 
-    def get_context_data(self, **kwargs):
-        """
-        Get libraries for the template list
-
-        """
-        ctx = super(LibrariesListView, self).get_context_data(**kwargs)
-        ctx["libraries"] = h5p_libraries.objects.all()
-
-        return ctx
-
-    def form_valid(self, form):
-        if "h5p" in self.request.FILES and self.request.FILES["h5p"] is not None:
-            messages.success(self.request, "Upload complete")
-        elif 'download' in self.request.POST:
-            messages.success(self.request, "Update complete")
-        else:
-            status = uninstall()
-            messages.success(self.request, status)
+    return HttpResponseRedirect('/h5p/login/?next=/h5p/home/')
 
 
 class CreateContentView(CreateView):
@@ -88,7 +78,7 @@ class CreateContentView(CreateView):
         return ctx
 
     def post(self, request, *args, **kwargs):
-        form = CreateForm(self.request, self.request.POST, self.request.FILES)
+        form = CreateForm(self.request, self.request.user, self.request.POST, self.request.FILES)
         if form.is_valid():
             return self.form_valid(form)
         else:

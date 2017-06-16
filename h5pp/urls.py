@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
 
 from h5pp.views import (
-    LibrariesListView,
+    librariesView,
     CreateContentView,
     UpdateContentView,
     ContentDetailView,
@@ -19,7 +19,7 @@ urlpatterns = [
     url(r'^home/$', TemplateView.as_view(template_name="h5p/home.html"), name="h5phome"),
 
     # Contents and Libraries
-    url(r'^libraries/$', login_required(LibrariesListView.as_view()), name="h5plibraries"),
+    url(r'^libraries/$', librariesView, name="h5plibraries"),
     url(r'^listContents/$', listView, name="h5plistContents"),
     url(r'^content/(?P<content_id>\d+)/$', login_required(ContentDetailView.as_view()), name="h5pcontent"),
 
