@@ -78,7 +78,7 @@ class CreateContentView(CreateView):
         return ctx
 
     def post(self, request, *args, **kwargs):
-        form = CreateForm(self.request, self.request.user, self.request.POST, self.request.FILES)
+        form = CreateForm(self.request, self.request.POST, self.request.FILES)
         if form.is_valid():
             return self.form_valid(form)
         else:
