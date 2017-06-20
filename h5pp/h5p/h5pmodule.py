@@ -1,10 +1,4 @@
-##
 # Django module h5p.
-##
-from django.conf import settings
-from django.contrib.auth.models import User
-from h5pp.models import *
-from h5pp.h5p.h5pclasses import H5PDjango
 import collections
 import hashlib
 import shutil
@@ -14,6 +8,15 @@ import math
 import json
 import os
 import re
+
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.contrib.auth.models import User
+
+from h5pp.utils import get_media_url
+from h5pp.models import *
+from h5pp.h5p.h5pclasses import H5PDjango
+
 
 STYLES = [
     "styles/h5p.css",
@@ -263,13 +266,13 @@ def h5pAddCoreAssets():
 
 def h5pGetCoreSettings(user):
     coreSettings = {
-        'baseUrl': settings.BASE_URL,
-        'url': settings.BASE_URL + settings.MEDIA_URL + 'h5pp',
+        'baseUrl': Site.objects.get_current().domain,
+        'url': "{}h5pp".format(get_media_url()),
         'postUserStatistics': user.id > 0,
-        'ajaxPath': settings.BASE_URL + settings.H5P_URL + 'ajax',
+        'ajaxPath': "{}{}ajax".format(Site.objects.get_current().domain, settings.H5P_URL),
         'ajax': {
-            'setFinished': settings.BASE_URL + settings.H5P_URL + 'ajax/?setFinished',
-            'contentUserData': settings.BASE_URL + settings.H5P_URL + 'ajax/?content-user-data&contentId=:contentId&dataType=:dataType&subContentId=:subContentId'
+            'setFinished': "{}ajax/?setFinished".format(settings.H5P_URL),
+            'contentUserData': "{}ajax/?content-user-data&contentId=:contentId&dataType=:dataType&subContentId=:subContentId".format(settings.H5P_URL),
         },
         'tokens': {
             'result': createToken('result'),
@@ -354,12 +357,12 @@ def h5pAddFilesAndSettings(request, embedType):
     }
     if embedType == 'div':
         for script in files['scripts']:
-            url = settings.MEDIA_URL + 'h5pp/' + script['path'] + script['version']
-            filesAssets['js'].append(settings.MEDIA_URL + 'h5pp/' + script['path'])
+            url = get_media_url() + 'h5pp/' + script['path'] + script['version']
+            filesAssets['js'].append(get_media_url() + 'h5pp/' + script['path'])
             integration['loadedJs'] = url
         for style in files['styles']:
-            url = settings.MEDIA_URL + 'h5pp/' + style['path'] + style['version']
-            filesAssets['css'].append(settings.MEDIA_URL + 'h5pp/' + style['path'])
+            url = get_media_url() + 'h5pp/' + style['path'] + style['version']
+            filesAssets['css'].append(get_media_url() + 'h5pp/' + style['path'])
             integration['loadedCss'] = url
     elif embedType == 'iframe':
         h5pAddIframeAssets(request, integration, content['id'], files)
@@ -382,7 +385,7 @@ def h5pGetContent(request):
         'library': request.GET['main_library'],
         'embedType': 'div',
         'filtered': request.GET['filtered'],
-        'url': settings.BASE_URL + settings.MEDIA_URL + 'h5pp/content/' + str(h5pGetContentId(request)),
+        'url': "{}h5pp/content/{}/".format(get_media_url(), str(h5pGetContentId(request))),
         'displayOptions': '',
         'slug': request.GET['h5p_slug']
     }
@@ -411,7 +414,7 @@ def h5pGetContentSettings(user, content):
         'jsonContent': filtered,
         'fullScreen': content['library']['fullscreen'],
         'exportUrl': h5pGetExportPath(content),
-        'embedCode': str('<iframe src="' + settings.BASE_URL + settings.H5P_URL + 'embed/' + content['id'] + '" width=":w" height=":h" frameborder="0" allowFullscreen="allowfullscreen"></iframe>'),
+        'embedCode': str('<iframe src="' + Site.objects.get_current().domain + settings.H5P_URL + 'embed/' + content['id'] + '" width=":w" height=":h" frameborder="0" allowFullscreen="allowfullscreen"></iframe>'),
         'mainId': content['id'],
         'url': str(content['url']),
         'title': str(content['title']),

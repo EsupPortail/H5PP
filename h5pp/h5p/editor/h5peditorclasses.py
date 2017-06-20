@@ -1,13 +1,16 @@
-##
 # Handles all communication with the database
-##
-from django.conf import settings
-from h5pp.models import h5p_libraries
+
 import collections
 import shutil
 import json
 import re
 import os
+
+from django.conf import settings
+
+from h5pp.models import h5p_libraries
+from h5pp.utils import get_media_url
+
 
 
 class H5PDjangoEditor:
@@ -91,7 +94,7 @@ class H5PDjangoEditor:
         self.h5p.aggregateAssets = aggregateAssets
 
         # Create base URL
-        url = settings.MEDIA_URL + '/h5pp' + prefix
+        url = get_media_url() + '/h5pp' + prefix
 
         # JavaScripts
         if 'scripts' in files:

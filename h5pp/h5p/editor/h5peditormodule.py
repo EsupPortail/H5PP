@@ -1,15 +1,19 @@
-##
 # Django module h5p editor
-##
-from django.conf import settings
-from h5pp.models import h5p_content_user_data, h5p_libraries, h5p_points
-from h5pp.h5p.h5pmodule import h5pAddCoreAssets, h5pAddFilesAndSettings
-from h5pp.h5p.h5pclasses import H5PDjango
+
 import shutil
 import time
 import json
 import os
 import re
+
+from django.contrib.sites.models import Site
+from django.conf import settings
+
+from h5pp.utils import get_media_url
+from h5pp.models import h5p_content_user_data, h5p_libraries, h5p_points
+from h5pp.h5p.h5pmodule import h5pAddCoreAssets, h5pAddFilesAndSettings
+from h5pp.h5p.h5pclasses import H5PDjango
+
 
 STYLES = ["libs/darkroom.css",
           "styles/css/application.css"]
@@ -71,14 +75,14 @@ def h5peditorContent(request):
 
     contentValidator = framework.h5pGetInstance('contentvalidator')
     editor['editor'] = {
-        'filesPath': settings.MEDIA_URL + 'h5pp/editor',
+        'filesPath': get_media_url() + 'h5pp/editor',
         'fileIcon': {
-            'path': settings.BASE_URL + settings.STATIC_URL + 'h5p/h5peditor/images/binary-file.png',
+            'path': "{}/{}h5p/h5peditor/images/binary-file.png".format(Site.objects.get_current().domain, settings.STATIC_URL),
             'width': 50,
             'height': 50
         },
-        'ajaxPath': settings.BASE_URL + settings.H5P_URL + 'editorajax/' + (request['contentId'] if 'contentId' in request else '0') + '/',
-        'libraryPath': settings.BASE_URL + settings.STATIC_URL + 'h5p/h5peditor/',
+        'ajaxPath': "{}editorajax/{}/".format(settings.H5P_URL, (request['contentId'] if 'contentId' in request else '0')),
+        'libraryPath': "{}{}h5p/h5peditor/".format(Site.objects.get_current().domain, settings.STATIC_URL),
         'copyrightSemantics': contentValidator.getCopyrightSemantics(),
         'assets': assets,
         'contentRelUrl': '../media/h5pp/content/'
