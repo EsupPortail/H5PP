@@ -1171,7 +1171,7 @@ class H5PCore:
 
             # Add URL prefix if not external
             if '://' not in asset['path']:
-                url = "{}{}{}".format(settings.MEDIA_URL(), 'h5pp', url)
+                url = "{}{}{}".format(settings.MEDIA_URL, 'h5pp', url)
                 urls.append(url)
 
             # Add version/cache buster if set

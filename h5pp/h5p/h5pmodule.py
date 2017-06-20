@@ -266,7 +266,7 @@ def h5pAddCoreAssets():
 def h5pGetCoreSettings(user):
     coreSettings = {
         'baseUrl': Site.objects.get_current().domain,
-        'url': "{}h5pp".format(settings.MEDIA_URL()),
+        'url': "{}h5pp".format(settings.MEDIA_URL),
         'postUserStatistics': user.id > 0,
         'ajaxPath': "{}{}ajax".format(Site.objects.get_current().domain, settings.H5P_URL),
         'ajax': {
@@ -356,12 +356,12 @@ def h5pAddFilesAndSettings(request, embedType):
     }
     if embedType == 'div':
         for script in files['scripts']:
-            url = settings.MEDIA_URL() + 'h5pp/' + script['path'] + script['version']
-            filesAssets['js'].append(settings.MEDIA_URL() + 'h5pp/' + script['path'])
+            url = settings.MEDIA_URL + 'h5pp/' + script['path'] + script['version']
+            filesAssets['js'].append(settings.MEDIA_URL + 'h5pp/' + script['path'])
             integration['loadedJs'] = url
         for style in files['styles']:
-            url = settings.MEDIA_URL() + 'h5pp/' + style['path'] + style['version']
-            filesAssets['css'].append(settings.MEDIA_URL() + 'h5pp/' + style['path'])
+            url = settings.MEDIA_URL + 'h5pp/' + style['path'] + style['version']
+            filesAssets['css'].append(settings.MEDIA_URL + 'h5pp/' + style['path'])
             integration['loadedCss'] = url
     elif embedType == 'iframe':
         h5pAddIframeAssets(request, integration, content['id'], files)
@@ -384,7 +384,7 @@ def h5pGetContent(request):
         'library': request.GET['main_library'],
         'embedType': 'div',
         'filtered': request.GET['filtered'],
-        'url': "{}h5pp/content/{}/".format(settings.MEDIA_URL(), str(h5pGetContentId(request))),
+        'url': "{}h5pp/content/{}/".format(settings.MEDIA_URL, str(h5pGetContentId(request))),
         'displayOptions': '',
         'slug': request.GET['h5p_slug']
     }
