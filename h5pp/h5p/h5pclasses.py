@@ -13,7 +13,6 @@ from django.contrib import messages
 from django.db import connection
 
 from h5pp.models import h5p_libraries, h5p_libraries_libraries, h5p_libraries_languages, h5p_contents, h5p_counters, h5p_contents_libraries, h5p_content_user_data
-from h5pp.utils import get_media_url
 from h5pp.h5p.h5pevent import H5PEvent
 from h5pp.h5p.library.h5pclasses import H5PCore, H5PValidator, H5PStorage, H5PContentValidator, H5PExport
 from h5pp.h5p.editor.h5peditorclasses import H5PDjangoEditor
@@ -60,7 +59,7 @@ class H5PDjango:
             return self.core
         elif typ == 'editor':
             storage = H5PEditorStorage()
-            return H5PDjangoEditor(self.core, storage, settings.BASE_DIR, get_media_url() + 'h5pp/')
+            return H5PDjangoEditor(self.core, storage, settings.BASE_DIR, settings.MEDIA_URL() + 'h5pp/')
 
     ##
     # Returns info for the current platform

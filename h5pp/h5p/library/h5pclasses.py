@@ -18,7 +18,6 @@ import cgi
 from django.conf import settings
 from django.template.defaultfilters import slugify
 
-from h5pp.utils import get_media_url
 from h5pp.h5p.library.h5pdevelopment import H5PDevelopment
 from h5pp.h5p.library.h5pdefaultstorage import H5PDefaultStorage
 
@@ -1172,7 +1171,7 @@ class H5PCore:
 
             # Add URL prefix if not external
             if '://' not in asset['path']:
-                url = "{}{}{}".format(get_media_url(), 'h5pp', url)
+                url = "{}{}{}".format(settings.MEDIA_URL(), 'h5pp', url)
                 urls.append(url)
 
             # Add version/cache buster if set

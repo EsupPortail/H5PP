@@ -9,7 +9,6 @@ import re
 from django.contrib.sites.models import Site
 from django.conf import settings
 
-from h5pp.utils import get_media_url
 from h5pp.models import h5p_content_user_data, h5p_libraries, h5p_points
 from h5pp.h5p.h5pmodule import h5pAddCoreAssets, h5pAddFilesAndSettings
 from h5pp.h5p.h5pclasses import H5PDjango
@@ -75,7 +74,7 @@ def h5peditorContent(request):
 
     contentValidator = framework.h5pGetInstance('contentvalidator')
     editor['editor'] = {
-        'filesPath': get_media_url() + 'h5pp/editor',
+        'filesPath': settings.MEDIA_URL() + 'h5pp/editor',
         'fileIcon': {
             'path': "{}/{}h5p/h5peditor/images/binary-file.png".format(Site.objects.get_current().domain, settings.STATIC_URL),
             'width': 50,
