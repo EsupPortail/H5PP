@@ -24,7 +24,7 @@ class H5PDjangoEditor:
         self.h5p = h5p
         self.storage = storage
         self.basePath = basePath
-        self.contentFilesDir = filesDir + 'content'
+        self.contentFilesDir = basePath + '/h5pp/content'
         self.editorFilesDir = (filesDir if editorFilesDir ==
                                None else editorFilesDir) + 'editor'
 
@@ -173,14 +173,14 @@ class H5PDjangoEditor:
     def createDirectories(self, contentId):
         self.contentDirectory = self.contentFilesDir + \
             '/' + str(contentId) + '/'
-        if not os.path.isdir(self.basePath + self.contentFilesDir):
-            os.mkdir(self.basePath + self.contentFilesDir)
+        if not os.path.isdir(self.contentFilesDir):
+            os.mkdir(self.contentFilesDir)
 
         subDirectories = ['', 'files', 'images', 'videos', 'audios']
         for subDirectory in subDirectories:
             subDirectory = self.contentDirectory + subDirectory
-            if not os.path.isdir(self.basePath + subDirectory):
-                os.mkdir(self.basePath + subDirectory)
+            if not os.path.isdir(subDirectory):
+                os.mkdir(subDirectory)
 
         return True
 
