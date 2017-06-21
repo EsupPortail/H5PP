@@ -269,8 +269,8 @@ class H5PDjangoEditor:
 
             params['path'] = matches.group(5)
         else:
-            oldPath = self.basePath + editorPath + params['path']
-            newPath = self.basePath + self.contentDirectory + params['path']
+            oldPath = editorPath + params['path']
+            newPath = self.contentDirectory + params['path']
             if not os.path.exists(newPath) and os.path.exists(oldPath):
                 shutil.copy(oldPath, newPath)
 

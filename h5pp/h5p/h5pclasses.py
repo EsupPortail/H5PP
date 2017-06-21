@@ -59,7 +59,7 @@ class H5PDjango:
             return self.core
         elif typ == 'editor':
             storage = H5PEditorStorage()
-            return H5PDjangoEditor(self.core, storage, settings.MEDIA_ROOT, settings.MEDIA_URL + 'h5pp/')
+            return H5PDjangoEditor(self.core, storage, settings.MEDIA_ROOT, settings.MEDIA_ROOT + '/h5pp/')
 
     ##
     # Returns info for the current platform
