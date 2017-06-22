@@ -391,6 +391,7 @@ class H5PDjango:
             json_contents=content['params'],
             embed_type='div',
             main_library_id=content['library']['libraryId'],
+            author=content['author'],
             disable=content['disable'],
             filtered='',
             slug='')
@@ -547,6 +548,7 @@ class H5PDjango:
 					hn.title,
 					hn.json_contents AS params,
 					hn.embed_type,
+                    hn.author,
 					hl.library_id,
 					hl.machine_name AS library_name,
 					hl.major_version AS library_major_version,
