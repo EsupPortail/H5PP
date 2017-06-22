@@ -20,6 +20,9 @@
 	<script type="text/javascript">
 		H5PIntegration = {% autoescape off %} {{data.integration}} {% endautoescape %}
 	</script>
+	{% if request.GET.is_iframe %}
+		<script type="text/javascript" src="{% static 'h5p/js/h5p-resizer.js' %}"></script>
+	{% endif %}
 {% endblock head %}
 {% block body %}
 <div class="wrap">
@@ -33,20 +36,17 @@
 			{{html}}
 		{% endautoescape %}
 		{% if request.user.is_authenticated and not request.GET.is_iframe %}
-			<a href="{% url 'h5pedit' contentId=request.GET.contentId %}?title={{request.GET.title}}">
-				<input type="submit" class="btn btn-default edit-button" id="edit" value="Edit video" />
-			</a>
+			<div class="content-options">
+				{% if request.user.username == owner %}
+					<a href="{% url 'h5pedit' contentId=request.GET.contentId %}?title={{request.GET.title}}">
+						<input type="submit" class="btn btn-default edit-button" id="edit" value="Edit video" />
+					</a>
+				{% endif %}
+				<a href="{% url 'h5pscore' contentId=request.GET.contentId %}">
+					<input type="submit" class="btn btn-default edit-button" value="View users score" />
+				</a>
+			</div>
 		{% endif %}
 	</div>
 </div>
-{% if request.user.is_authenticated and not request.GET.is_iframe %}
-	<div class="well score">
-		<h5 class="h5p-score-header">Score</h5>
-		{% if score and score.points %}
-			Your score on this video : {{score.points}} / {{score.max_points}}
-		{% else %}
-			This is the first time you watch this video
-		{% endif %}
-	</div>
-{% endif %}
 {% endblock body %}

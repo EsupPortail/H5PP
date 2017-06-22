@@ -1,0 +1,85 @@
+{% extends "h5p/base.html" %}
+{% load static %}
+{% block head %}
+	<script>
+	function search() {
+			var input, filter, table, tr, td, i;
+			input = document.getElementById("searchbar");
+			filter = input.value.toUpperCase();
+			table = document.getElementById("contents");
+			tr = table.getElementsByTagName("tr");
+
+			for(i = 0; i < tr.length; i++) {
+				td = tr[i].getElementsByTagName("td")[0];
+				if(td) {
+					if(td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+						tr[i].style.display = "";
+					}else {
+						tr[i].style.display = "none";
+					}
+				}
+			}
+		}
+	</script>
+{% endblock head %}
+{% block body %}
+<div class="wrap">
+	<h3 class="page-title">Users score</h3>
+	<div class="alert alert-success">
+		<p>
+			Here is users score for this content.<br>
+			You can search for score by username and see his score. A 'X' in the score column indicates that the user has not yet completed the activities.<br>
+			{% if listScore.owner %}
+				You can reset user score or reset the scores saved on this content.
+			{% endif %}
+		</p>
+	</div>
+	{% if status %}
+		<div class="alert alert-danger">
+			<p>
+				{{ status }}
+			</p>
+		</div>
+	{% endif %}
+	<div class="list">
+		<input type="text" id="searchbar" onkeyup="search()" placeholder="Search by name...">
+		<table id="contents">
+			<tr class="header">
+				<th style="width:30%;">Username</th>
+				<th style="width:30%;">Score</th>
+				{% if listScore.owner %}
+					<th style="width:40%;">Options</th>
+				{% endif %}
+			</tr>
+			{% for score in listScore.data %}
+				<tr>
+					<td>
+						{{ score.user }}
+					</td>
+					<td>
+						{% if score.max_points %}
+							{{ score.points }} / {{ score.max_points }}
+						{% else %}
+							X
+						{% endif %}
+					</td>
+					{% if listScore.owner %}
+						<td class="options">
+							<a href="{% url "h5pscore" contentId=contentId %}?user={{ score.user }}">Reset score</a>
+						</td>
+					{% endif %}
+				</tr>
+			{% endfor %}
+		</table>
+	</div>
+	{% if listScore.owner %}
+		<div class="score-options">
+			
+				<form method="post" action="{% url "h5pscore" contentId=contentId %}">
+					{% csrf_token %}
+					<input type="submit" class="btn btn-default" value="Reset all">
+				</form>
+		</div>
+	{% endif %}
+</div>
+{% endblock body %}

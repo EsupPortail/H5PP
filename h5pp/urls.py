@@ -19,6 +19,9 @@ urlpatterns = [
     url(r'^create/$', 'h5pp.views.createView', name='h5pcreate'),
     url(r'^create/(?P<contentId>\d+)/$', 'h5pp.views.createView', name='h5pedit'),
 
+    # Users score
+    url(r'^score/(?P<contentId>\d+)/$', 'h5pp.views.scoreView', name='h5pscore'),
+
     # Ajax
     url(r'^ajax/$', 'h5pp.views.ajax', name='h5pajax'),
     url(r'^editorajax/(?P<contentId>\d+)/$', 'h5pp.views.editorAjax', name='h5peditorAjax'),
