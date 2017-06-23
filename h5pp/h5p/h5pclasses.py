@@ -361,6 +361,7 @@ class H5PDjango:
         # Update content
         update = h5p_contents.objects.get(content_id=contentId)
         update.title = content['title']
+        update.author = content['author']
         update.json_contents = content['params']
         update.embed_type = 'div'
         update.main_library_id = content['library']['libraryId']
