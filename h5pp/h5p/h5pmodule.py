@@ -554,7 +554,7 @@ def h5pAddIframeAssets(request, integration, contentId, files):
             'cid-' + contentId]['scripts'] = core.getAssetsUrls(files['scripts'])
 
 
-def getUserScore(contentId, user=None):
+def getUserScore(contentId, user=None, ajax=False):
     if user != None:
         score = h5p_points.objects.filter(
             content_id=contentId, uid=user.id).values('points', 'max_points')
@@ -565,6 +565,8 @@ def getUserScore(contentId, user=None):
             user['user'] = User.objects.get(id=user['user']).username
 
     if len(score) > 0:
+        if ajax:
+            return json.dumps(list(score))
         return score
 
     return None
@@ -625,3 +627,13 @@ def h5pIsExternalAsset(path):
 
 def libraryToString(library, folderName=False):
     return str(library["machineName"] if 'machineName' in library else library['name'] + ("-" if folderName else " ") + str(library["majorVersion"]) + "." + str(library["minorVersion"]))
+
+##
+# Returns all rows from a cursor as a dict
+##
+def dictfetchall(self, cursor):
+    desc = cursor.description
+    return [
+        dict(zip([col[0] for col in desc], row))
+        for row in cursor.fetchall()
+    ]

@@ -220,4 +220,11 @@ def ajax(request):
             data,
             content_type='application/json'
         )
+
+    elif 'user-scores' in request.GET:
+        score = getUserScore(request.GET['user-scores'], None, True)
+        return HttpResponse(
+            score,
+            content_type='application/json'
+        )
     return HttpResponseRedirect('/h5p/create')
