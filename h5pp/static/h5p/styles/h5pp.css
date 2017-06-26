@@ -139,6 +139,9 @@ label[for='id_title'] {
 .content-options {
 	width: 65px;
 }
+.options {
+	display: inline-flex;
+}
 
 #contents {
 	border-collapse: collapse;
@@ -157,11 +160,16 @@ label[for='id_title'] {
 	background-color: #f1f1f1;
 }
 
+/* Users score */
+.score-options {
+	margin-top: 10px;
+}
+
 /* Content */
 .edit-button {
 	text-align: center;
-	margin-left: 45%;
 	margin-top: 10px;
+	margin-left: 5px;
 }
 .score {
 	background : rgba(255,255,255, .4);
@@ -169,6 +177,9 @@ label[for='id_title'] {
 	padding-left: 15px;
 	padding-bottom: 2px;
 	margin: auto;
+}
+.content-options {
+	display: inline-flex;
 }
 
 /* Login */

@@ -86,6 +86,7 @@ def h5pInsert(request, interface):
             'embed_type': request.POST['embed_type'],
             'disable': request.POST['disable'],
             'library': lib,
+            'author': request.user.username,
             'h5p_library': request.POST['h5p_library'] if 'h5p_library' in request.POST else None
         }, request.POST['nid'])
 

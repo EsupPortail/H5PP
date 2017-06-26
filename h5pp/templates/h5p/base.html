@@ -24,6 +24,7 @@
 							<li><a href="{% url 'h5plibraries' %}">Libraries</a></li>
 							<li><a href="{% url 'h5pcreate' %}">Editor</a></li>
 							<li><a href="{% url 'h5plistContents' %}">Contents</a></li>
+							<li><a href="{% url 'admin:index' %}">Administration</a></li>
 						</ul>
 						{% if not request.user.is_authenticated %}
 							<a href="{% url 'login' %}?next=/h5p/home/" class="btn btn-success navbar-btn navbar-right user">
@@ -40,6 +41,10 @@
 								{{ request.user.username }}
 							</p>
 						{% endif %}
+						<a href="/" class="btn btn-info navbar-btn navbar-right user">
+							<span class="glyphicon glyphicon-exit"></span>
+							Return to home
+						</a>
 					</div>
 				</nav>
 			</header>

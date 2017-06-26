@@ -28,7 +28,7 @@
 	<div class="alert alert-success">
 		<p>
 			Here is the list of contents currently created or imported into the H5PP database.<br>
-			You can search for content by name, see the content type, the user's score, the ID of the content and the options table (View, edit or delete the content).
+			You can search for content by name, see the content type, the author, the ID of the content and the options table (View, edit or delete the content).
 		</p>
 	</div>
 	{% if status %}
@@ -42,12 +42,12 @@
 		<input type="text" id="searchbar" onkeyup="search()" placeholder="Search by name...">
 		<table id="contents">
 			<tr class="header">
-				<th style="width:40%;">Name</th>
+				<th style="width:20%;">Name</th>
+				<th style="width:20%;">Author</th>
 				<th style="width:20%;">Content type</th>
-				<th style="width:20%;">Score</th>
 				<th style="width:10%;">ID</th>
 				{% if request.user.is_authenticated %}
-					<th style="width:10%;">Options</th>
+					<th style="width:30%;">Options</th>
 				{% endif %}
 			</tr>
 		{% for content in listContent %}
@@ -56,30 +56,22 @@
 					{{content.title}}
 				</td>
 				<td>
+					{{content.author}}
+				</td>
+				<td>
 					{{content.library_name}}
 					<span class="label label-default">
 						{{content.library_major_version}}.{{content.library_minor_version}}
 					</span>
 				</td>
 				<td>
-					<ul class="list-group">
-					{% for user in content.score %}
-						{% if user.points %}	
-						<li class="list-group-item">{{user.user}} - {{user.points}} / {{user.max_points}}</li>
-						{% else %}
-						<li class="list-group-item">{{user.user}} - Not completed yet</li>
-						{% endif %}
-					{% endfor %}
-					</ul>
-				</td>
-				<td>
 					{{content.id}}
 				</td>
-				<td>
+				<td class="options">
 					<a href="{% url "h5pcontent" %}?contentId={{content.id}}">
 						<input type="submit" class="btn btn-default content-options" value="View" />
 					</a>
-					{% if request.user.is_authenticated %}
+					{% if request.user.is_authenticated and request.user.username == content.author or request.user.is_superuser%}
 						<a href="{% url "h5pedit" contentId=content.id %}?title={{content.title}}">
 							<input type="submit" class="btn btn-default content-options" value="Edit" />
 						</a>

@@ -10,24 +10,37 @@
 				With the navigation bar at the top of the page you can access the features of the plugin.
 			</p>
 		</div>
+		{% if status %}
+		<div class="alert alert-danger">
+			<p>
+				{{ status }}
+			</p>
+		</div>
+		{% endif %}
 		<div class="info">
 			<div class="info-body">
 				<h4 class="info-heading">Libraries</h4>
 				<p>
 					To use H5PP you need a set of files named "libraries" that contains the necessary to create different types of content.<br>
 					You can find the official release of H5P, containing many content types, at this adress :<br>
-					<a href="https://h5p.org/sites/default/files/official-h5p-release-20170301.h5p">Official release</a>
+					<a href="https://h5p.org/sites/default/files/official-h5p-release-20170301.h5p">Official release</a><br>
+					Only administrators / superuser can access to this page.
 				</p>
 				<h4 class="info-heading">Editor</h4>
 				<p>
 					To create or edit a content you need to use the editor provided by H5P.<br>
-					All content is identified by a title, set during creation, and a identifier (ID) created automatically after the creation.<br>
-					Everybody can view a content, but only authenticated users can create and edit contents. Finally, only superuser can delete content.
+					All content is identified by a title, set during creation, a identifier (ID) created automatically after the creation and their author.<br>
+					Everybody can view a content, but only authenticated users can create content. The owner of the content can edit or delete his content.
 				</p>
 				<h4 class="info-heading">Contents</h4>
 				<p>
 					Anytime, you can consult the list of created contents.<br>
-					It is through this list that you can view the contents.
+					It is through this list that you can view, edit or delete the contents. 
+				</p>
+				<h4 class="info-heading">Scores</h4>
+				<p>
+					Interactive video contents have a score system. When an interactive video has activities with a point system, the user then has a score.<br>
+					You can verify the scores obtained by users who saw your video. If you are the owner of this video you can reset any user score on your video if you want, or you can reset all the scores obtained on this video.
 				</p>
 			</div>
 		</div>

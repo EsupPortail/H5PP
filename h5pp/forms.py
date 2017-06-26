@@ -144,6 +144,7 @@ class CreateForm(forms.Form):
 
                 content['title'] = self.request.POST['title']
                 content['params'] = self.request.POST['json_content']
+                content['author'] = self.request.user.username
                 params = json.loads(content['params'])
                 if 'contentId' in self.request.POST:
                     content['id'] = self.request.POST['contentId']
