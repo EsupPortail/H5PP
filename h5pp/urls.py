@@ -22,6 +22,9 @@ urlpatterns = [
     # Users score
     url(r'^score/(?P<contentId>\d+)/$', 'h5pp.views.scoreView', name='h5pscore'),
 
+    # Embed page
+    url(r'^embed/$', 'h5pp.views.embedView', name='h5pembed'),
+
     # Ajax
     url(r'^ajax/$', 'h5pp.views.ajax', name='h5pajax'),
     url(r'^editorajax/(?P<contentId>\d+)/$', 'h5pp.views.editorAjax', name='h5peditorAjax'),
