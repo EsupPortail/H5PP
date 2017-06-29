@@ -106,7 +106,7 @@ def listView(request):
 
 def scoreView(request, contentId):
     owner = h5p_contents.objects.get(content_id=contentId)
-    if request.method == 'POST' and request.user.username == owner.author:
+    if request.method == 'POST' and (request.user.username == owner.author or request.user.is_superuser):
         userData = h5p_content_user_data.objects.filter(content_main_id=contentId)
         if userData:
             userData.delete()
@@ -116,7 +116,7 @@ def scoreView(request, contentId):
 
         return HttpResponseRedirect('/h5p/score/%s' % contentId, {'status': "Scores has been reset !"})
 
-    if 'user' in request.GET:
+    if 'user' in request.GET and (request.user.username == owner.author or request.user.is_superuser):
         user = User.objects.get(username=request.GET['user'])
         userData = h5p_content_user_data.objects.filter(user_id=user.id, content_main_id=contentId)
         if userData:
@@ -128,14 +128,14 @@ def scoreView(request, contentId):
         return HttpResponseRedirect('/h5p/score/%s' % contentId, {'status': "%s's score has been reset !" % user.username})
 
     listScore = dict()
-    if request.user.username == owner.author:
+    if request.user.username == owner.author or request.user.is_superuser:
         listScore['owner'] = True
 
     listScore['data'] = getUserScore(contentId)
     if listScore['data'] > 0:
         return render(request, 'h5p/score.html', {'listScore': listScore, 'contentId': contentId})
 
-    return render(request, 'h5p/score.html', {'status': 'No score available yet.'})
+    return render(request, 'h5p/score.html', {'status': 'No score available yet.', 'contentId': contentId})
 
 def embedView(request):
     if 'contentId' in request.GET:
