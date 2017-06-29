@@ -553,6 +553,37 @@ def h5pAddIframeAssets(request, integration, contentId, files):
         integration['contents'][
             'cid-' + contentId]['scripts'] = core.getAssetsUrls(files['scripts'])
 
+##
+# Generate embed page to be included in iframe
+##
+def h5pEmbed(request):
+    h5pPath = settings.STATIC_URL + 'h5p/'
+    coreSettings = h5pGetCoreSettings(request.user)
+    framework = H5PDjango(request.user)
+    
+    scripts = list()
+    for script in SCRIPTS:
+        scripts.append(h5pPath + script)
+    styles = list()
+    for style in STYLES:
+        styles.append(h5pPath + style)
+
+    integration = h5pGetCoreSettings(request.user)
+    
+    content = h5pGetContent(request)
+
+    integration['contents'] = dict()
+    integration['contents']['cid-' + content['id']] = h5pGetContentSettings(request.user, content)
+
+    core = framework.h5pGetInstance('core')
+    preloadedDependencies = core.loadContentDependencies(content['id'])
+    files = core.getDependenciesFiles(preloadedDependencies)
+    libraryList = h5pDependenciesToLibraryList(preloadedDependencies)
+
+    scripts = scripts + core.getAssetsUrls(files['scripts'])
+    styles = styles + core.getAssetsUrls(files['styles'])
+
+    return {'h5p': json.dumps(integration), 'scripts': scripts, 'styles': styles, 'lang': settings.H5P_LANGUAGE}
 
 def getUserScore(contentId, user=None, ajax=False):
     if user != None:

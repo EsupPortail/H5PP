@@ -1,11 +1,11 @@
 from django.conf import settings
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from h5pp.forms import LibrariesForm, CreateForm
 from h5pp.models import h5p_libraries, h5p_contents, h5p_content_user_data, h5p_points
-from h5pp.h5p.h5pmodule import includeH5p, h5pSetStarted, h5pSetFinished, h5pGetContentId, h5pGetListContent, h5pLoad, h5pDelete, getUserScore, uninstall
+from h5pp.h5p.h5pmodule import *
 from h5pp.h5p.h5pclasses import H5PDjango
 from h5pp.h5p.editor.h5peditormodule import h5peditorContent, handleContentUserData
 from h5pp.h5p.editor.h5peditorclasses import H5PDjangoEditor
@@ -136,6 +136,18 @@ def scoreView(request, contentId):
         return render(request, 'h5p/score.html', {'listScore': listScore, 'contentId': contentId})
 
     return render(request, 'h5p/score.html', {'status': 'No score available yet.'})
+
+def embedView(request):
+    if 'contentId' in request.GET:
+        h5pLoad(request)
+        embed = h5pEmbed(request)
+        score = None
+        if request.user.is_authenticated():
+            h5pSetStarted(request.user, h5pGetContentId(request))
+            score = getUserScore(request.GET['contentId'], request.user)[0]
+        return render(request, 'h5p/embed.html', {'embed': embed, 'score': score})
+
+    return HttpResponseForbidden()
 
 @csrf_exempt
 def editorAjax(request, contentId):

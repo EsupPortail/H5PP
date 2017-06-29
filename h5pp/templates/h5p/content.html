@@ -5,11 +5,6 @@
 	{% for style in data.assets.css %}
 		@import url("{% static style %}");
 	{% endfor %}
-	{% if request.GET.is_iframe %}
-		.content {
-			padding: 0px !important;
-		}
-	{% endif %}
 	</style>
 	{% for script in data.assets.js %}
 		<script type="text/javascript" src="{% static script %}"></script>
@@ -20,22 +15,15 @@
 	<script type="text/javascript">
 		H5PIntegration = {% autoescape off %} {{data.integration}} {% endautoescape %}
 	</script>
-	{% if request.GET.is_iframe %}
-		<script type="text/javascript" src="{% static 'h5p/js/h5p-resizer.js' %}"></script>
-	{% endif %}
 {% endblock head %}
 {% block body %}
 <div class="wrap">
-	{% if not request.GET.is_iframe %}
-		<h3 class="page-title">{{request.GET.title}}</h3>
+	<h3 class="page-title">{{request.GET.title}}</h3>
 	<div class="well">
-	{% else %}
-		<div class="html-content">
-	{% endif %}
 		{% autoescape off %}
 			{{html}}
 		{% endautoescape %}
-		{% if request.user.is_authenticated and not request.GET.is_iframe %}
+		{% if request.user.is_authenticated %}
 			<div class="content-options">
 				{% if request.user.username == owner %}
 					<a href="{% url 'h5pedit' contentId=request.GET.contentId %}?title={{request.GET.title}}">
