@@ -141,7 +141,11 @@ def embedView(request):
     if 'contentId' in request.GET:
         h5pLoad(request)
         embed = h5pEmbed(request)
-        return render(request, 'h5p/embed.html', {'embed': embed})
+        score = None
+        if request.user.is_authenticated():
+            h5pSetStarted(request.user, h5pGetContentId(request))
+            score = getUserScore(request.GET['contentId'], request.user)[0]
+        return render(request, 'h5p/embed.html', {'embed': embed, 'score': score})
 
     return HttpResponseForbidden()
 
