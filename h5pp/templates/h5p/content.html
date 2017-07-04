@@ -5,6 +5,9 @@
 	{% for style in data.assets.css %}
 		@import url("{% static style %}");
 	{% endfor %}
+	{% for style in data.filesAssets.css %}
+		@import url("{% static style %}");
+	{% endfor %}
 	</style>
 	{% for script in data.assets.js %}
 		<script type="text/javascript" src="{% static script %}"></script>
@@ -27,7 +30,7 @@
 			<div class="content-options">
 				{% if request.user.username == owner %}
 					<a href="{% url 'h5pedit' contentId=request.GET.contentId %}?title={{request.GET.title}}">
-						<input type="submit" class="btn btn-default edit-button" id="edit" value="Edit video" />
+						<input type="submit" class="btn btn-default edit-button" id="edit" value="Edit content" />
 					</a>
 				{% endif %}
 				<a href="{% url 'h5pscore' contentId=request.GET.contentId %}">
