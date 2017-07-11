@@ -2,55 +2,59 @@
 
 H5PP is a port of H5P by Joubel to the Python language and the web framework Django. H5P makes it easy to create, share and reuse HTML5 content and applications. Authors may create and edit interactive video, presentations, games, advertisements and more. Content may be imported and exported. All that is needed to view or edit H5P content is a web browser.
 
-## Quick start
-1. Install H5PP packages with pip :
-<pre><code>
-pip install H5PP-0.1.tar.gz
-</code></pre>
+## Docs
 
-2. Add 'h5pp' to your INSTALLED_APPS settings like this :
-<pre><code>
-INSTALLED_APPS = [
-  ...
-  'h5pp',
-]
-</code></pre>
+The documentation of this port of H5P is being writted and not completed yet. 
 
-3. Include the h5pp Urlconf in your project urls.py like this :
-<pre><code>
-url(r'^h5p/', include('h5pp.urls'))
-</code></pre>
+For the moment here is the wiki chapters available : 
 
-4. Include these variables into the settings.py file of your Django project :
-<pre><code>
-H5P_VERSION = '7.x'
-H5P_DEV_MODE = 0
-H5P_PATH = os.path.join(BASE_DIR, 'h5pp/static/h5p')
-H5P_URL = '/h5p/'
-H5P_SAVE = 30
-H5P_EXPORT = '/exports/'
-H5P_LANGUAGE = 'en'
-BASE_URL = 'http://localhost:8000' # Hostname of your server
-</code></pre>
-Beta version use the inner system of login of Django. So don't forget to set your `LOGIN_URL` and `LOGIN_REDIRECT_URL` variables in your settings.
+-> [Home](https://github.com/DrClockwork/H5PP/wiki)
 
-5. If not already done. Make a 'media' directory at the root of your Django project.
+-> [How to install H5PP](https://github.com/DrClockwork/H5PP/wiki/Setup_EN)
 
-6. Run `python manage.py migrate` to create the h5pp models.
+-> [Database and variables](https://github.com/DrClockwork/H5PP/wiki/About_EN)
 
-7. Start the development server and visit http://127.0.0.1:8000/h5p/home/ to access to the main menu of h5pp. Go to libraries to install the officiel H5P Release from h5p.org.
-
-8. Visit http://127.0.0.1:8000/h5p/create/ to create or upload new H5P contents.
+Official documentation of the original version of H5P : https://h5p.org/documentation
 
 ## Beta version
 This version of H5P is a beta. Many things have to be corrected, code need to be optimized and currently the project is being tested. So we can not ensure the stability of the project until the end of the beta phase.
 
+## Informations
+
+H5P git repositories : https://github.com/h5p
+
+H5P official website : https://h5p.org/
+
+Joubel officiel website : https://joubel.com/ 
+
+***
+
+# H5PP - HTML5 Package Python
+
+H5PP est un portable d'H5P par Joubel vers le language Python et l'application web Django. H5P permet de créer, partager et réutiliser facilement du contenu et des applications HTML5. Les auteurs peuvent créer et éditer des vidéos interactives, des présentations, des jeux, des annonces et plus encore. Le contenu peut être importé ou exporté. Le seul outil nécessaire pour voir et éditer du contenu H5P est un navigateur web.
+
 ## Docs
 
-The documentation of this port of H5P is being writted. For the moment here is the official documentation of the original version of H5P : https://h5p.org/documentation
+La documentation de ce portage H5P est en cours de rédaction et n'est pas encore complète. 
 
-## ====================
+Pour le moment voici les chapitres du wiki disponible : 
 
-H5P git repositories : https://github.com/h5p <br>
-H5P official website : https://h5p.org/ <br>
-Joubel officiel website : https://joubel.com/ 
+-> [Home](https://github.com/DrClockwork/H5PP/wiki/HOME_FR)
+
+-> [Installer H5PP](https://github.com/DrClockwork/H5PP/wiki/Setup_FR)
+
+-> [Base de données et variables](https://github.com/DrClockwork/H5PP/wiki/About_FR)
+
+Documentation officielle du plugin original H5P : https://h5p.org/documentation
+
+## Version Beta
+This version of H5P is a beta. Many things have to be corrected, code need to be optimized and currently the project is being tested. So we can not ensure the stability of the project until the end of the beta phase.
+Cette version d'H5P est en beta. Plusieurs choses nécessitent d'être corrigé, le code a besoin d'être optimisé et pour l'instant le projet est encore en phase de test. De ce fait, nous ne pouvons garantir la stabilité du projet avant la fin de la phase de beta.
+
+## Informations
+
+Dépot git d'H5P : https://github.com/h5p
+
+Site officiel d'H5P : https://h5p.org/
+
+Site officiel de Joubel : https://joubel.com/
