@@ -26,7 +26,7 @@ def isset(variable):
 
 
 def substr_replace(subject, replace, start, length):
-    if length == None:
+    if length is None:
         return subject[:start] + replace
     elif length < 0:
         return subject[:start] + replace + subject[length:]
@@ -124,7 +124,7 @@ class H5PDefaultStorage:
 
         try:
             shutil.copy(source, os.path.join(self.path, 'exports', filename))
-        except IOError, e:
+        except IOError as e:
             print('Unable to copy %s' % e)
 
         return True
@@ -239,7 +239,7 @@ class H5PDefaultStorage:
             if not self.dirReady(parent):
                 return False
 
-            os.mkdir(path, 0777)
+            os.mkdir(path, 0o777)
 
         if not os.path.isdir(path):
             raise Exception('Path is not a directory')

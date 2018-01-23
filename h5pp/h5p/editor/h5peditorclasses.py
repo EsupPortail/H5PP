@@ -23,8 +23,7 @@ class H5PDjangoEditor:
         self.storage = storage
         self.basePath = basePath
         self.contentFilesDir = os.path.join(filesDir, 'content')
-        self.editorFilesDir = os.path.join(filesDir if editorFilesDir ==
-                                           None else editorFilesDir, 'editor')
+        self.editorFilesDir = os.path.join(filesDir if editorFilesDir is None else editorFilesDir, 'editor')
 
     ##
     # This does alot of the same as getLibraries in library/h5pclasses.py. Use that instead ?
@@ -172,7 +171,7 @@ class H5PDjangoEditor:
         self.contentDirectory = os.path.join(
             self.contentFilesDir, str(contentId))
         if not os.path.isdir(self.contentFilesDir):
-            os.mkdir(os.path.join(self.basePath, self.contentFilesDir), 0777)
+            os.mkdir(os.path.join(self.basePath, self.contentFilesDir), 0o777)
 
         subDirectories = ['', 'files', 'images', 'videos', 'audios']
         for subDirectory in subDirectories:
