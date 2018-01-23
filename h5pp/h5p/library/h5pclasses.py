@@ -8,7 +8,7 @@ import pprint
 import glob
 import binascii
 import cgi
-import urllib2
+import urllib3
 import math
 import time
 import hashlib
@@ -20,6 +20,7 @@ from h5pdefaultstorage import H5PDefaultStorage
 
 is_array = lambda var: isinstance(var, (list, tuple))
 
+http = urllib3.PoolManager()
 
 def empty(variable):
     if not variable:
@@ -43,7 +44,7 @@ def mb_substr(s, start, length=None, encoding="UTF-8"):
 
 def file_get_contents(filename, use_include_path=0, context=None, offset=-1, maxlen=-1):
     if filename.find("://") > 0:
-        ret = urllib2.urlopen(filename).read()
+        ret = http.request('GET', filename).read()
         if offset > 0:
             ret = ret[offset:]
         if maxlen > 0:
@@ -52,7 +53,7 @@ def file_get_contents(filename, use_include_path=0, context=None, offset=-1, max
     else:
         fp = open(filename, "rb")
         try:
-            if (offset > 0):
+            if offset > 0:
                 fp.seek(offset)
             ret = fp.read(maxlen)
             return ret
