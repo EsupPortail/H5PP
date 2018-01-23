@@ -22,13 +22,16 @@ def librariesView(request):
         if request.method == 'POST':
             form = LibrariesForm(request.user, request.POST, request.FILES)
             if form.is_valid():
-                if 'h5p' in request.FILES and request.FILES['h5p'] != None:
-                    return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries, 'status': 'Upload complete'})
+                if 'h5p' in request.FILES and request.FILES['h5p'] is not None:
+                    return render(request, 'h5p/libraries.html',
+                                  {'form': form, 'libraries': libraries, 'status': 'Upload complete'})
                 elif 'download' in request.POST:
-                    return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries, 'status': 'Update complete'})
+                    return render(request, 'h5p/libraries.html',
+                                  {'form': form, 'libraries': libraries, 'status': 'Update complete'})
                 else:
                     status = uninstall()
-                    return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries, 'status': status})
+                    return render(request, 'h5p/libraries.html',
+                                  {'form': form, 'libraries': libraries, 'status': status})
             return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries})
 
         form = LibrariesForm(request.user)
@@ -41,11 +44,11 @@ def createView(request, contentId=None):
     if request.user.is_authenticated():
         editor = h5peditorContent(request, contentId)
         if request.method == 'POST':
-            if contentId != None:
+            if contentId is not None:
                 request.POST['contentId'] = contentId
             form = CreateForm(request, request.POST, request.FILES)
             if form.is_valid():
-                if contentId != None:
+                if contentId is not None:
                     return HttpResponseRedirect('/h5p/content/?contentId=' + contentId)
                 else:
                     newId = h5p_contents.objects.all(
@@ -53,15 +56,15 @@ def createView(request, contentId=None):
                     return HttpResponseRedirect('/h5p/content/?contentId=' + str(newId.content_id))
             return render(request, 'h5p/create.html', {'form': form, 'data': editor})
 
-        elif contentId != None:
+        elif contentId is not None:
             framework = H5PDjango(request.user)
             edit = framework.loadContent(contentId)
             request.GET = request.GET.copy()
             request.GET['contentId'] = contentId
             request.GET['json_content'] = edit['params']
             request.GET['h5p_library'] = edit['library_name'] + ' ' + \
-                str(edit['library_major_version']) + '.' + \
-                str(edit['library_minor_version'])
+                                         str(edit['library_major_version']) + '.' + \
+                                         str(edit['library_minor_version'])
 
         form = CreateForm(request)
 
@@ -85,8 +88,11 @@ def contentsView(request):
                 h5pSetStarted(request.user, h5pGetContentId(request))
                 score = getUserScore(h5pGetContentId(request), request.user)
 
-                return render(request, 'h5p/content.html', {'html': content['html'], 'data': content['data'], 'owner': owner.author, 'score': score[0]})
-            return render(request, 'h5p/content.html', {'html': content['html'], 'data': content['data'], 'owner': owner.author})
+                return render(request, 'h5p/content.html',
+                              {'html': content['html'], 'data': content['data'], 'owner': owner.author,
+                               'score': score[0]})
+            return render(request, 'h5p/content.html',
+                          {'html': content['html'], 'data': content['data'], 'owner': owner.author})
 
     return HttpResponseRedirect('/h5p/listContents')
 
@@ -96,13 +102,15 @@ def listView(request):
         if request.user.is_superuser:
             h5pDelete(request)
             return HttpResponseRedirect('/h5p/listContents')
-        return render(request, 'h5p/listContents.html', {'status': 'You do not have the necessary rights to delete a video.'})
+        return render(request, 'h5p/listContents.html',
+                      {'status': 'You do not have the necessary rights to delete a video.'})
 
     listContent = h5pGetListContent(request)
     if listContent > 0:
         return render(request, 'h5p/listContents.html', {'listContent': listContent})
 
     return render(request, 'h5p/listContents.html', {'status': 'No contents installed.'})
+
 
 def scoreView(request, contentId):
     owner = h5p_contents.objects.get(content_id=contentId)
@@ -125,7 +133,8 @@ def scoreView(request, contentId):
         if userPoints:
             userPoints.delete()
 
-        return HttpResponseRedirect('/h5p/score/%s' % contentId, {'status': "%s's score has been reset !" % user.username})
+        return HttpResponseRedirect('/h5p/score/%s' % contentId,
+                                    {'status': "%s's score has been reset !" % user.username})
 
     listScore = dict()
     if request.user.username == owner.author or request.user.is_superuser:
@@ -136,6 +145,7 @@ def scoreView(request, contentId):
         return render(request, 'h5p/score.html', {'listScore': listScore, 'contentId': contentId})
 
     return render(request, 'h5p/score.html', {'status': 'No score available yet.', 'contentId': contentId})
+
 
 def embedView(request):
     if 'contentId' in request.GET:
@@ -148,6 +158,7 @@ def embedView(request):
         return render(request, 'h5p/embed.html', {'embed': embed, 'score': score})
 
     return HttpResponseForbidden()
+
 
 @csrf_exempt
 def editorAjax(request, contentId):
