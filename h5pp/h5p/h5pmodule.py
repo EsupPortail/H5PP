@@ -504,9 +504,7 @@ def h5pAddIframeAssets(request, integration, contentId, files):
     integration['core']['scripts'] = assets['js']
     integration['core']['styles'] = assets['css']
 
-    writable = os.path.exists(settings.H5P_PATH)
-    # Temp
-    writable = False
+    writable = False # Temporary, future feature
     if writable:
         if not os.path.exists(os.path.join(settings.H5P_PATH, 'files')):
             os.mkdir(os.path.join(settings.H5P_PATH, 'files'))
@@ -587,18 +585,20 @@ def h5pEmbed(request):
 
 def getUserScore(contentId, user=None, ajax=False):
     if user != None:
-        score = h5p_points.objects.filter(
+        scores = h5p_points.objects.filter(
             content_id=contentId, uid=user.id).values('points', 'max_points')
     else:
-        score = h5p_points.objects.filter(content_id=contentId).extra(
-            select={'user': 'uid'}).values('user', 'points', 'max_points')
-        for user in score:
-            user['user'] = User.objects.get(id=user['user']).username
+        scores = h5p_points.objects.filter(content_id=contentId)
+        for score in scores:
+            score.uid = User.objects.get(id=score.uid).username
+            score.has_finished = score.finished >= score.started
+            score.points = '..' if score.points == None else score.points
+            score.max_points = '..' if score.max_points == None else score.max_points
 
-    if len(score) > 0:
+    if len(scores) > 0:
         if ajax:
-            return json.dumps(list(score))
-        return score
+            return json.dumps(list(scores))
+        return scores
 
     return None
 

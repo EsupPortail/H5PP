@@ -9,29 +9,11 @@
 		{% endif %}
 	</style>
 	<script>
-		function search() {
-			var input, filter, table, tr, td, i;
-			input = document.getElementById("searchbar");
-			filter = input.value.toUpperCase();
-			table = document.getElementById("libraries");
-			tr = table.getElementsByTagName("tr");
-
-			for(i = 0; i < tr.length; i++) {
-				td = tr[i].getElementsByTagName("td")[0];
-				if(td) {
-					if(td.innerHTML.toUpperCase().indexOf(filter) > -1) {
-						tr[i].style.display = "";
-					}else {
-						tr[i].style.display = "none";
-					}
-				}
-			}
-		}
 		window.onload = function() {
 			var fileInput = document.getElementById("id_h5p");
-			button = document.getElementsByClassName("upload-libraries")[0];
-			result = document.getElementsByClassName("file-return")[0];
-			submit = document.getElementsByClassName("submit")[0];
+			var button = document.getElementsByClassName("upload-libraries")[0];
+			var result = document.getElementsByClassName("file-return")[0];
+			var submit = document.getElementsByClassName("submit")[0];
 
 			button.addEventListener( "keydown", function(event) {
 				if(event.keyCode == 13 || event.keyCode == 32) {
@@ -49,6 +31,26 @@
 				loader = document.getElementsByClassName("loader")[0];
 				loader.style.display = 'block';
 				result.innerHTML = '';
+			});
+
+			var searchbar = document.getElementById('searchbar');
+			searchbar.addEventListener("keyup", function(event) {
+				var input, filter, table, tr, td, i;
+				input = document.getElementById("searchbar");
+				filter = input.value.toUpperCase();
+				table = document.getElementById("libraries");
+				tr = table.getElementsByTagName("tr");
+
+				for(i = 0; i < tr.length; i++) {
+					td = tr[i].getElementsByTagName("td")[0];
+					if(td) {
+						if(td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+							tr[i].style.display = "";
+						}else {
+							tr[i].style.display = "none";
+						}
+					}
+				}
 			});
 		};
 	</script>
@@ -108,7 +110,7 @@
 <div class="list">
 	{% if libraries %}
 	<h4 class="section-title">List of libraries availables</h4>
-	<input type="text" id="searchbar" onkeyup="search()" placeholder="Search for libraries...">
+	<input type="text" id="searchbar" placeholder="Search for libraries...">
 	<table id="libraries">
 		<tr class="header">
 			<th style="width:60%;">Name</th>

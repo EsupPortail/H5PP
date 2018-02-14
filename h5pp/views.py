@@ -67,12 +67,12 @@ def createView(request, contentId=None):
 
         return render(request, 'h5p/create.html', {'form': form, 'data': editor})
 
-    return HttpResponseRedirect('/h5p/login/?next=/h5p/home/')
+    return HttpResponseRedirect('/h5p/login/?next=/h5p/create/')
 
 
 def contentsView(request):
-    owner = h5p_contents.objects.get(content_id=h5pGetContentId(request))
     if 'contentId' in request.GET:
+        owner = h5p_contents.objects.get(content_id=h5pGetContentId(request))
         h5pLoad(request)
         content = includeH5p(request)
         score = None

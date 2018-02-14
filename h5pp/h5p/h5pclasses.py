@@ -4,9 +4,10 @@
 from django.conf import settings
 from django.contrib import messages
 from django.db import connection
-from h5pp.models import h5p_libraries, h5p_libraries_libraries, h5p_libraries_languages, h5p_contents, h5p_counters, h5p_contents_libraries, h5p_content_user_data
+from django.template.defaultfilters import slugify
+from h5pp.models import *
 from h5pp.h5p.h5pevent import H5PEvent
-from h5pp.h5p.library.h5pclasses import H5PCore, H5PValidator, H5PStorage, H5PContentValidator, H5PExport
+from h5pp.h5p.library.h5pclasses import *
 from h5pp.h5p.editor.h5peditorclasses import H5PDjangoEditor
 from h5pp.h5p.editor.library.h5peditorstorage import H5PEditorStorage
 import collections
@@ -68,7 +69,7 @@ class H5PDjango:
         return {
             'name': 'django',
             'version': django.get_version(),
-            'h5pVersion': h5pInfo
+            'h5pVersion': '7.x'
         }
     ##
     # Fetches a file from a remote server using HTTP GET
@@ -367,6 +368,7 @@ class H5PDjango:
         update.main_library_id = content['library']['libraryId']
         update.filtered = ''
         update.disable = content['disable']
+        update.slug = slugify(content['title'])
         update.save()
 
         # Derive library data from string
@@ -395,7 +397,7 @@ class H5PDjango:
             author=content['author'],
             disable=content['disable'],
             filtered='',
-            slug='')
+            slug=slugify(content['title']))
 
         event = H5PEvent('content', 'create', result.content_id, content['title'] if 'title' in content else '', content[
                          'library']['machineName'], str(content['library']['majorVersion']) + '.' + str(content['library']['minorVersion']))
