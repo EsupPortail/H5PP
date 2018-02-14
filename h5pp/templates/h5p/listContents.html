@@ -3,6 +3,7 @@
 {% block head %}
 	<title>H5P - List of contents</title>
 	<script>
+	{% if listContent %}
 	window.onload = function() {
 		// Initialize the searchbar
 		var searchbar = document.getElementById('searchbar');
@@ -51,28 +52,31 @@
 		// Initialize the delete button
 		var remove = document.getElementById('delete');
 		remove.addEventListener("click", function(event) {
-			try {
-				var selected = document.getElementsByClassName('success')[0];
-				var id = selected.getElementsByTagName('td')[3].innerText;
-				var form = document.createElement("form");
-				form.setAttribute("method", "post");
-				form.setAttribute("action", "{% url 'h5plistContents' %}?contentId=" + id);
-				var hiddenField = document.createElement("input");
-				hiddenField.setAttribute("type", "hidden");
-				hiddenField.setAttribute("name", "csrfmiddlewaretoken");
-				hiddenField.setAttribute("value", "{{csrf_token}}");
-				form.appendChild(hiddenField);
-				document.body.appendChild(form);
-				form.submit();
+			if (confirm('Are you sure you want to delete this content ?')) {
+				try {
+					var selected = document.getElementsByClassName('success')[0];
+					var id = selected.getElementsByTagName('td')[3].innerText;
+					var form = document.createElement("form");
+					form.setAttribute("method", "post");
+					form.setAttribute("action", "{% url 'h5plistContents' %}?contentId=" + id);
+					var hiddenField = document.createElement("input");
+					hiddenField.setAttribute("type", "hidden");
+					hiddenField.setAttribute("name", "csrfmiddlewaretoken");
+					hiddenField.setAttribute("value", "{{csrf_token}}");
+					form.appendChild(hiddenField);
+					document.body.appendChild(form);
+					form.submit();
+				}
+				catch(error) {
+					alert('First select a content to delete.');
+				}
 			}
-			catch(error) {
-				alert('First select a content to delete.');
-			}
+			return false;
 		});
 
 		// Initialize the score buttons and tables
 		var score = document.getElementById('score');
-		var manage = document.getElementById('manage');
+		var manage_buttons = document.getElementsByClassName('manage');
 		score.addEventListener("click", function(event) {
 			try {
 				var selected = document.getElementsByClassName('success')[0];
@@ -85,21 +89,24 @@
 				}
 			}
 			catch(error) {
-				alert('Error bad score');
+				alert('First select a content to view his score.');
 			}
 		});
-		manage.addEventListener("click", function(event) {
-			try {
-				var selected = document.getElementsByClassName('success')[0];
-				var id = selected.getElementsByTagName('td')[3].innerText;
-				window.location = "/h5p/score/" + id + "/";
-			}
-			catch(error) {
-				alert('Error bad score');
-			}
-		});
+		for(var i = 0; i < manage_buttons.length; i++) {
+			manage_buttons[i].addEventListener("click", function(event) {
+				try {
+					var selected = document.getElementsByClassName('success')[0];
+					var id = selected.getElementsByTagName('td')[3].innerText;
+					window.location = "/h5p/score/" + id + "/";
+				}
+				catch(error) {
+					alert('Error bad score');
+				}
+			});
+		}
 		{% endif %}
 	}
+	{% endif %}
 	</script>
 {% endblock head %}
 {% block body %}
@@ -131,17 +138,17 @@
 		<input type="text" id="searchbar" placeholder="Search by name...">
 		{% if request.user.is_authenticated or request.user.is_superuser %}
 			<button type="submit" id="edit" class="btn btn-link" value="Edit">
-				<span class="glyphicon glyphicon-wrench"></span>
+				<span class="glyphicon glyphicon-wrench"> Edit</span>
 			</button>
 		{% endif %}
 		{% if request.user.is_authenticated or request.user.is_superuser %}
 			<button type="submit" id="delete" class="btn btn-link" value="Delete">
-				<span class="glyphicon glyphicon-erase"></span>
+				<span class="glyphicon glyphicon-erase"> Delete</span>
 			</button>
 		{% endif %}
 		{% if request.user.is_authenticated or request.user.is_superuser %}
 			<button type="submit" id="score" class="btn btn-link" value="Score">
-				<span class="glyphicon glyphicon-list-alt"></span>
+				<span class="glyphicon glyphicon-list-alt"> Score</span>
 			</button>
 		{% endif %}
 		<h4>Contents</h4>
@@ -238,11 +245,14 @@
 							{% endif %}
 						{% endfor %}
 						{% if content.author == request.user.username or request.user.is_superuser %}
-						<tr><td>
-							<button type="submit" id="manage" class="btn btn-link" value="Manage">
-								<span class="glyphicon glyphicon-edit">Manage</span>
-							</button>
-						</td></tr>
+						<tr>
+							<td><h4>{{content.title}}</h4></td>
+							<td>
+								<button type="submit" class="btn btn-link manage" value="Manage">
+									<span class="glyphicon glyphicon-edit">Manage</span>
+								</button>
+							</td>
+						</tr>
 						{% endif %}
 					</tbody>
 				</table>

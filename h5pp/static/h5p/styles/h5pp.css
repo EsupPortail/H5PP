@@ -164,6 +164,9 @@ label[for='id_title'] {
 .score-options {
 	margin-top: 10px;
 }
+#resetall.btn.btn-link {
+	color: red;
+}
 
 /* Content (h5p/content.html) */
 .edit-button {
