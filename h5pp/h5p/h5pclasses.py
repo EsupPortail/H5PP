@@ -393,6 +393,7 @@ class H5PDjango:
             title=content['title'],
             json_contents=content['params'],
             embed_type='div',
+            content_type=content['library']['machineName'],
             main_library_id=content['library']['libraryId'],
             author=content['author'],
             disable=content['disable'],
