@@ -97,9 +97,10 @@ def contentsView(request):
 
 def listView(request):
     if request.method == 'POST':
-        if request.user.is_superuser:
+        if request.user.is_superuser and 'contentId' in request.GET:
             h5pDelete(request)
             return HttpResponseRedirect('/h5p/listContents')
+            
         return render(request, 'h5p/listContents.html', {'status': 'You do not have the necessary rights to delete a video.'})
 
     listContent = h5pGetListContent(request)

@@ -1,6 +1,7 @@
 {% extends "h5p/base.html" %}
 {% load static %}
 {% block head %}
+	<title>H5PP - {{request.GET.title}}</title>
 	<style type="text/css" media="all">
 	{% for style in data.assets.css %}
 		@import url("{% static style %}");
@@ -21,6 +22,7 @@
 {% endblock head %}
 {% block body %}
 <div class="wrap">
+	<a href="{% url 'h5plistContents' %}"><span class="glyphicon glyphicon-arrow-left"></span> List of contents</a>
 	<h3 class="page-title">{{request.GET.title}}</h3>
 	<div class="well">
 		{% autoescape off %}

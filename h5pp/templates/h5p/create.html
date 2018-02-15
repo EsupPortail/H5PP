@@ -1,6 +1,14 @@
 {% extends "h5p/base.html" %}
 {% load static %}
 {% block head %}
+	<title>H5PP - Editor</title>
+	{% if request.GET.title %}
+		<style>
+			.radio {
+				display: none;
+			}
+		</style>
+	{% endif %}
 	<style type="text/css" media="all">
 	{% for style in data.coreAssets.css %}
 		@import url("{% static style %}");
@@ -52,33 +60,45 @@
 {% endblock head %}
 {% block body %}
 <div class="wrap">
+	<a href="{% url 'h5plistContents' %}"><span class="glyphicon glyphicon-arrow-left"></span> List of contents</a>
 	{% if not request.GET.is_iframe %}
-		<h1 class="page-title">Editor {% if request.GET.title %}<br>{{request.GET.title}}{% endif %}</h3>
+		<h1 class="page-title">Editor</h1>
 	{% endif %}
 	<div class="well">
 		{% if not request.GET.is_iframe %}
-			<h4 class="section-title">Create new content</h4>
-			<div class="alert alert-success">
-				<p>
-					You can create, upload or edit contents with this editor.<br>
-					To create a content start by giving it a title. Select 'create' and choose a content type from the dropdown list. The content type depends on the installed libraries.<br>
-					When you're done click on the button below.
-				</p>
-			</div>
+
+			{% if not request.GET.title %}
+				<h4 class="section-title">Create new content</h4>
+				<div class="alert alert-success info">
+					<p>You can create or upload content with this editor :</p>
+						<ul><li><b>Create </b>: Start by giving it a <i>title</i>. Select <i>create</i> and choose a content type from the dropdown list. 
+						The number of content types depends on the libraries installed.<br>If a tutorial is available for this content you can access to it (label <i>Tutorial available</i>)</li>
+
+						<li><b>Upload </b>: Start by giving it a <i>title</i>. Select <i>upload</i> and click on <i>Upload H5P Package</i> to upload your content. The content must be a <i>.h5p</i> file.</li></ul>
+
+					<p>When you're done, click on the <b>Save</b> button. You will be redirected to the viewing page of your content.</p>
+				</div>
+			{% else %}
+				<h4 class="section-title">{{request.GET.title}}</h4>
+				<div class="alert alert-success info">
+					<p>You can edit your content with this editor :</p>
+						<ul><li><b>Edit </b>: You can change the <i>title</i> and the <i>content type</i>. If your content is a <i>interactive video</i>, users will be notified of changes made in your video when they watch it again.</li>
+
+						<li><b>Delete </b>: To delete a content you must go to the <a href="{% url 'h5plistContents' %}">contents page</a></li></ul>
+
+					<p>When you're done, click on the <b>Save</b> button. You will be redirected to the viewing page of your content.</p>
+				</div>
+			{% endif %}
 		{% endif %}
 		<form method="post" enctype="multipart/form-data" id="h5p-content-form">
 			{% csrf_token %}
-			{% if not request.GET.contentId %}
-				<input class="btn btn-default" type="submit" id="submit_editor" value="Create">
-			{% else %}
-				<input class="btn btn-default" type="submit" id="submit_editor" value="Edit">
-			{% endif %}
 			<label for="id_title" class="label_form"><b>Title</b></label>
 			{{form.title}}
 			<div class="radio">
+				<b>Action</b>
 				{{form.h5p_type}}
 			</div>
-			<label for="h5p-editor-iframe" class="label_form">Select a new content type :</label>
+			<label for="h5p-editor-iframe" class="label_form">Content type editor :</label>
 			<div class="h5p-editor">Waiting for javascript...</div>
 			{{form.json_content}}
 			{{form.disable}}
@@ -86,9 +106,14 @@
 			<br>
 			<div class="file-container">
 				{{ form.h5p }}
-				<label for="id_h5p" class="btn btn-default upload-h5p" tabindex="0">Select H5P Libraries...</label>
+				<label for="id_h5p" class="btn btn-default upload-h5p" tabindex="0">Upload H5P Package</label>
 			</div>
 			<p class="file-return"></p>
+			{% if not request.GET.contentId %}
+				<input class="btn btn-default" type="submit" id="submit_editor" value="Save">
+			{% else %}
+				<input class="btn btn-default" type="submit" id="submit_editor" value="Save">
+			{% endif %}
 			{% if form.non_field_errors %}
 				<div class="alert alert-danger">
 						<p>
@@ -99,13 +124,4 @@
 		</form>
 	</div>
 </div>
-{% if not request.GET.is_iframe %}
-	<div class="configuration">
-		{% if request.GET.contentId %}
-		<a href="{% url 'h5pcontent' %}?contentId={{request.GET.contentId}}">
-			<input type="submit" class="btn btn-default submit_editor" id="view" value="View video" />
-		</a>
-		{% endif %}
-	</div>
-{% endif %}
 {% endblock body %}

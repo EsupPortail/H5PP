@@ -735,10 +735,10 @@ class H5PStorage:
     # Delete an H5P package
     ##
     def deletePackage(self, content):
-        self.h5pC.fs.deleteContent(content["id"])
+        self.h5pC.fs.deleteContent(content.content_id)
         self.h5pC.fs.deleteExport(
-            (content["slug"] + "-" if "slug" in content else "") + str(content["id"]) + ".h5p")
-        self.h5pF.deleteContentData(content["id"])
+            (content.slug + "-" if content.slug else "") + str(content.content_id) + ".h5p")
+        self.h5pF.deleteContentData(content.content_id)
 
     ##
     # Copy/clone an H5P package

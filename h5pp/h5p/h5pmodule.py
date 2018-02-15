@@ -106,10 +106,8 @@ def h5pUpdate(request):
 
 
 def h5pDelete(request):
-    res = h5p_contents.objects.filter(content_id=request.GET['contentId']).extra(
-        select={'id': 'content_id'}).values('id', 'slug')
-    for content in res:
-        h5pDeleteH5PContent(request, content)
+    content = h5p_contents.objects.get(content_id=request.GET['contentId'])
+    h5pDeleteH5PContent(request, content)
 
     if 'main_library' in request.POST:
         # Log content delete
@@ -132,11 +130,11 @@ def h5pDeleteH5PContent(request, content):
     storage.deletePackage(content)
 
     # Remove content points
-    h5p_points.objects.filter(content_id=content['id']).delete()
+    h5p_points.objects.filter(content_id=content.content_id).delete()
 
     # Remove content user data
     h5p_content_user_data.objects.filter(
-        content_main_id=content['id']).delete()
+        content_main_id=content.content_id).delete()
 
 
 def h5pLoad(request):
