@@ -76,9 +76,9 @@
 		// Initialize the export button
 		var exportfile = document.getElementById('export');
 		exportfile.addEventListener("click", function(event) {
-			if (confirm('Do you want the user scores of all videos?')) {
+			if (confirm('Do you want the user scores of all videos ?')) {
 				window.location = "{% url 'h5pscore' contentId=content.content_id %}?download=all";
-			} else {
+			} else if (confirm('Do you want the user scores of this video ?')) {
 				window.location = "{% url 'h5pscore' contentId=content.content_id %}?download={{content.content_id}}";
 			}
 		});
@@ -100,7 +100,7 @@
 			You can reset a user's score <span class="glyphicon glyphicon-step-backward"></span> or all users who have already completed your video activities <span class="glyphicon glyphicon-fast-backward"></span></li>
 				
 			<li><b>As a superuser </b>:
-			You can get the user scores of the current video or all existing videos in text format.</li></ul>
+			You can get the user scores of the current video or all existing videos in text format <span class="glyphicon glyphicon-download"></span>.</li></ul>
 		</p>
 	</div>
 	{% if status %}

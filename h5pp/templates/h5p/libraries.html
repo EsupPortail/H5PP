@@ -70,9 +70,9 @@
 		</div>
 		<form method="post" enctype="multipart/form-data" id="h5p-library-form" style="display: inline;">
 			{% csrf_token %}
-			<div class="file-container">
+			<div class="file-container library">
 				{{ form.h5p }}
-				<label for="id_h5p" class="btn btn-default upload-libraries" tabindex="0">Upload H5P file...</label>
+				<label for="id_h5p" class="btn btn-default upload-libraries" tabindex="0">Upload H5P Package</label>
 			</div>
 			<br>
 			<div class="loader"></div>

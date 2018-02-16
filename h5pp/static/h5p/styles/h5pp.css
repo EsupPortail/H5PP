@@ -58,7 +58,7 @@
 	font-style: normal;
 	font-weight: normal;
 }
-.file-container {
+.file-container .editor {
 	margin-top: -5%;
 }
 .file-return {
@@ -73,7 +73,9 @@
 	background-color: #f2f2f2;
 	padding: 10px;
 }
-
+#h5p-library-form {
+	text-align: center;
+}
 #id_h5p {
 	opacity: 0;
 }
