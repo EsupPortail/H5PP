@@ -60,8 +60,8 @@
 {% endblock head %}
 {% block body %}
 <div class="wrap">
-	<a href="{% url 'h5plistContents' %}"><span class="glyphicon glyphicon-arrow-left"></span> List of contents</a>
 	{% if not request.GET.is_iframe %}
+		<a href="{% url 'h5plistContents' %}"><span class="glyphicon glyphicon-arrow-left"></span> List of contents</a>
 		<h1 class="page-title">Editor</h1>
 	{% endif %}
 	<div class="well">
