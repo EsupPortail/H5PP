@@ -552,6 +552,7 @@ class H5PDjango:
 					hn.title,
 					hn.json_contents AS params,
 					hn.embed_type,
+                    hn.content_type,
                     hn.author,
 					hl.library_id,
 					hl.machine_name AS library_name,

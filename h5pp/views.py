@@ -35,7 +35,7 @@ def librariesView(request):
         form = LibrariesForm(request.user)
         return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries})
 
-    return render(request, 'h5p/home.html', {'status': 'Only administrators can manage libraries.'})
+    return HttpResponseRedirect('/h5p/login/?next=/h5p/libraries/')
 
 
 def createView(request, contentId=None):
