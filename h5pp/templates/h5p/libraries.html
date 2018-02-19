@@ -1,6 +1,7 @@
 {% extends "h5p/base.html" %}
 {% load static %}
 {% block head %}
+	<title>H5PP - Libraries</title>
 	<style>
 		{% if not libraries %}
 		.configuration {
@@ -9,29 +10,11 @@
 		{% endif %}
 	</style>
 	<script>
-		function search() {
-			var input, filter, table, tr, td, i;
-			input = document.getElementById("searchbar");
-			filter = input.value.toUpperCase();
-			table = document.getElementById("libraries");
-			tr = table.getElementsByTagName("tr");
-
-			for(i = 0; i < tr.length; i++) {
-				td = tr[i].getElementsByTagName("td")[0];
-				if(td) {
-					if(td.innerHTML.toUpperCase().indexOf(filter) > -1) {
-						tr[i].style.display = "";
-					}else {
-						tr[i].style.display = "none";
-					}
-				}
-			}
-		}
 		window.onload = function() {
 			var fileInput = document.getElementById("id_h5p");
-			button = document.getElementsByClassName("upload-libraries")[0];
-			result = document.getElementsByClassName("file-return")[0];
-			submit = document.getElementsByClassName("submit")[0];
+			var button = document.getElementsByClassName("upload-libraries")[0];
+			var result = document.getElementsByClassName("file-return")[0];
+			var submit = document.getElementsByClassName("submit")[0];
 
 			button.addEventListener( "keydown", function(event) {
 				if(event.keyCode == 13 || event.keyCode == 32) {
@@ -50,6 +33,26 @@
 				loader.style.display = 'block';
 				result.innerHTML = '';
 			});
+
+			var searchbar = document.getElementById('searchbar');
+			searchbar.addEventListener("keyup", function(event) {
+				var input, filter, table, tr, td, i;
+				input = document.getElementById("searchbar");
+				filter = input.value.toUpperCase();
+				table = document.getElementById("libraries");
+				tr = table.getElementsByTagName("tr");
+
+				for(i = 0; i < tr.length; i++) {
+					td = tr[i].getElementsByTagName("td")[0];
+					if(td) {
+						if(td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+							tr[i].style.display = "";
+						}else {
+							tr[i].style.display = "none";
+						}
+					}
+				}
+			});
 		};
 	</script>
 {% endblock head %}
@@ -59,25 +62,28 @@
 	<div class="well upload">
 	<h4 class="section-title">Manage libraries</h4>
 		<div class="alert alert-success">
-			<p>
+			<p align="center">
 				You can manage your libraries here.<br>
-				To install or update a new library click on the button below, choose your H5P package (.h5p) and click to proceed.
+				Libraries are the source files for the different types of content offered by H5PP.<br>
+				To install or update a new library click on the button below, choose your H5P package (.h5p) and click to <b>proceed</b>.
 			</p>
 		</div>
 		<form method="post" enctype="multipart/form-data" id="h5p-library-form" style="display: inline;">
 			{% csrf_token %}
-			<div class="file-container">
+			<div class="file-container library">
 				{{ form.h5p }}
-				<label for="id_h5p" class="btn btn-default upload-libraries" tabindex="0">Upload H5P file...</label>
+				<label for="id_h5p" class="btn btn-default upload-libraries" tabindex="0">Upload H5P Package</label>
 			</div>
 			<br>
 			<div class="loader"></div>
 			<p class="file-return"></p>
 			<br>
-			<div class="configuration">
-				<label>Update libraries tutorials : {{ form.download }}</label>
-				<br>
-				<label> Uninstall H5P : {{ form.uninstall }}</label><br><br>
+			<div class="configuration" align="center">
+				<label>Update libraries tutorials : {{ form.download }}</label><br>
+				<i>Some types of content have tutorials. It is possible that with time new ones appear. You can update these tutorials here.</i><br>
+				<label> Uninstall H5P : {{ form.uninstall }}</label><br>
+				<i>You can uninstall your libraries. If you do, all your libraries and contents created will be deleted.</i><br>
+				<input class="btn btn-default submit" type="submit" value="Proceed">
 			</div>
 			{% if form.non_field_errors or status %}
 				<div class="alert alert-danger">
@@ -92,15 +98,6 @@
 					{% endif %}
 				</div>
 			{% endif %}
-			{% if libraries %}
-				<div class="alert alert-success">
-					<p>
-						You can update tutorials for installed contents. Check "Update tutorials" and click on "Proceed".<br>
-						You can uninstall your libraries. If you do, all your libraries and contents created will be deleted. 
-					</p>
-				</div>
-			{% endif %}
-			<input class="btn btn-default submit" type="submit" value="Proceed">
 		</form>
 	</div>
 </div>
@@ -108,15 +105,19 @@
 <div class="list">
 	{% if libraries %}
 	<h4 class="section-title">List of libraries availables</h4>
-	<input type="text" id="searchbar" onkeyup="search()" placeholder="Search for libraries...">
-	<table id="libraries">
+	<input type="text" id="searchbar" placeholder="Search for libraries...">
+	<table id="libraries" class="table table-striped">
 		<tr class="header">
 			<th style="width:60%;">Name</th>
 			<th style="width: 40%;">Version</th>
 			<th style="width: 40%;">Tutorial</th>
 		</tr>
 	{% for library in libraries %}
-	  <tr><td>{{library.machine_name}}</td><td>{{library.major_version}}.{{library.minor_version}}</td><td>{% if library.tutorial_url %}<a href="{{library.tutorial_url}}">Available</a>{% else %}Unavailable{% endif %}</td></tr>
+	 <tr>
+	  	<td>{{library.machine_name}}</td>
+	  	<td>{{library.major_version}}.{{library.minor_version}}</td>
+	  	<td>{% if library.tutorial_url %}<a href="{{library.tutorial_url}}">Available</a>{% else %}Unavailable{% endif %}</td>
+	 </tr>
 	{% endfor %}
 	</table>
 	{% endif %}
