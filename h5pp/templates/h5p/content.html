@@ -1,6 +1,14 @@
 {% extends "h5p/base.html" %}
 {% load static %}
 {% block head %}
+	<title>H5PP - {{request.GET.title}}</title>
+	{% if request.GET.is_iframe %}
+		<style>
+			.content {
+				padding-top: 0;
+			}
+		</style>
+	{% endif %}
 	<style type="text/css" media="all">
 	{% for style in data.assets.css %}
 		@import url("{% static style %}");
@@ -20,7 +28,9 @@
 	</script>
 {% endblock head %}
 {% block body %}
+{% if not request.GET.is_iframe %}
 <div class="wrap">
+	<a href="{% url 'h5plistContents' %}"><span class="glyphicon glyphicon-arrow-left"></span> List of contents</a>
 	<h3 class="page-title">{{request.GET.title}}</h3>
 	<div class="well">
 		{% autoescape off %}
@@ -30,7 +40,7 @@
 			<div class="content-options">
 				{% if request.user.username == owner %}
 					<a href="{% url 'h5pedit' contentId=request.GET.contentId %}?title={{request.GET.title}}">
-						<input type="submit" class="btn btn-default edit-button" id="edit" value="Edit content" />
+						<input type="submit" class="btn btn-default edit-button" id="edit" value="Edit video" />
 					</a>
 				{% endif %}
 				<a href="{% url 'h5pscore' contentId=request.GET.contentId %}">
@@ -40,4 +50,9 @@
 		{% endif %}
 	</div>
 </div>
+{% else %}
+	{% autoescape off %}
+		{{html}}
+	{% endautoescape %}	
+{% endif %}
 {% endblock body %}

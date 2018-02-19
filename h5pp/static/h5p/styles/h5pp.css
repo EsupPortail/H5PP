@@ -49,7 +49,7 @@
 	margin-right: 10px;
 }
 
-/* Libraries */
+/* Libraries (h5p/libraries.html) */
 .file-return:not(:empty) {
 	margin: 1em 0;
 }
@@ -58,8 +58,8 @@
 	font-style: normal;
 	font-weight: normal;
 }
-.file-container {
-	text-align: center;
+.file-container .editor {
+	margin-top: -5%;
 }
 .file-return {
 	margin: 0;
@@ -73,7 +73,9 @@
 	background-color: #f2f2f2;
 	padding: 10px;
 }
-
+#h5p-library-form {
+	text-align: center;
+}
 #id_h5p {
 	opacity: 0;
 }
@@ -105,11 +107,12 @@
 	margin-bottom: 12px;
 }
 
-/* Editor */
+/* Editor (h5p/create.html) */
 #h5p-content-form {
 	border-radius: 5px;
 	background-color: #f2f2f2;
 	padding: 10px;
+	display: grid;
 }
 #id_title {
 	width: 178px;
@@ -123,49 +126,52 @@
 label[for='id_title'] {
 	display: block;
 }
-#id_h5p_type {
-
-}
 .upload-h5p {
 	display: none;
 }
+.info ul {
+	margin: 5px;
+}
 #submit_editor {
 	text-align: center;
-	margin-left: 46%;
-	margin-bottom: 10px;
+	margin-left: 40%;
+	margin-right: 40%;
 }
 
-/* List contents */
+/* List contents (h5p/listContents.html) */
 .content-options {
 	width: 65px;
+	padding: 2px;
+	margin: 2px;
+}
+.table>tbody>tr>td {
+	border: none;
+}
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+  background-color: #ddd;
 }
 .options {
 	display: inline-flex;
 }
-
-#contents {
-	border-collapse: collapse;
-	width: 100%;
-	border: 1px solid #ddd;
-	font-size: 18px;
+.scores-hidden {
+	display: none;
 }
-#contents th, #contents td {
-	text-align: left;
-	padding: 12px;
+.scores {
+	display: table-row;
 }
-#contents tr {
-	border-bottom: 1px solid #ddd;
-}
-#contents tr.header, #contents tr:hover {
-	background-color: #f1f1f1;
+#delete.btn.btn-link {
+	color: red;
 }
 
-/* Users score */
+/* Users score (h5p/score.html) */
 .score-options {
 	margin-top: 10px;
 }
+#resetall.btn.btn-link {
+	color: red;
+}
 
-/* Content */
+/* Content (h5p/content.html) */
 .edit-button {
 	text-align: center;
 	margin-top: 10px;
@@ -182,14 +188,14 @@ label[for='id_title'] {
 	display: inline-flex;
 }
 
-/* Login */
+/* Login (h5p/login.html) */
 #form_login {
 	width: 50px;
 	margin: 0;
 	padding: 0;
 }
 
-/* bootstrap override */
+/* bootstrap override (all) */
 .btn:focus, .btn:active {
 	outline-color: #25AA2E !important;
 }
@@ -200,7 +206,7 @@ label[for='id_title'] {
 	color: #3ab242;
 }
 
-/* h5p override */
-.h5p-interactive-video .h5p-video {
-	height: 500px !important;
+/* h5p override (video player) */
+.h5p-video-wrapper .h5p-video .hardware-accelerated {
+	margin-top: 0px;
 }

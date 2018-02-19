@@ -1,5 +1,3 @@
-# -*-coding:Latin-1 -*
-
 import os
 import zipfile
 import re
@@ -34,12 +32,6 @@ def substr_replace(subject, replace, start, length):
         return subject[:start] + replace + subject[length:]
     else:
         return subject[:start] + replace + subject[start + length:]
-
-
-def mb_substr(s, start, length=None, encoding="UTF-8"):
-    u_s = s.decode(encoding)
-    return (u_s[start:(start + length)] if length else u_s[start:]).encode(encoding)
-
 
 def file_get_contents(filename, use_include_path=0, context=None, offset=-1, maxlen=-1):
     if (filename.find("://") > 0):
@@ -743,10 +735,10 @@ class H5PStorage:
     # Delete an H5P package
     ##
     def deletePackage(self, content):
-        self.h5pC.fs.deleteContent(content["id"])
+        self.h5pC.fs.deleteContent(content.content_id)
         self.h5pC.fs.deleteExport(
-            (content["slug"] + "-" if "slug" in content else "") + str(content["id"]) + ".h5p")
-        self.h5pF.deleteContentData(content["id"])
+            (content.slug + "-" if content.slug else "") + str(content.content_id) + ".h5p")
+        self.h5pF.deleteContentData(content.content_id)
 
     ##
     # Copy/clone an H5P package
@@ -1703,7 +1695,7 @@ class H5PContentValidator:
             text = cgi.escape(text, True)
 
         if 'maxLength' in semantics:
-            text = mb_substr(text, 0, semantics['maxLength'])
+            text = text[0:semantics['maxLength']]
 
         if not text == '' and 'optional' in semantics and 'regexp' in semantics:
             pattern = semantics['regexp'][
