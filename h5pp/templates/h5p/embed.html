@@ -1,0 +1,26 @@
+{% load static %}
+<!doctype html>
+<html lang="{{ embed.lang }}" class="h5p-iframe">
+<head>
+  <meta charset="utf-8">
+  <title>{{ request.GET.title }}</title>
+  {% for script in embed.scripts %}
+    <script type="text/javascript" src="{% static script %}"></script>
+  {% endfor %}
+  {% for style in embed.styles %}
+    <link rel="stylesheet" href="{% static style %}">
+  {% endfor %}
+  <link rel="stylesheet" href="{% static 'h5p/styles/bootstrap/css/bootstrap.min.css' %}">
+</head>
+<body>
+  <div class="h5p-content" data-content-id="{{request.GET.contentId}}"></div>
+  {% if request.user.is_authenticated and score.max_points %}
+      <div class="content-options">
+        <span class="badge">Score : {{score.points}} / {{score.max_points}}</span>
+      </div>
+  {% endif %}
+  <script>
+    H5PIntegration = {% autoescape off %} {{embed.h5p}} {% endautoescape %}
+  </script>
+</body>
+</html>

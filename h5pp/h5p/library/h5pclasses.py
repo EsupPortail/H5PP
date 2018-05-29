@@ -1,5 +1,6 @@
 # -*-coding:Latin-1 -*
 
+
 import os
 import zipfile
 import re
@@ -23,6 +24,8 @@ from h5pp.h5p.library.h5pdefaultstorage import H5PDefaultStorage
 
 is_array = lambda var: isinstance(var, (list, tuple))
 
+http = urllib3.PoolManager()
+
 
 def empty(variable):
     if not variable:
@@ -31,7 +34,7 @@ def empty(variable):
 
 
 def substr_replace(subject, replace, start, length):
-    if length == None:
+    if length is None:
         return subject[:start] + replace
     elif length < 0:
         return subject[:start] + replace + subject[length:]
@@ -45,22 +48,23 @@ def mb_substr(s, start, length=None, encoding="UTF-8"):
 
 
 def file_get_contents(filename, use_include_path=0, context=None, offset=-1, maxlen=-1):
-    if (filename.find("://") > 0):
-        ret = urllib2.urlopen(filename).read()
-        if (offset > 0):
+    if filename.find("://") > 0:
+        ret = http.request('GET', filename).read()
+        if offset > 0:
             ret = ret[offset:]
-        if (maxlen > 0):
+        if maxlen > 0:
             ret = ret[:maxlen]
         return ret
     else:
         fp = open(filename, "rb")
         try:
-            if (offset > 0):
+            if offset > 0:
                 fp.seek(offset)
             ret = fp.read(maxlen).decode('utf8')
             return ret
         finally:
             fp.close()
+
 
 ##
 # self class is used for validating H5P files
@@ -68,7 +72,6 @@ def file_get_contents(filename, use_include_path=0, context=None, offset=-1, max
 
 
 class H5PValidator:
-
     h5pRequired = {
         "title": "^.{1,255}$",
         "language": "^[a-z]{1,5}$",
@@ -269,7 +272,8 @@ class H5PValidator:
                 %s
                 %s
                 %s
-                %s)""" % (f, libraryH5PData["machineName"], libraryH5PData["majorVersion"], libraryH5PData["minorVersion"]))
+                %s)""" % (f, libraryH5PData["machineName"], libraryH5PData["majorVersion"],
+                          libraryH5PData["minorVersion"]))
                         valid = False
                         continue
 
@@ -296,7 +300,7 @@ class H5PValidator:
                 upgrades = {}
                 for libString, library in libraries:
                     # Is self library already installed ?
-                    if not self.h5pF.getLibraryId(library["machineName"]):
+                    if self.h5pF.getLibraryId(library["machineName"]):
                         upgrades[libString] = library
 
                 missingLibraries = self.getMissingLibraries(upgrades)
@@ -518,11 +522,13 @@ class H5PValidator:
                 if isinstance(h5pData, str) or isinstance(h5pData, int):
                     if not re.search(requirement, str(h5pData)):
                         print(
-                            "Invalid data provided for %s in %s. No Matches between %s and %s" % (property_name, library_name, requirement, h5pData))
+                            "Invalid data provided for %s in %s. No Matches between %s and %s" % (
+                            property_name, library_name, requirement, h5pData))
                         valid = False
                 else:
                     print(
-                        "Invalid data provided for %s in %s. String or Integer expected." % (property_name, library_name))
+                        "Invalid data provided for %s in %s. String or Integer expected." % (
+                        property_name, library_name))
                     valid = False
         elif isinstance(requirement, dict) or isinstance(requirement, set):
             # we have sub requirements
@@ -596,13 +602,13 @@ class H5PValidator:
 
         return jsonFile if return_as_string else jsonData
 
+
 ##
 # self class is used for saving H5P files
 ##
 
 
 class H5PStorage:
-
     contentId = None  # Quick fix so WP can get ID of new content.
 
     ##
@@ -722,13 +728,13 @@ class H5PStorage:
             # Insert the different new ones
             if "preloadedDependencies" in library:
                 self.h5pF.saveLibraryDependencies(library["libraryId"], library[
-                                                  "preloadedDependencies"], "preloaded")
+                    "preloadedDependencies"], "preloaded")
             if "dynamicDependencies" in library:
                 self.h5pF.saveLibraryDependencies(library["libraryId"], library[
-                                                  "dynamicDependencies"], "dynamic")
+                    "dynamicDependencies"], "dynamic")
             if "editorDependencies" in library:
                 self.h5pF.saveLibraryDependencies(library["libraryId"], library[
-                                                  "editorDependencies"], "editor")
+                    "editorDependencies"], "editor")
 
             # Make sure libraries dependencies, parameter filtering and export
             # files get regenerated for all content who uses self library.
@@ -765,6 +771,7 @@ class H5PStorage:
     def copyPackage(contentId, copyFromId, contentMainId=None):
         self.h5pC.fs.cloneContent(copyFromId, contentId)
         self.h5pF.copyLibraryUsage(contentId, copyFromId, contentMainId)
+
 
 ##
 # self class is used for exporting zips
@@ -933,13 +940,13 @@ class H5PExport:
                 libraries[editorLibrary["machineName"]] = editorLibrary
             return libraries
 
+
 ##
 # Functions and storage shared by the other H5P classes
 ##
 
 
 class H5PCore:
-
     coreApi = {
         "majorVersion": 1,
         "minorVersion": 12
@@ -1209,7 +1216,7 @@ class H5PCore:
         for key, dependency in dependencies.items():
             if "path" not in dependency:
                 dependency['path'] = '/libraries/' + \
-                    self.libraryToString(dependency, True)
+                                     self.libraryToString(dependency, True)
                 dependency['preloadedJs'] = dependency[
                     'preloaded_js'].strip('[]').split(',')
                 dependency['preloadedCss'] = dependency[
@@ -1274,7 +1281,7 @@ class H5PCore:
             semantics = self.h5pF.loadLibrarySemantics(
                 name, majorVersion, minorVersion)
 
-        if semantics:
+        if semantics is not None:
             semantics = json.loads(semantics['semantics'])
 
         return semantics
@@ -1288,7 +1295,7 @@ class H5PCore:
             # Try to load from dev
             library = self.h5pD.getLibrary(
                 name, majorVersion, minorVersion)
-            if library:
+            if library is not None:
                 library["semantics"] = self.h5pD.getSemantics(
                     name, majorVersion, minorVersion)
         if library is None:
@@ -1301,7 +1308,7 @@ class H5PCore:
     ##
     # Deletes a library
     ##
-    def deleteLibrary(libraryId):
+    def deleteLibrary(self, libraryId):
         self.h5pF.deleteLibrary(libraryId)
 
     ##
@@ -1325,7 +1332,7 @@ class H5PCore:
                     continue  # Skip, already have self
 
                 dependencyLibrary = self.loadLibrary(dependency["machineName"], dependency[
-                                                     "majorVersion"], dependency["minorVersion"])
+                    "majorVersion"], dependency["minorVersion"])
                 if dependencyLibrary:
                     dependencies[dependencyKey] = {
                         "library": dependencyLibrary,
@@ -1376,11 +1383,14 @@ class H5PCore:
     ##
     def libraryToString(self, library, folderName=False):
         if 'machineName' in library:
-            return library["machineName"] + ("-" if folderName else " ") + str(library["majorVersion"]) + "." + str(library["minorVersion"])
+            return library["machineName"] + ("-" if folderName else " ") + str(library["majorVersion"]) + "." + str(
+                library["minorVersion"])
         elif 'machine_name' in library:
-            return library["machine_name"] + ("-" if folderName else " ") + str(library["major_version"]) + "." + str(library["minor_version"])
+            return library["machine_name"] + ("-" if folderName else " ") + str(library["major_version"]) + "." + str(
+                library["minor_version"])
         else:
-            return library["name"] + ("-" if folderName else " ") + str(library["majorVersion"]) + "." + str(library["minorVersion"])
+            return library["name"] + ("-" if folderName else " ") + str(library["majorVersion"]) + "." + str(
+                library["minorVersion"])
 
     ##
     # Parses library data from a string on the form {machineName} {majorVersion}.{minorVersion}
@@ -1403,7 +1413,7 @@ class H5PCore:
         # Detect content embed type
         embedType = "div" if "div" in libraryEmbedTypes.lower() else "iframe"
 
-        if libraryEmbedTypes != None and libraryEmbedTypes != "":
+        if libraryEmbedTypes is not None and libraryEmbedTypes != "":
             # Check that embed type is available for library
             if embedType not in embedTypes:
                 # Not available, pick default.
@@ -1414,13 +1424,13 @@ class H5PCore:
     ##
     # Get the absolute version for the library as a human readable string.
     ##
-    def libraryVersion(library):
+    def libraryVersion(self, library):
         return library.major_version + "." + library.minor_version + "." + library.patch_version
 
     ##
     # Determine which version content with the given library can be upgraded to.
     ##
-    def getUpgrades(library, versions):
+    def getUpgrades(self, library, versions):
         for upgrade in versions:
             if ((upgrade.major_version > library.major_version) or
                     ((upgrade.major_version == library.major_version) and
@@ -1527,11 +1537,11 @@ class H5PCore:
         # Handle latest version of H5P
         if not empty(jsonData['latest']):
             self.h5pF.setOption("H5P_UPDATE_AVAILABLE", jsonData[
-                                'latest']['releasedAt'])
+                'latest']['releasedAt'])
             self.h5pF.setOption("H5P_UPDATE_AVAILABLE_PATH",
                                 jsonData['latest']['path'])
 
-    def getGlobalDisable():
+    def getGlobalDisable(self):
         disable = self.DISABLE_NONE
 
         # Allow global settings to override and disable options
@@ -1552,7 +1562,7 @@ class H5PCore:
     ##
     # Determine disable state from sources.
     ##
-    def getDisable(sources, current):
+    def getDisable(self, sources, current):
         for bit, option in H5PCore.disable:
             if self.h5pF.getOption("export" if (bit & H5PCore.DISABLE_DOWNLOAD) else option, True):
                 if not sources[option] or not sources[option]:
@@ -1587,7 +1597,7 @@ class H5PCore:
         response = {
             "success": True
         }
-        if data:
+        if data is not None:
             response["data"] = data
 
         return json.dumps(response)
@@ -1600,7 +1610,7 @@ class H5PCore:
         response = {
             "success": False
         }
-        if message:
+        if message is not None:
             response["message"] = message
 
         return json.dumps(response)
@@ -1628,6 +1638,7 @@ class H5PCore:
     ##
     def getTimeFactor(self):
         return math.ceil(int(time.time()) / (86400 / 2))
+
 
 ##
 # Functions for validating basic types from H5P library semantics.
@@ -1756,7 +1767,8 @@ class H5PContentValidator:
             else:
                 if not re.search(wl_regex, f.lower()):
                     print(
-                        "File \"%s\" not allowed. Only files with the following extension are allowed : %s" % (f, whitelist))
+                        "File \"%s\" not allowed. Only files with the following extension are allowed : %s" % (
+                        f, whitelist))
                     valid = False
 
         return valid
@@ -1930,7 +1942,7 @@ class H5PContentValidator:
     def validateVideo(self, video, semantics):
         for variant in video:
             self._validateFilelike(variant, semantics, [
-                                   "width", "height", "codecs", "quality"])
+                "width", "height", "codecs", "quality"])
 
     ##
     # Validate given audio data
@@ -1977,10 +1989,10 @@ class H5PContentValidator:
                             del(key)
                     else:
                         print('H5P internal error: unknown content type "%s" in semantics. Removing content !' % field[
-                              'type'])
-                        del(key)
+                            'type'])
+                        del (key)
                 else:
-                    del(key)
+                    del (key)
 
         if "optional" not in semantics:
             if group is None:
@@ -2024,7 +2036,7 @@ class H5PContentValidator:
         if not value['library'] in self.libraries:
             libSpec = self.h5pC.libraryFromString(value['library'])
             library = self.h5pC.loadLibrary(libSpec['machineName'], libSpec[
-                                            'majorVersion'], libSpec['minorVersion'])
+                'majorVersion'], libSpec['minorVersion'])
             library['semantics'] = self.h5pC.loadLibrarySemantics(
                 libSpec['machineName'], libSpec['majorVersion'], libSpec['minorVersion'])
             self.libraries[value['library']] = library

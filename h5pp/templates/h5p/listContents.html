@@ -1,68 +1,6 @@
 {% extends "h5p/base.html" %}
 {% load static %}
 {% block head %}
-	<style>
-	.list {
-		border-radius: 5px;
-		background-color: #f2f2f2;
-		padding: 10px;
-	}
-	#searchbar {
-		background-image: url('../../static/h5p/images/search.png');
-		background-size: 30px 30px;
-		background-position: 8px 5px;
-		background-repeat: no-repeat;
-		width: 50%;
-		font-size: 16px;
-		padding: 12px 20px 12px 40px;
-		border: 1px solid #ddd;
-		margin-bottom: 12px;
-	}
-	#contents {
-		border-collapse: collapse;
-		width: 100%;
-		border: 1px solid #ddd;
-		font-size: 18px;
-	}
-	#contents th, #contents td {
-		text-align: left;
-		padding: 12px;
-	}
-	#contents tr {
-		border-bottom: 1px solid #ddd;
-	}
-	#contents tr.header, #contents tr:hover {
-		background-color: #f1f1f1;
-	}
-	#back {
-		border-radius: 5px;
-		background-color: white;
-		position: relative;
-		top: 5px;
-		padding: 5px;
-
-	}
-	.content {
-		background: rgba(102, 178, 255, .4);
-		border-radius: 25px;
-		padding: 20px;
-		max-width: 1000px;
-		margin: auto;
-	}
-	.h5p-admin-header {
-		font-family: 'Raleway', sans-serif;
-		font-size: 25px;
-		font-weight: 800;
-		line-height: 36px;
-		margin: 0 0 24px;
-		text-align: center;
-		text-decoration: overline;
-	}
-	p {
-		background-color: #ffdddd;
-		border-left: 6px solid #f44336;
-	}
-	</style>
 	<script>
 	function search() {
 			var input, filter, table, tr, td, i;
@@ -86,44 +24,67 @@
 {% endblock head %}
 {% block body %}
 <div class="wrap">
-	<h3 class="h5p-admin-header">List of contents</h3>
+	<h3 class="page-title">Contents</h3>
+	<div class="alert alert-success">
+		<p>
+			Here is the list of contents currently created or imported into the H5PP database.<br>
+			You can search for content by name, see the content type, the author, the ID of the content and the options table (View, edit or delete the content).
+		</p>
+	</div>
+	{% if status %}
+		<div class="alert alert-danger">
+			<p>
+				{{ status }}
+			</p>
+		</div>
+	{% endif %}
 	<div class="list">
 		<input type="text" id="searchbar" onkeyup="search()" placeholder="Search by name...">
 		<table id="contents">
 			<tr class="header">
-				<th style="width:40%;">Name</th>
-				<th style="width:20%;">Version</th>
-				<th style="width:20%;">Score</th>
+				<th style="width:20%;">Name</th>
+				<th style="width:20%;">Author</th>
+				<th style="width:20%;">Content type</th>
 				<th style="width:10%;">ID</th>
 				{% if request.user.is_authenticated %}
-				<th style="width:10%;">Options</th>
+					<th style="width:30%;">Options</th>
 				{% endif %}
 			</tr>
 		{% for content in listContent %}
 			<tr>
-				<td>{{content.title}}</td>
-				<td>{{content.library_major_version}}.{{content.library_minor_version}}</td>
 				<td>
-					<ul>
-					{% for user in content.score %}
-						{% if user.points %}
-						<li>{{user.user}} - {{user.points}} / {{user.max_points}}</li>
-						{% else %}
-						<li>{{user.user}} - Not completed yet</li>
-						{% endif %}
-					{% endfor %}
-					</ul>
+					{{content.title}}
 				</td>
-				<td>{{content.id}}</td>
-				<td><a href="{% url "h5pcontent" content.id %}">View</a>
-				{% if request.user.is_superuser %}
-					<a href="{% url "h5pedit" contentId=content.id %}?title={{content.title}}">Edit</a><br><form method="post" action="{% url "h5plistContents" %}?contentId={{content.id}}">{% csrf_token %}<input type="submit" value="Delete"></form>
-				{% endif %}
+				<td>
+					{{content.author}}
+				</td>
+				<td>
+					{{content.library_name}}
+					<span class="label label-default">
+						{{content.library_major_version}}.{{content.library_minor_version}}
+					</span>
+				</td>
+				<td>
+					{{content.id}}
+				</td>
+				<td class="options">
+					<a href="{% url "h5pcontent" %}?contentId={{content.id}}">
+						<input type="submit" class="btn btn-default content-options" value="View" />
+					</a>
+					{% if request.user.is_authenticated and request.user.username == content.author or request.user.is_superuser%}
+						<a href="{% url "h5pedit" contentId=content.id %}?title={{content.title}}">
+							<input type="submit" class="btn btn-default content-options" value="Edit" />
+						</a>
+					{% endif %}
+					{% if request.user.is_superuser %}
+						<form method="post" action="{% url "h5plistContents" %}?contentId={{content.id}}">
+							{% csrf_token %}<input type="submit" class="btn btn-default content-options" value="Delete">
+						</form>
+					{% endif %}
 				</td>
 			</tr>
 		{% endfor %}
 		</table>
 	</div>
-	<p>{{ status }}</p>
 </div>
 {% endblock body %}

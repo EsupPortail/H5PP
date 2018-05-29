@@ -13,7 +13,7 @@ class h5p_contents_libraries(models.Model):
 
     class Meta:
         db_table = 'h5p_contents_libraries'
-        unique_together = (('content_id', 'library_id', 'dependency_type'))
+        unique_together = ('content_id', 'library_id', 'dependency_type')
 
 # Stores information about libraries
 
@@ -48,7 +48,7 @@ class h5p_libraries_libraries(models.Model):
 
     class Meta:
         db_table = 'h5p_libraries_libraries'
-        unique_together = (('library_id', 'required_library_id'))
+        unique_together = ('library_id', 'required_library_id')
 
 # Stores translations for the languages
 
@@ -60,7 +60,7 @@ class h5p_libraries_languages(models.Model):
 
     class Meta:
         db_table = 'h5p_libraries_languages'
-        unique_together = (('library_id', 'language_code'))
+        unique_together = ('library_id', 'language_code')
 
 # Stores information about where the h5p content is stored
 
@@ -96,7 +96,7 @@ class h5p_points(models.Model):
 
     class Meta:
         db_table = 'h5p_points'
-        unique_together = (('content_id', 'uid'))
+        unique_together = ('content_id', 'uid')
 
 # Stores user data about the content
 
@@ -113,8 +113,7 @@ class h5p_content_user_data(models.Model):
 
     class Meta:
         db_table = 'h5p_content_user_data'
-        unique_together = (('user_id', 'content_main_id',
-                            'sub_content_id', 'data_id'))
+        unique_together = ('user_id', 'content_main_id', 'sub_content_id', 'data_id')
 
 # Keeps track of what happens in the H5p system
 
@@ -143,4 +142,4 @@ class h5p_counters(models.Model):
 
     class Meta:
         db_table = 'h5p_counters'
-        unique_together = (('type', 'library_name', 'library_version'))
+        unique_together = ('type', 'library_name', 'library_version')

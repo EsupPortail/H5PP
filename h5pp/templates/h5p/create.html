@@ -112,14 +112,12 @@
 		window.onload = function() {
 			document.getElementById('id_h5p_type_0').onclick = function() {
 				document.getElementsByTagName('label')[4].style.display = 'inline-block';
-				document.getElementsByTagName('p')[0].style.display = 'inline-block';
 				document.getElementById('id_h5p').style.display = '';
 				document.getElementsByTagName('label')[3].style.display = 'none';
 				document.getElementsByClassName('h5p-editor-iframe')[0].style.display = 'none'
 			}
 			document.getElementById('id_h5p_type_1').onclick = function() {
 				document.getElementsByTagName('label')[4].style.display = 'none';
-				document.getElementsByTagName('p')[0].style.display = 'none';
 				document.getElementById('id_h5p').style.display = 'none';
 				document.getElementsByTagName('label')[3].style.display = 'inline-block';
 				document.getElementsByClassName('h5p-editor-iframe')[0].style.display = 'inline-block';
@@ -127,7 +125,7 @@
 			ns.$('.h5peditor-form').hide();
 
 			var fileInput = document.getElementById("id_h5p"),
-			button = document.getElementsByClassName("file-trigger")[0],
+			button = document.getElementsByClassName("upload-h5p")[0],
 			result = document.getElementsByClassName("file-return")[0];
 
 			button.addEventListener( "keydown", function(event) {
@@ -147,7 +145,9 @@
 {% endblock head %}
 {% block body %}
 <div class="wrap">
-	<h3 class="h5p-admin-header">Interactive Editor {% if request.GET.title %}<br>{{request.GET.title}}{% endif %}</h3>
+    {% if not request.GET.is_iframe %}
+        <h3 class="h5p-admin-header">Interactive Editor {% if request.GET.title %}<br>{{request.GET.title}}{% endif %}</h3>
+    {% endif %}
 	<form method="post" enctype="multipart/form-data" id="h5p-content-form">
 		{% csrf_token %}
 		<input type="submit" id="submit_editor" value="Create">
@@ -175,10 +175,57 @@
 		<input type="submit" class="submit_editor" id="view" value="View video" />
 	</a>
 	{% endif %}
-	<a href="{% url 'h5phome' %}">
-		<input type="submit" class="submit_editor" id="back" value="Back to home" />
-	</a>
+	<div class="well">
+		{% if not request.GET.is_iframe %}
+			<h4 class="section-title">Create new content</h4>
+			<div class="alert alert-success">
+				<p>
+					You can create, upload or edit contents with this editor.<br>
+					To create a content start by giving it a title. Select 'create' and choose a content type from the dropdown list. The content type depends on the installed libraries.<br>
+					When you're done click on the button below.
+				</p>
+			</div>
+		{% endif %}
+		<form method="post" enctype="multipart/form-data" id="h5p-content-form">
+			{% csrf_token %}
+			{% if not request.GET.contentId %}
+				<input class="btn btn-default" type="submit" id="submit_editor" value="Create">
+			{% else %}
+				<input class="btn btn-default" type="submit" id="submit_editor" value="Edit">
+			{% endif %}
+			<label for="id_title" class="label_form"><b>Title</b></label>
+			{{form.title}}
+			<div class="radio">
+				{{form.h5p_type}}
+			</div>
+			<label for="h5p-editor-iframe" class="label_form">Select a new content type :</label>
+			<div class="h5p-editor">Waiting for javascript...</div>
+			{{form.json_content}}
+			{{form.disable}}
+			{{form.h5p_library}}
+			<br>
+			<div class="file-container">
+				{{ form.h5p }}
+				<label for="id_h5p" class="btn btn-default upload-h5p" tabindex="0">Select H5P Libraries...</label>
+			</div>
+			<p class="file-return"></p>
+			{% if form.non_field_errors %}
+				<div class="alert alert-danger">
+						<p>
+							{{ form.non_field_errors }}
+						</p>
+				</div>
+			{% endif %}
+		</form>
+	</div>
 </div>
-{% block back %}
-{% endblock back %}
+{% if not request.GET.is_iframe %}
+	<div class="configuration">
+		{% if request.GET.contentId %}
+		<a href="{% url 'h5pcontent' %}?contentId={{request.GET.contentId}}">
+			<input type="submit" class="btn btn-default submit_editor" id="view" value="View video" />
+		</a>
+		{% endif %}
+	</div>
+{% endif %}
 {% endblock body %}
