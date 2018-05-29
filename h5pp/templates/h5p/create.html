@@ -154,7 +154,7 @@
 {% block body %}
 <div class="wrap">
 	{% if not request.GET.is_iframe %}
-		<a href="{% url 'h5plistContents' %}"><span class="glyphicon glyphicon-arrow-left"></span> List of contents</a>
+		<a href="{% url 'h5pp:h5plistContents' %}"><span class="glyphicon glyphicon-arrow-left"></span> List of contents</a>
 		<h1 class="page-title">Editor</h1>
 	{% endif %}
 	<div class="well">
