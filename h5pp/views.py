@@ -1,8 +1,9 @@
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from django.core.files.base import ContentFile
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import (
     FormView,
@@ -53,7 +54,7 @@ def librariesView(request):
         form = LibrariesForm(request.user)
         return render(request, 'h5p/libraries.html', {'form': form, 'libraries': libraries})
 
-    return render(request, 'h5p/home.html', {'status': 'Only administrators can manage libraries.'})
+    return HttpResponseRedirect('/h5p/login/?next=/h5p/libraries/')
 
 
 class CreateContentView(CreateView):
@@ -189,7 +190,7 @@ def createView(request, contentId=None):
             {'form': form, 'data': editor}
         )
 
-    return HttpResponseRedirect('/h5p/login/?next=/h5p/home/')
+    return HttpResponseRedirect('/h5p/login/?next=/h5p/create/')
 
 
 class ContentDetailView(TemplateView):
@@ -219,8 +220,11 @@ class ContentDetailView(TemplateView):
 
 
 def contentsView(request):
-    owner = h5p_contents.objects.get(content_id=h5pGetContentId(request))
     if 'contentId' in request.GET:
+        try:
+            owner = h5p_contents.objects.get(content_id=h5pGetContentId(request))
+        except:
+            raise Http404
         h5pLoad(request)
         content = includeH5p(request)
         score = None
@@ -244,7 +248,7 @@ def contentsView(request):
 
 def listView(request):
     if request.method == 'POST':
-        if request.user.is_superuser:
+        if request.user.is_superuser and 'contentId' in request.GET:
             h5pDelete(request)
             return HttpResponseRedirect('/h5p/listContents')
         return render(
@@ -269,38 +273,59 @@ def listView(request):
 
 
 def scoreView(request, contentId):
-    owner = h5p_contents.objects.get(content_id=contentId)
-    if request.method == 'POST' and (request.user.username == owner.author or request.user.is_superuser):
-        userData = h5p_content_user_data.objects.filter(content_main_id=contentId)
-        if userData:
-            userData.delete()
-        userPoints = h5p_points.objects.filter(content_id=contentId)
-        if userPoints:
-            userPoints.delete()
+    try:
+        content = h5p_contents.objects.get(content_id=contentId)
+    except:
+        raise Http404
+    if request.user.is_authenticated():
+        if request.method == 'POST' and (request.user.username == content.author or request.user.is_superuser):
+            userData = h5p_content_user_data.objects.filter(content_main_id=content.content_id)
+            if userData:
+                userData.delete()
+            userPoints = h5p_points.objects.filter(content_id=content.content_id)
+            if userPoints:
+                userPoints.delete()
 
-        return HttpResponseRedirect('/h5p/score/%s' % contentId, {'status': "Scores has been reset !"})
+            return HttpResponseRedirect('/h5p/score/%s' % content.content_id, {'status': "Scores has been reset !"})
 
-    if 'user' in request.GET and (request.user.username == owner.author or request.user.is_superuser):
-        user = User.objects.get(username=request.GET['user'])
-        userData = h5p_content_user_data.objects.filter(user_id=user.id, content_main_id=contentId)
-        if userData:
-            userData.delete()
-        userPoints = h5p_points.objects.filter(uid=user.id, content_id=contentId)
-        if userPoints:
-            userPoints.delete()
+        if 'user' in request.GET and (request.user.username == content.author or request.user.is_superuser):
+            user = User.objects.get(username=request.GET['user'])
+            userData = h5p_content_user_data.objects.filter(user_id=user.id, content_main_id=content.content_id)
+            if userData:
+                userData.delete()
+            userPoints = h5p_points.objects.filter(uid=user.id, content_id=content.content_id)
+            if userPoints:
+                userPoints.delete()
 
-        return HttpResponseRedirect('/h5p/score/%s' % contentId,
-                                    {'status': "%s's score has been reset !" % user.username})
+            return HttpResponseRedirect('/h5p/score/%s' % content.content_id, {'status': "%s's score has been reset !" % user.username})
 
-    listScore = dict()
-    if request.user.username == owner.author or request.user.is_superuser:
-        listScore['owner'] = True
+        if 'download' in request.GET and request.user.is_superuser:
+            if request.GET['download'] == 'all':
+                scores = exportScore()
+                scores = ContentFile(scores)
+                response = HttpResponse(scores, 'text/plain')
+                response['Content-Length'] = scores.size
+                response['Content-Disposition'] = 'attachment; filename="h5pp_users_score.txt"'
+            else:
+                scores = exportScore(request.GET['download'])
+                scores = ContentFile(scores)
+                response = HttpResponse(scores, 'text/plain')
+                response['Content-Length'] = scores.size
+                response['Content-Disposition'] = 'attachment; filename="content_%s_users_score.txt"' % request.GET['download']
 
-    listScore['data'] = getUserScore(contentId)
-    if listScore['data'] > 0:
-        return render(request, 'h5p/score.html', {'listScore': listScore, 'contentId': contentId})
+            return response
 
-    return render(request, 'h5p/score.html', {'status': 'No score available yet.', 'contentId': contentId})
+        listScore = dict()
+        if request.user.username == content.author or request.user.is_superuser:
+            listScore['owner'] = True
+
+        listScore['data'] = getUserScore(content.content_id)
+        if listScore['data'] > 0:
+            return render(request, 'h5p/score.html', {'listScore': listScore, 'content': content})
+
+        return render(request, 'h5p/score.html', {'status': 'No score available yet.', 'content': content})
+
+    return HttpResponseRedirect('/h5p/login/?next=/h5p/score/' + contentId + '/')
 
 
 def embedView(request):

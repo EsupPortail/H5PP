@@ -1,6 +1,3 @@
-# -*-coding:Latin-1 -*
-
-
 import os
 import zipfile
 import re
@@ -757,10 +754,10 @@ class H5PStorage:
     # Delete an H5P package
     ##
     def deletePackage(self, content):
-        self.h5pC.fs.deleteContent(content["id"])
+        self.h5pC.fs.deleteContent(content.content_id)
         self.h5pC.fs.deleteExport(
-            (content["slug"] + "-" if "slug" in content else "") + str(content["id"]) + ".h5p")
-        self.h5pF.deleteContentData(content["id"])
+            (content.slug + "-" if content.slug else "") + str(content.content_id) + ".h5p")
+        self.h5pF.deleteContentData(content.content_id)
 
     ##
     # Copy/clone an H5P package
@@ -981,13 +978,11 @@ class H5PCore:
     DISABLE_COPYRIGHT = 8
     DISABLE_ABOUT = 16
 
-    # Map flags to string
-    disable = {
-        DISABLE_FRAME: "frame",
-        DISABLE_DOWNLOAD: "download",
-        DISABLE_EMBED: "embed",
-        DISABLE_COPYRIGHT: "copyright"
-    }
+    DISPLAY_OPTION_FRAME = 'frame'
+    DISPLAY_OPTION_DOWNLOAD = 'export'
+    DISPLAY_OPTION_EMBED = 'embed'
+    DISPLAY_OPTION_COPYRIGHT = 'copyright'
+    DISPLAY_OPTION_ABOUT = 'icon'
 
     global libraryIdMap
     libraryIdMap = dict()
@@ -1019,6 +1014,14 @@ class H5PCore:
         self.librariesJsonData = None
         self.contentJsonData = None
         self.mainJsonData = None
+
+        # Map flags to string
+        disable = {
+            self.DISABLE_FRAME: self.DISPLAY_OPTION_FRAME,
+            self.DISABLE_DOWNLOAD: self.DISPLAY_OPTION_DOWNLOAD,
+            self.DISABLE_EMBED: self.DISPLAY_OPTION_EMBED,
+            self.DISABLE_COPYRIGHT: self.DISPLAY_OPTION_COPYRIGHT
+        }
 
     ##
     # Save content and clear cache.
@@ -1686,7 +1689,7 @@ class H5PContentValidator:
     # Validate given text value against text semantics.
     ##
     def validateText(self, text, semantics):
-        if not isinstance(text, str):
+        if not isinstance(text, basestring):
             text = ''
 
         if 'tags' in semantics:
@@ -1731,7 +1734,7 @@ class H5PContentValidator:
             text = cgi.escape(text, True)
 
         if 'maxLength' in semantics:
-            text = mb_substr(text, 0, semantics['maxLength'])
+            text = text[0:semantics['maxLength']]
 
         if not text == '' and 'optional' in semantics and 'regexp' in semantics:
             pattern = semantics['regexp'][
@@ -1789,9 +1792,9 @@ class H5PContentValidator:
 
         # Check if number if withing allowed bounds even if step value is set.
         if 'step' in semantics:
-            testNumber = number - \
-                (semantics['min'] if semantics['min'] else 0)
-            rest = testNumber % semantics['step']
+            textNumber = number - \
+                (semantics['min'] if 'min' in semantics else 0)
+            rest = textNumber % semantics['step']
             if rest != 0:
                 number = number - rest
 
@@ -1809,26 +1812,21 @@ class H5PContentValidator:
     # Validate select values
     ##
     def validateSelect(self, select, semantics):
-        options = {}
-        if "optional" in semantics:
-            optional = semantics["optional"] and semantics["optional"]
-        else:
-            optional = False
+        optional = semantics['optional'] if 'optional' in semantics else False
         strict = False
-        if ("options" in semantics and semantics["options"]
-                and not empty(semantics["options"])):
+        if 'options' in semantics and not empty(semantics['options']):
             # We have a strict set of options to choose from.
             strict = True
-            for option in semantics["options"]:
-                options[option["value"]] = True
+            options = dict()
+            for option in semantics['options']:
+                options[option['value']] = True
 
-        if ("multiple" in semantics and semantics["multiple"] and
-                semantics["multiple"]):
+        if 'multiple' in semantics and semantics['multiple']:
             # Multi-choice generates array of values. Test each one against valid
             # options, if we are strict. First make sure we are working on an
             # array.
-            if not is_array(select):
-                select = [select]
+            if not isinstance(select, list):
+                select = list(select)
 
             for key, value in select:
                 if strict and not optional and not options[value]:
@@ -1840,13 +1838,13 @@ class H5PContentValidator:
         else:
             # Single mode. If we get an array in here, we chop off the first
             # element and use that instead.
-            if is_array(select):
+            if isinstance(select, list):
                 select = select[0]
 
             if strict and not optional and not options[select]:
                 print(
                     "Invalid selected option in select.")
-                select = semantics["options"][0].value
+                select = semantics[options[0]['value']]
 
             select = cgi.escape(select, True)
 
@@ -1858,22 +1856,12 @@ class H5PContentValidator:
         field = semantics['field']
         function = self.typeMap[field['type']]
 
-        # Check that list is not longer than allowed length. We do self before
-        # iterating to avoid unnecessary work.
-        if 'max' in semantics:
-            plist[semantics['max']:]
-
-        if not is_array(plist):
-            plist = []
+        if not isinstance(plist, list):
+            plist = list()
 
         # Validate each element in list.
-        for key, value in enumerate(plist):
-            #if not isinstance(key, int):
-            #    plist[key: key + 1]
-            #    continue
+        for value in plist:
             eval('self.' + function + '(value, field)')
-            if value == None:
-                plist[key: key + 1]
 
         if len(plist) == 0:
             plist = None
@@ -1881,13 +1869,11 @@ class H5PContentValidator:
     ##
     # Validate a file like object, such as video, image, audio and file.
     ##
-    def _validateFilelike(self, f, semantics, typeValidKeys=[]):
+    def validateFilelike(self, f, semantics, typeValidKeys=[]):
         # Do not allow to use files from other content folders.
-        matches = []
-        # DAVEB This probably doesn't do what we need it to
-        match = re.search(self.h5pC.relativePathRegExp, f['path'])
-        if match:
-            f['path'] = match.group(5)
+        matches = re.search(self.h5pC.relativePathRegExp, f['path'])
+        if matches:
+            f['path'] = matches.group(4)
 
         # Make sure path and mime does not have any special chars
         f['path'] = cgi.escape(f['path'], True)
@@ -1912,28 +1898,27 @@ class H5PContentValidator:
             f['codecs'] = cgi.escape(f['codecs'], True)
 
         if 'quality' in f:
-            if (not isintance(f['quality'], object) or level not in  f['quality'] or
-                    not label not in f['quality']):
+            if not isinstance(f['quality'], object) or not 'level' in f['quality'] or not 'label' in f['quality']:
                 del f['quality']
             else:
                 self.filterParams(f['quality'], ["level", "label"])
                 f['quality']['level'] = int(f['quality']['level'])
                 f['quality']['label'] = cgi.escape(f['quality']['label'], True)
 
-        if copyright in f:
+        if 'copyright' in f:
             self.validateGroup(f['copyright'], self.getCopyrightSemantics())
 
     ##
     # Validate given file data
     ##
     def validateFile(self, f, semantics):
-        self._validateFilelike(f, semantics)
+        self.validateFilelike(f, semantics)
 
     ##
     # Validate given image data
     ##
     def validateImage(self, image, semantics):
-        self._validateFilelike(
+        self.validateFilelike(
             image, semantics, ["width", "height", "originalImage"])
 
     ##
@@ -1941,15 +1926,15 @@ class H5PContentValidator:
     ##
     def validateVideo(self, video, semantics):
         for variant in video:
-            self._validateFilelike(variant, semantics, [
-                "width", "height", "codecs", "quality"])
+            self.validateFilelike(variant, semantics, [
+                                   "width", "height", "codecs", "quality"])
 
     ##
     # Validate given audio data
     ##
     def validateAudio(self, audio, semantics):
         for variant in audio:
-            self._validateFilelike(variant, semantics)
+            self.validateFilelike(variant, semantics)
 
     ##
     # Validate given group value against group semantics
@@ -2075,6 +2060,89 @@ class H5PContentValidator:
         for key, value in params.items():
             if not key in whitelist:
                 del params[key]
+
+    ##
+    # Prevent cross-site-scripting (XSS) vulnerabilities
+    ##
+    def filterXss(self, string, allowedTags=['a', 'em', 'strong', 'cite', 'blockquote', 'code', 'ul', 'ol', 'li', 'dl', 'dt', 'dd'], allowedStyles=False):
+        if len(string) == 0:
+            return string
+
+        # Only operate on valid UTF-8 strings
+        if not re.search('(?us)^.', string):
+            return ''
+
+        self.allowedStyles = allowedStyles
+        # Store the text format
+        self.filterXssSplit(allowedTags, True)
+        # Remove NULL characters (ignored by some browsers)
+        string = string.replace(chr(0), '')
+        # Remove Netscape 4 JS entities
+        string = re.sub('%&\s*\{[^}]*(\)\s*;?|$)%', '', string)
+
+        # Defuse all HTML entities
+        string = string.replace('&', '&amp;')
+        # Change back only well-formed entities in our whitelist
+        # Deciman numeric entities
+        string = re.sub('&amp;#([0-9]+;)', '&#\1', string)
+        # Hexadecimal numeric entities
+        string = re.sub('&amp;#[Xx]0*((?:[0-9A-Fa-f]{2})+;)', '&#x\1', string)
+        # Named entities
+        string = re.sub('&amp;([A-Za-z][A-Za-z0-9]*;)', '&\1', string)
+
+        return re.sub('%(<(?=[^a-zA-Z!/])|<!--.*?-->|<[^>]*(>|$)|>)%x', self.filterXssSplit, string)
+
+    ##
+    # Process an HTML tag
+    ##
+    def filterXssSplit(self, m, store=False):
+        if store:
+            self.allowedHtml = m
+            return self.allowedHtml
+
+        string = m[1]
+
+        if string[0:1] != '<':
+            # We matched a lone ">" character
+            return '&gt;'
+        elif len(string) == 1:
+            # We matched a lone "<" character
+            return '&lt;'
+
+        matches = re.search('%^<\s*(/\s*)?([a-zA-Z0-9\-]+)([^>]*)>?|(<!--.*?-->)$%', string)
+        if not matches:
+            # Seriously malformed
+            return ''
+
+        slash = matches.group(0).strip()
+        elem = matches.group(1)
+        attrList = matches.group(2)
+        comment = matches.group(3)
+
+        if comment:
+            elem = '!--'
+
+        if not elem.lower() in self.allowedHtml:
+            # Disallowed HTML element
+            return ''
+
+        if comment:
+            return comment
+
+        if slash != '':
+            return '</' + elem + '>'
+
+        # Is there a closing XHTML slash at the end of the attributes ?
+        attrList = re.sub('%(\s?)/\s*$%', '\1', attrList, -1)
+        xhtmlSlash = '/' if attrList else ''
+
+        # Clean up attributes
+        attr2 = ' '.join(self.filterXssAttributes(attrList, self.allowedStyles if elem in self.allowed_styleable_tags else False))
+        attr2 = re.sub('[<>]', '', attr2)
+        attr2 = ' ' + attr2 if len(attr2) else ''
+
+        return '<' + elem + attr2 + xhtmlSlash + '>'
+
 
     def getCopyrightSemantics(self):
 

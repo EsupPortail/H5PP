@@ -114,10 +114,8 @@ def h5pUpdate(request):
 
 
 def h5pDelete(request):
-    res = h5p_contents.objects.filter(content_id=request.GET['contentId']).extra(
-        select={'id': 'content_id'}).values('id', 'slug')
-    for content in res:
-        h5pDeleteH5PContent(request, content)
+    content = h5p_contents.objects.get(content_id=request.GET['contentId'])
+    h5pDeleteH5PContent(request, content)
 
     if 'main_library' in request.POST:
         # Log content delete
@@ -141,11 +139,11 @@ def h5pDeleteH5PContent(request, content):
     storage.deletePackage(content)
 
     # Remove content points
-    h5p_points.objects.filter(content_id=content['id']).delete()
+    h5p_points.objects.filter(content_id=content.content_id).delete()
 
     # Remove content user data
     h5p_content_user_data.objects.filter(
-        content_main_id=content['id']).delete()
+        content_main_id=content.content_id).delete()
 
 
 def h5pLoad(request):
@@ -523,9 +521,7 @@ def h5pAddIframeAssets(request, integration, contentId, files):
     integration['core']['scripts'] = assets['js']
     integration['core']['styles'] = assets['css']
 
-    writable = os.path.exists(settings.H5P_PATH)
-    # Temp
-    writable = False
+    writable = False # Temporary, future feature
     if writable:
         if not os.path.exists(os.path.join(settings.H5P_PATH, 'files')):
             os.mkdir(os.path.join(settings.H5P_PATH, 'files'))
@@ -608,22 +604,51 @@ def h5pEmbed(request):
 
 def getUserScore(contentId, user=None, ajax=False):
     if user != None:
-        score = h5p_points.objects.filter(
+        scores = h5p_points.objects.filter(
             content_id=contentId, uid=user.id).values('points', 'max_points')
     else:
-        score = h5p_points.objects.filter(content_id=contentId).extra(
-            select={'user': 'uid'}).values('user', 'points', 'max_points')
-        for user in score:
-            user['user'] = User.objects.get(id=user['user']).username
+        scores = h5p_points.objects.filter(content_id=contentId)
+        for score in scores:
+            score.uid = User.objects.get(id=score.uid).username
+            score.has_finished = score.finished >= score.started
+            score.points = '..' if score.points == None else score.points
+            score.max_points = '..' if score.max_points == None else score.max_points
 
-    if len(score) > 0:
+    if len(scores) > 0:
         if ajax:
-            return json.dumps(list(score))
-        return score
+            return json.dumps(list(scores))
+        return scores
 
     return None
 
+def exportScore(contentId=None):
+    response = ''
+    if contentId:
+        scores = h5p_points.objects.filter(content_id=contentId)
+        content = h5p_contents.objects.get(content_id=contentId)
+        response = response + '[Content] : %s - [Users] : %s\n' % (content.title, len(scores))
+        for score in scores:
+            score.uid = User.objects.get(id=score.uid).username
+            score.has_finished = 'Completed' if score.finished >= score.started else 'Not completed'
+            score.points = '..' if score.points == None else score.points
+            score.max_points = '..' if score.max_points == None else score.max_points
+            response = response + '[Username] : %s | [Current] : %s | [Max] : %s | [Progression] : %s\n' % (score.uid, score.points, score.max_points, score.has_finished)
+        return response
 
+    scores = h5p_points.objects.all()
+    response = response + '[Users] : %s\n' % len(scores)
+    currentContent = ''
+    for score in scores:
+        content = h5p_contents.objects.get(content_id=score.content_id)
+        if content.content_id != currentContent:
+            response = response + '--------------------\n[Content] : %s\n--------------------\n' % content.title
+        score.uid = User.objects.get(id=score.uid).username
+        score.has_finished = 'Completed' if score.finished >= score.started else 'Not completed'
+        score.points = '..' if score.points == None else score.points
+        score.max_points = '..' if score.max_points == None else score.max_points
+        response = response + '[Username] : %s | [Current] : %s | [Max] : %s | [Progression] : %s\n' % (score.uid, score.points, score.max_points, score.has_finished)
+        currentContent = content.content_id
+    return response
 ##
 # Uninstall H5P
 ##

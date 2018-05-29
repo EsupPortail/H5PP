@@ -1,8 +1,13 @@
 {% extends "h5p/base.html" %}
 {% load static %}
 {% block head %}
+	<title>H5PP - Users score</title>
 	<script>
-	function search() {
+	{% if listScore %}
+	window.onload = function() {
+		// Initialize the searchbar
+		var searchbar = document.getElementById('searchbar');
+		searchbar.addEventListener("keyup", function(event) {
 			var input, filter, table, tr, td, i;
 			input = document.getElementById("searchbar");
 			filter = input.value.toUpperCase();
@@ -19,19 +24,83 @@
 					}
 				}
 			}
+		});
+
+		// Initialize the row selector
+		var line = document.getElementById('contents').rows;
+		for(var i = 1; i < line.length; i++) {
+			line[i].addEventListener("click", function(event) {
+				for(var j = 1; j < line.length; j++) {
+					line[j].classList.remove("success");
+				}
+				this.className = "success";
+			});
 		}
+
+		// Initialize the reset button
+		var reset = document.getElementById('reset');
+		reset.addEventListener("click", function(event) {
+			try {
+				var selected = document.getElementsByClassName('success')[0];
+				var user = selected.getElementsByTagName('td')[0].innerText;
+				window.location = "{% url 'h5pscore' contentId=content.content_id %}?user=" + user;
+			}
+			catch(error) {
+				alert('First select a user score to reset.');
+			}
+		});
+
+		// Initialize the reset-all button
+		var resetall = document.getElementById('resetall');
+		resetall.addEventListener("click", function(event) {
+			if (confirm('Are you sure you want to reset the score of all this users ?')) {
+				try {
+					var form = document.createElement("form");
+					form.setAttribute("method", "post");
+					form.setAttribute("action", "{% url 'h5pscore' contentId=content.content_id %}");
+					var hiddenField = document.createElement("input");
+					hiddenField.setAttribute("type", "hidden");
+					hiddenField.setAttribute("name", "csrfmiddlewaretoken");
+					hiddenField.setAttribute("value", "{{csrf_token}}");
+					form.appendChild(hiddenField);
+					document.body.appendChild(form);
+					form.submit();
+				}
+				catch(error) {
+					alert('Error while sending the form');
+				}
+			}
+			return false;
+		});
+
+		// Initialize the export button
+		var exportfile = document.getElementById('export');
+		exportfile.addEventListener("click", function(event) {
+			if (confirm('Do you want the user scores of all videos ?')) {
+				window.location = "{% url 'h5pscore' contentId=content.content_id %}?download=all";
+			} else if (confirm('Do you want the user scores of this video ?')) {
+				window.location = "{% url 'h5pscore' contentId=content.content_id %}?download={{content.content_id}}";
+			}
+		});
+	}
+	{% endif %}
 	</script>
 {% endblock head %}
 {% block body %}
 <div class="wrap">
 	<h3 class="page-title">Users score</h3>
 	<div class="alert alert-success">
+		<p align="center">
+			Here is the score management page.<br>
+			You can search for score by username and see his score.<br>
+		</p>
+		<hr>
 		<p>
-			Here is users score for this content.<br>
-			You can search for score by username and see his score. A 'X' in the score column indicates that the user has not yet completed the activities.<br>
-			{% if listScore.owner %}
-				You can reset user score or reset the scores saved on this content.
-			{% endif %}
+			<ul><li><b>As a content owner </b>:
+			You can reset a user's score <span class="glyphicon glyphicon-step-backward"></span> or all users who have already completed your video activities <span class="glyphicon glyphicon-fast-backward"></span></li>
+				
+			<li><b>As a superuser </b>:
+			You can get the user scores of the current video or all existing videos in text format <span class="glyphicon glyphicon-download"></span>.</li></ul>
 		</p>
 	</div>
 	{% if status %}
@@ -42,44 +111,45 @@
 		</div>
 	{% endif %}
 	<div class="list">
-		<input type="text" id="searchbar" onkeyup="search()" placeholder="Search by name...">
-		<table id="contents">
-			<tr class="header">
-				<th style="width:30%;">Username</th>
-				<th style="width:30%;">Score</th>
-				{% if listScore.owner %}
-					<th style="width:40%;">Options</th>
-				{% endif %}
-			</tr>
+		<input type="text" id="searchbar" placeholder="Search by name...">
+		{% if listScore.owner %}
+			<button type="submit" id="reset" class="btn btn-link" value="Reset">
+				<span class="glyphicon glyphicon-step-backward"> Reset</span>
+			</button>
+			<button type="submit" id="resetall" class="btn btn-link" value="Reset-all">
+				<span class="glyphicon glyphicon-fast-backward"> Reset-all</span>
+			</button>
+		{% endif %}
+		{% if request.user.is_superuser %}
+			<button type="submit" id="export" class="btn btn-link" value="Export">
+				<span class="glyphicon glyphicon-download"> Export</span>
+			</button>
+		{% endif %}
+		<h4>{{content.title}} - <i>{{content.author}}</i></h4>
+		<table id="contents" class="table table-hover">
+			<thead>
+				<tr class="header">
+					<th style="width:20%;">Username</th>
+					<th style="width:20%;">Current</th>
+					<th style="width:20%;">Max</th>
+				</tr>
+			</thead>
+			<tbody>
 			{% for score in listScore.data %}
 				<tr>
 					<td>
-						{{ score.user }}
+						{{ score.uid }}
 					</td>
 					<td>
-						{% if score.max_points %}
-							{{ score.points }} / {{ score.max_points }}
-						{% else %}
-							X
-						{% endif %}
+						{{score.points}}
 					</td>
-					{% if listScore.owner %}
-						<td class="options">
-							<a href="{% url "h5pscore" contentId=contentId %}?user={{ score.user }}">Reset score</a>
-						</td>
-					{% endif %}
+					<td>
+						{{score.max_points}}
+					</td>
 				</tr>
 			{% endfor %}
+			</tbody>
 		</table>
 	</div>
-	{% if listScore.owner %}
-		<div class="score-options">
-			
-				<form method="post" action="{% url "h5pscore" contentId=contentId %}">
-					{% csrf_token %}
-					<input type="submit" class="btn btn-default" value="Reset all">
-				</form>
-		</div>
-	{% endif %}
 </div>
 {% endblock body %}
