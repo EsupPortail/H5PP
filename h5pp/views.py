@@ -69,7 +69,7 @@ class CreateContentView(CreateView):
         return kwargs
 
     def get_success_url(self, pk):
-        return reverse("h5pcontent", args=[pk])
+        return reverse("h5pp:h5pcontent", args=[pk])
 
     def get_context_data(self, **kwargs):
         """
