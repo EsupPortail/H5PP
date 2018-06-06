@@ -23,7 +23,7 @@ STYLES = [
     "styles/h5p-core-button.css"
 ]
 
-OVERRIDE_STYLES = '/static/h5p/styles/h5pp.css'
+OVERRIDE_STYLES = settings.STATIC_URL + '/h5p/styles/h5pp.css'
 
 SCRIPTS = [
     "js/jquery.js",

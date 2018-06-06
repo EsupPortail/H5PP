@@ -16,7 +16,8 @@ from h5pp.h5p.h5pclasses import H5PDjango
 STYLES = ["libs/darkroom.css",
           "styles/css/application.css"]
 
-OVERRIDE_STYLES = '/static/h5p/styles/h5pp.css'
+
+OVERRIDE_STYLES = settings.STATIC_URL + '/h5p/styles/h5pp.css'
 
 SCRIPTS = [
     "scripts/h5peditor.js",
