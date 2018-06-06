@@ -33,7 +33,7 @@
 {% block body %}
 {% if not request.GET.is_iframe %}
 <div class="wrap">
-	<a href="{% url 'htpp:h5plistContents' %}"><span class="glyphicon glyphicon-arrow-left"></span> List of contents</a>
+	<a href="{% url 'h5pp:h5plistContents' %}"><span class="glyphicon glyphicon-arrow-left"></span> List of contents</a>
 	<h3 class="page-title">{{request.GET.title}}</h3>
 	<div class="well">
 		{% autoescape off %}
