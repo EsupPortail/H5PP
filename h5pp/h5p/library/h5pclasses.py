@@ -1690,7 +1690,7 @@ class H5PContentValidator:
     # Validate given text value against text semantics.
     ##
     def validateText(self, text, semantics):
-        if not isinstance(text, basestring):
+        if not isinstance(text, str):
             text = ''
 
         if 'tags' in semantics:
