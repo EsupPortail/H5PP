@@ -16,12 +16,13 @@
 				<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 					<div class="container-fluid">
 						<div class="navbar-header">
-							<a class="navbar-brand" href="{% url 'h5phome' %}">H5PP</a>
+							<a class="navbar-brand" href="{% url 'h5pp:h5phome' %}">H5PP</a>
 						</div>
 						<ul class="nav navbar-nav">
-							<li><a href="{% url 'h5plibraries' %}">Libraries</a></li>
-							<li><a href="{% url 'h5pcreate' %}">Editor</a></li>
-							<li><a href="{% url 'h5plistContents' %}">Contents</a></li>
+							<li><a href="{% url 'h5pp:h5phome' %}">Home</a></li>
+							<li><a href="{% url 'h5pp:h5plibraries' %}">Libraries</a></li>
+							<li><a href="{% url 'h5pp:h5pcreate' %}">Editor</a></li>
+							<li><a href="{% url 'h5pp:h5plistContents' %}">Contents</a></li>
 							<li><a href="{% url 'admin:index' %}">Administration</a></li>
 						</ul>
 						{% if not request.user.is_authenticated %}
@@ -30,7 +31,7 @@
 								Login
 							</a>
 						{% else %}
-							<a href="{% url 'logout' %}" class="btn btn-danger navbar-btn navbar-right user">
+							<a href="#" class="btn btn-danger navbar-btn navbar-right user">
 								<span class="glyphicon glyphicon-exit"></span>
 								Log out
 							</a>

@@ -11,26 +11,29 @@
 	{% endif %}
 	<style type="text/css" media="all">
 	{% for style in data.assets.css %}
-		@import url("{% static style %}");
+		@import url("{{ style }}");
 	{% endfor %}
 	{% for style in data.filesAssets.css %}
 		@import url("{% static style %}");
 	{% endfor %}
 	</style>
 	{% for script in data.assets.js %}
-		<script type="text/javascript" src="{% static script %}"></script>
+		<script type="text/javascript" src="{{ script }}"></script>
 	{% endfor %}
+
 	{% for script in data.filesAssets.js %}
-		<script type="text/javascript" src="{% static script %}"></script>
+		<script type="text/javascript" src="{{ script }}"></script>
 	{% endfor %}
+
 	<script type="text/javascript">
 		H5PIntegration = {% autoescape off %} {{data.integration}} {% endautoescape %}
 	</script>
+
 {% endblock head %}
 {% block body %}
 {% if not request.GET.is_iframe %}
 <div class="wrap">
-	<a href="{% url 'h5plistContents' %}"><span class="glyphicon glyphicon-arrow-left"></span> List of contents</a>
+	<a href="{% url 'h5pp:h5plistContents' %}"><span class="glyphicon glyphicon-arrow-left"></span> List of contents</a>
 	<h3 class="page-title">{{request.GET.title}}</h3>
 	<div class="well">
 		{% autoescape off %}
@@ -39,11 +42,11 @@
 		{% if request.user.is_authenticated %}
 			<div class="content-options">
 				{% if request.user.username == owner %}
-					<a href="{% url 'h5pedit' contentId=request.GET.contentId %}?title={{request.GET.title}}">
+					<a href="{% url 'h5pp:h5pedit' contentId=request.GET.contentId %}?title={{request.GET.title}}">
 						<input type="submit" class="btn btn-default edit-button" id="edit" value="Edit video" />
 					</a>
 				{% endif %}
-				<a href="{% url 'h5pscore' contentId=request.GET.contentId %}">
+				<a href="{% url 'h5pp:h5pscore' contentId=request.GET.contentId %}">
 					<input type="submit" class="btn btn-default edit-button" value="View users score" />
 				</a>
 			</div>

@@ -1,13 +1,15 @@
-##
 # Handles all communication with the database
-##
-from django.conf import settings
-from h5pp.models import h5p_libraries
+
 import collections
 import shutil
 import json
 import re
 import os
+
+from django.conf import settings
+
+from h5pp.models import h5p_libraries
+
 
 
 class H5PDjangoEditor:
@@ -23,15 +25,14 @@ class H5PDjangoEditor:
         self.storage = storage
         self.basePath = basePath
         self.contentFilesDir = os.path.join(filesDir, 'content')
-        self.editorFilesDir = os.path.join(filesDir if editorFilesDir ==
-                                           None else editorFilesDir, 'editor')
+        self.editorFilesDir = os.path.join(filesDir if editorFilesDir is None else editorFilesDir, 'editor')
 
     ##
     # This does alot of the same as getLibraries in library/h5pclasses.py. Use that instead ?
     ##
     def getLibraries(self, request):
         if 'libraries[]' in request.POST:
-            lib = dict(request.POST.iterlists())
+            lib = dict(request.POST.lists())
             liblist = list()
             for name in lib['libraries[]']:
                 liblist.append(name)
@@ -91,7 +92,7 @@ class H5PDjangoEditor:
         self.h5p.aggregateAssets = aggregateAssets
 
         # Create base URL
-        url = settings.BASE_URL + '/media/h5pp' + prefix
+        url = settings.MEDIA_URL + '/h5pp' + prefix
 
         # JavaScripts
         if 'scripts' in files:
@@ -128,7 +129,7 @@ class H5PDjangoEditor:
                         '(?i)url\([\']?(?![a-z]+:|\/+)([^\')]+)[\']?\)', self.buildCssPath, self.h5p.fs.getContent(css['path']))
 
         # Add translations for libraries
-        for key, library in libraries.iteritems():
+        for key, library in libraries.items():
             language = self.getLibraryLanguage(library['machine_name'], library[
                                                'major_version'], library['minor_version'], langageCode)
             if language != None:
@@ -149,7 +150,7 @@ class H5PDjangoEditor:
         # Order dependencies by weight
         orderedDependencies = collections.OrderedDict()
         for i in range(1, len(dependencies) + 1):
-            for key, dependency in dependencies.iteritems():
+            for key, dependency in dependencies.items():
                 if dependency['weight'] == i and dependency['type'] == 'editor':
                     # Only load editor libraries
                     dependency['library']['id'] = dependency[
@@ -172,7 +173,7 @@ class H5PDjangoEditor:
         self.contentDirectory = os.path.join(
             self.contentFilesDir, str(contentId))
         if not os.path.isdir(self.contentFilesDir):
-            os.mkdir(os.path.join(self.basePath, self.contentFilesDir), 0777)
+            os.mkdir(os.path.join(self.basePath, self.contentFilesDir))
 
         subDirectories = ['', 'files', 'images', 'videos', 'audios']
         for subDirectory in subDirectories:

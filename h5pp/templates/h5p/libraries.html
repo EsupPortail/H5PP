@@ -35,7 +35,8 @@
 			});
 
 			var searchbar = document.getElementById('searchbar');
-			searchbar.addEventListener("keyup", function(event) {
+                        if (searchbar) {
+  		            searchbar.addEventListener("keyup", function(event) {
 				var input, filter, table, tr, td, i;
 				input = document.getElementById("searchbar");
 				filter = input.value.toUpperCase();
@@ -52,8 +53,8 @@
 						}
 					}
 				}
-			});
-		};
+			    });   
+		};    }
 	</script>
 {% endblock head %}
 {% block body %}
@@ -83,8 +84,8 @@
 				<i>Some types of content have tutorials. It is possible that with time new ones appear. You can update these tutorials here.</i><br>
 				<label> Uninstall H5P : {{ form.uninstall }}</label><br>
 				<i>You can uninstall your libraries. If you do, all your libraries and contents created will be deleted.</i><br>
-				<input class="btn btn-default submit" type="submit" value="Proceed">
 			</div>
+			<p style="text-align:center"><input class="btn btn-default submit" type="submit" value="Proceed"></p>
 			{% if form.non_field_errors or status %}
 				<div class="alert alert-danger">
 					{% if form.non_field_errors %}
@@ -97,7 +98,7 @@
 						</p>
 					{% endif %}
 				</div>
-			{% endif %}
+			        {% endif %}
 		</form>
 	</div>
 </div>

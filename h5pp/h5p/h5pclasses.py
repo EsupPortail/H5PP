@@ -1,15 +1,5 @@
-##
 # Implementation of H5PFrameworkInterface
-##
-from django.conf import settings
-from django.contrib import messages
-from django.db import connection
-from django.template.defaultfilters import slugify
-from h5pp.models import *
-from h5pp.h5p.h5pevent import H5PEvent
-from h5pp.h5p.library.h5pclasses import *
-from h5pp.h5p.editor.h5peditorclasses import H5PDjangoEditor
-from h5pp.h5p.editor.library.h5peditorstorage import H5PEditorStorage
+
 import collections
 import requests
 import django
@@ -17,6 +7,18 @@ import time
 import json
 import re
 import os
+
+from django.conf import settings
+from django.contrib import messages
+from django.db import connection
+from django.template.defaultfilters import slugify
+
+from h5pp.models import h5p_libraries, h5p_libraries_libraries, h5p_libraries_languages, h5p_contents, h5p_counters, h5p_contents_libraries, h5p_content_user_data
+from h5pp.h5p.h5pevent import H5PEvent
+from h5pp.h5p.library.h5pclasses import *
+from h5pp.h5p.editor.h5peditorclasses import H5PDjangoEditor
+from h5pp.h5p.editor.library.h5peditorstorage import H5PEditorStorage
+
 
 
 class H5PDjango:
@@ -302,7 +304,7 @@ class H5PDjango:
         h5p_libraries_languages.objects.filter(
             library_id=libraryData['libraryId']).delete()
         if 'language' in libraryData:
-            for languageCode, languageJson in libraryData['language'].iteritems():
+            for languageCode, languageJson in libraryData['language'].items():
                 pid = h5p_libraries_languages.objects.create(library_id=libraryData[
                                                              'libraryId'], language_code=languageCode, language_json=languageJson)
 
@@ -395,7 +397,7 @@ class H5PDjango:
             embed_type='div',
             content_type=content['library']['machineName'],
             main_library_id=content['library']['libraryId'],
-            author=content['author'],
+            author=content.get('author',''),
             disable=content['disable'],
             filtered='',
             slug=slugify(content['title']))
@@ -455,18 +457,18 @@ class H5PDjango:
     ##
     def saveLibraryUsage(self, contentId, librariesInUse):
         dropLibraryCssList = dict()
-        for key, dependency in librariesInUse.iteritems():
+        for key, dependency in librariesInUse.items():
             if 'dropLibraryCss' in dependency['library']:
                 dropLibraryCssList = dropLibraryCssList + \
                     dependency['library']['drop_library_css'].split(', ')
 
-        for key, dependency in librariesInUse.iteritems():
+        for key, dependency in librariesInUse.items():
             dropCss = 1 if dependency['library'][
                 'machine_name'] in dropLibraryCssList else 0
             h5p_contents_libraries.objects.create(
                 content_id=contentId,
                 library_id=dependency['library']['library_id'],
-                dependency_type=dependency['type'],
+                dependency_type=dependency['type'].replace("'", ""),
                 drop_css=dropCss,
                 weight=dependency['weight'])
 
@@ -626,7 +628,7 @@ class H5PDjango:
         response = json.loads(self.fetchExternalData(
             'https://h5p.org/libraries-metadata.json'))
         libraries = h5p_libraries.objects.values()
-        for name, url in response['libraries'].iteritems():
+        for name, url in response['libraries'].items():
             for library in libraries:
                 if library['machine_name'] == name:
                     self.setLibraryTutorialUrl(
@@ -663,7 +665,7 @@ class H5PDjango:
     ##
     def updateContentFields(self, pid, fields):
         cursor = connection.cursor()
-        for name, value in fields.iteritems():
+        for name, value in fields.items():
             query = {
                 '{0}'.format(name): value
             }

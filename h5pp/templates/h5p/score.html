@@ -43,7 +43,7 @@
 			try {
 				var selected = document.getElementsByClassName('success')[0];
 				var user = selected.getElementsByTagName('td')[0].innerText;
-				window.location = "{% url 'h5pscore' contentId=content.content_id %}?user=" + user;
+				window.location = "{% url 'h5pp:h5pscore' contentId=content.content_id %}?user=" + user;
 			}
 			catch(error) {
 				alert('First select a user score to reset.');
@@ -57,7 +57,7 @@
 				try {
 					var form = document.createElement("form");
 					form.setAttribute("method", "post");
-					form.setAttribute("action", "{% url 'h5pscore' contentId=content.content_id %}");
+					form.setAttribute("action", "{% url 'h5pp:h5pscore' contentId=content.content_id %}");
 					var hiddenField = document.createElement("input");
 					hiddenField.setAttribute("type", "hidden");
 					hiddenField.setAttribute("name", "csrfmiddlewaretoken");
@@ -77,9 +77,9 @@
 		var exportfile = document.getElementById('export');
 		exportfile.addEventListener("click", function(event) {
 			if (confirm('Do you want the user scores of all videos ?')) {
-				window.location = "{% url 'h5pscore' contentId=content.content_id %}?download=all";
+				window.location = "{% url 'h5pp:h5pscore' contentId=content.content_id %}?download=all";
 			} else if (confirm('Do you want the user scores of this video ?')) {
-				window.location = "{% url 'h5pscore' contentId=content.content_id %}?download={{content.content_id}}";
+				window.location = "{% url 'h5pp:h5pscore' contentId=content.content_id %}?download={{content.content_id}}";
 			}
 		});
 	}

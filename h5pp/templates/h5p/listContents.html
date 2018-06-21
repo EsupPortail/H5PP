@@ -43,7 +43,7 @@
 				var selected = document.getElementsByClassName('success')[0];
 				var title = selected.getElementsByTagName('td')[0].getElementsByTagName('a')[0].innerHTML;
 				var id = selected.getElementsByTagName('td')[3].innerText;
-				window.location = "{% url 'h5pcreate' %}" + id + "/?title=" + title;
+				window.location = "{% url 'h5pp:h5pcreate' %}" + id + "/?title=" + title;
 			}
 			catch(error) {
 				alert('First select a content to edit.');
@@ -58,7 +58,7 @@
 					var id = selected.getElementsByTagName('td')[3].innerText;
 					var form = document.createElement("form");
 					form.setAttribute("method", "post");
-					form.setAttribute("action", "{% url 'h5plistContents' %}?contentId=" + id);
+					form.setAttribute("action", "{% url 'h5pp:h5plistContents' %});
 					var hiddenField = document.createElement("input");
 					hiddenField.setAttribute("type", "hidden");
 					hiddenField.setAttribute("name", "csrfmiddlewaretoken");
@@ -167,7 +167,7 @@
 			{% for content in listContent %}
 				<tr>
 					<td>
-						<a href="{% url 'h5pcontent' %}?contentId={{content.id}}">
+						<a href="{% url 'h5pp:h5pcontent' content.id %}">
 							{{content.title}}
 						</a>
 					</td>

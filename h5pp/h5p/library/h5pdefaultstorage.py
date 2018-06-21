@@ -1,5 +1,3 @@
-# -*-coding:Latin-1 -*
-
 import os
 import zipfile
 import re
@@ -26,7 +24,7 @@ def isset(variable):
 
 
 def substr_replace(subject, replace, start, length):
-    if length == None:
+    if length is None:
         return subject[:start] + replace
     elif length < 0:
         return subject[:start] + replace + subject[length:]
@@ -124,7 +122,7 @@ class H5PDefaultStorage:
 
         try:
             shutil.copy(source, os.path.join(self.path, 'exports', filename))
-        except IOError, e:
+        except IOError as e:
             print('Unable to copy %s' % e)
 
         return True
@@ -239,7 +237,7 @@ class H5PDefaultStorage:
             if not self.dirReady(parent):
                 return False
 
-            os.mkdir(path, 0777)
+            os.mkdir(path)
 
         if not os.path.isdir(path):
             raise Exception('Path is not a directory')
@@ -333,6 +331,6 @@ class H5PDefaultStorage:
     # Read file content of given file and then return it
     ##
     def getContent(self, path):
-        content = open(self.path + path)
-        result = content.read()
+        content = open(self.path + path, 'rb')
+        result = content.read().decode('utf8', 'ignore')
         return result

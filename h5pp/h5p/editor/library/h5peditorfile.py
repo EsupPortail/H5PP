@@ -58,7 +58,7 @@ class H5PEditorFile:
     ##
     def check(self, mimes):
         ext = self.extension.lower().replace('.', '')
-        for mime, extension in mimes.iteritems():
+        for mime, extension in mimes.items():
             if isinstance(extension, list):
                 # Multiple extensions
                 if ext in extension:
@@ -102,7 +102,7 @@ class H5PEditorFile:
             if 'data' in locals() or 'data' in globals():
                 image = Image.open(self.data)
             else:
-                with open(self.path, 'w+') as f:
+                with open(self.path, 'ab') as f:
                     f.write(self.files.read())
                 # Image size from tmp file
                 image = Image.open(self.path)
