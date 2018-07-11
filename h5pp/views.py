@@ -154,17 +154,18 @@ def createView(request, contentId=None):
         editor = h5peditorContent(request, contentId)
         if request.method == 'POST':
             if contentId is not None:
+                request.POST = request.POST.copy()
                 request.POST['contentId'] = contentId
             form = CreateForm(request, request.POST, request.FILES)
             if form.is_valid():
                 if contentId is not None:
                     return HttpResponseRedirect(
-                        '/h5p/content/?contentId=' + contentId
+                        reverse("h5pp:h5pcontent", args=[contentId])
                     )
                 else:
                     newId = h5p_contents.objects.all().order_by('-content_id')[0]
                     return HttpResponseRedirect(
-                        '/h5p/content/?contentId=' + str(newId.content_id)
+                        reverse("h5pp:h5pcontent", args=[newId.content_id])
                     )
             return render(
                 request,
@@ -258,7 +259,7 @@ def listView(request):
         )
 
     listContent = h5pGetListContent(request)
-    if len(listContent) > 0:
+    if listContent and len(listContent) > 0:
         return render(
             request,
             'h5p/listContents.html',

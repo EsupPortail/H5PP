@@ -15,7 +15,7 @@ from h5pp.views import (
     embedView
 )
 
-
+app_name = 'h5pp'
 urlpatterns = [
     # Base
     url(r'^home/$', TemplateView.as_view(template_name="h5p/home.html"), name="h5phome"),
