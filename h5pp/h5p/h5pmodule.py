@@ -281,7 +281,7 @@ def h5pGetCoreSettings(user):
     coreSettings = {
         'baseUrl': Site.objects.get_current().domain,
         'url': "{}h5pp".format(settings.MEDIA_URL),
-        'postUserStatistics': user.id > 0,
+        'postUserStatistics': user.id > 0 if user.id else False,
         'ajaxPath': "{}{}ajax".format(Site.objects.get_current().domain, settings.H5P_URL),
         'ajax': {
             'setFinished': "{}ajax/?setFinished".format(settings.H5P_URL),
