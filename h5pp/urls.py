@@ -7,6 +7,7 @@ from h5pp.views import (
     CreateContentView,
     UpdateContentView,
     ContentDetailView,
+    contentsView,
     createView,
     editorAjax,
     listView,
@@ -23,6 +24,7 @@ urlpatterns = [
     # Contents and Libraries
     url(r'^libraries/$', librariesView, name="h5plibraries"),
     url(r'^listContents/$', listView, name="h5plistContents"),
+    url(r'^content/$', contentsView, name='h5pcontent'),
     url(r'^content/(?P<content_id>\d+)/$', login_required(ContentDetailView.as_view()), name="h5pcontent"),
 
     # Contents creation / upload

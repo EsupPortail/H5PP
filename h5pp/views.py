@@ -321,7 +321,7 @@ def scoreView(request, contentId):
             listScore['owner'] = True
 
         listScore['data'] = getUserScore(content.content_id)
-        if listScore['data'] > 0:
+        if listScore['data'].count() > 0:
             return render(request, 'h5p/score.html', {'listScore': listScore, 'content': content})
 
         return render(request, 'h5p/score.html', {'status': 'No score available yet.', 'content': content})

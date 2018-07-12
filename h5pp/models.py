@@ -131,7 +131,8 @@ class h5p_contents(models.Model):
         return "%s - %s" % (self.content_id, self.title)
 
     def get_absolute_url(self):
-        return '%s?contentId=%s' % (reverse('h5pcontent'), self.content_id)
+        # return '%s?contentId=%s' % (reverse('h5pcontent'), self.content_id)
+        return reverse("h5pp:h5pcontent", args=[self.content_id])
 
 # Stores user statistics
 
