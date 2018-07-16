@@ -16,6 +16,9 @@ from django.contrib.auth.models import User
 from h5pp.models import *
 from h5pp.h5p.h5pclasses import H5PDjango
 
+from django.core import serializers
+jsonserializer = serializers.get_serializer("json")
+json_serializer = jsonserializer()
 
 STYLES = [
     "styles/h5p.css",
@@ -606,7 +609,9 @@ def getUserScore(contentId, user=None, ajax=False):
 
     if len(scores) > 0:
         if ajax:
-            return json.dumps(list(scores))
+            return json_serializer.serialize(scores)
+            # return json.dumps(list(scores))
+
         return scores
 
     return None
