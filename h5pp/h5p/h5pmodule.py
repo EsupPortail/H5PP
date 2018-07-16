@@ -1,10 +1,4 @@
-##
 # Django module h5p.
-##
-from django.conf import settings
-from django.contrib.auth.models import User
-from h5pp.models import *
-from h5pp.h5p.h5pclasses import H5PDjango
 import collections
 import hashlib
 import shutil
@@ -15,13 +9,21 @@ import json
 import os
 import re
 
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.contrib.auth.models import User
+
+from h5pp.models import *
+from h5pp.h5p.h5pclasses import H5PDjango
+
+
 STYLES = [
     "styles/h5p.css",
     "styles/h5p-confirmation-dialog.css",
     "styles/h5p-core-button.css"
 ]
 
-OVERRIDE_STYLES = '/static/h5p/styles/h5pp.css'
+OVERRIDE_STYLES = settings.STATIC_URL + '/h5p/styles/h5pp.css'
 
 SCRIPTS = [
     "js/jquery.js",
@@ -245,7 +247,7 @@ def h5pSetFinished(request):
 
 
 def h5pAddCoreAssets():
-    path = settings.STATIC_URL + 'h5p/'
+    path = "{}h5p/".format(settings.STATIC_URL)
     assets = {
         'css': list(),
         'js': list()
@@ -269,12 +271,12 @@ def h5pAddCoreAssets():
 def h5pGetCoreSettings(user):
     coreSettings = {
         'baseUrl': settings.BASE_URL,
-        'url': settings.BASE_URL + settings.MEDIA_URL + 'h5pp',
-        'postUserStatistics': user.id > 0,
-        'ajaxPath': settings.BASE_URL + settings.H5P_URL + 'ajax',
+        'url': "{}h5pp".format(settings.MEDIA_URL),
+        'postUserStatistics': user.id > 0 if user.id else False,
+        'ajaxPath': "{}{}ajax".format(Site.objects.get_current().domain, settings.H5P_URL),
         'ajax': {
-            'setFinished': settings.BASE_URL + settings.H5P_URL + 'ajax/?setFinished',
-            'contentUserData': settings.BASE_URL + settings.H5P_URL + 'ajax/?content-user-data&contentId=:contentId&dataType=:dataType&subContentId=:subContentId'
+            'setFinished': "{}ajax/?setFinished".format(settings.H5P_URL),
+            'contentUserData': "{}ajax/?content-user-data&contentId=:contentId&dataType=:dataType&subContentId=:subContentId".format(settings.H5P_URL),
         },
         'tokens': {
             'result': createToken('result'),
@@ -407,8 +409,9 @@ def h5pGetContentSettings(user, content):
     filtered = core.filterParameters(content)
 
     # Get preloaded user data
-    results = h5p_content_user_data.objects.filter(user_id=user.id, content_main_id=content[
-                                                   'id'], preloaded=1).values('sub_content_id', 'data_id', 'data')
+    results = h5p_content_user_data.objects.filter(
+        user_id=user.id, content_main_id=content[
+            'id'], preloaded=1).values('sub_content_id', 'data_id', 'data')
 
     contentUserData = {
         0: {
