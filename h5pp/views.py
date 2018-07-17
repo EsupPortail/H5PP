@@ -12,8 +12,8 @@ from django.views.generic import (
     TemplateView
 )
 
-from h5pp.forms import LibrariesForm, CreateForm
-from h5pp.models import h5p_libraries, h5p_contents
+from .forms import LibrariesForm, CreateForm
+from .models import h5p_libraries, h5p_contents, h5p_content_user_data, h5p_points
 from h5pp.h5p.h5pmodule import (
     includeH5p,
     h5pSetStarted,
@@ -321,7 +321,7 @@ def scoreView(request, contentId):
             listScore['owner'] = True
 
         listScore['data'] = getUserScore(content.content_id)
-        if listScore['data'].count() > 0:
+        if listScore['data'] and listScore['data'].count() > 0:
             return render(request, 'h5p/score.html', {'listScore': listScore, 'content': content})
 
         return render(request, 'h5p/score.html', {'status': 'No score available yet.', 'content': content})
