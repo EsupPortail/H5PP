@@ -16,6 +16,9 @@ from django.contrib.auth.models import User
 from h5pp.models import *
 from h5pp.h5p.h5pclasses import H5PDjango
 
+from django.core import serializers
+
+
 
 STYLES = [
     "styles/h5p.css",
@@ -169,7 +172,8 @@ def h5pView(request):
         html = includeH5p(request)
 
     if not html:
-        html = '<div>' + 'Sorry, preview of H5P content is not yet available.' + '</div>'
+        html = '<div>' + \
+            'Sorry, preview of H5P content is not yet available.' + '</div>'
     else:
         h5pSetStarted(h5pGetContentId(request))
 
@@ -195,10 +199,12 @@ def includeH5p(request):
 
     data = h5pAddFilesAndSettings(request, embed)
     if embed == 'div':
-        html = '<div class="h5p-content" data-content-id="' + contentId + '"></div>'
+        html = '<div class="h5p-content" data-content-id="' + \
+            contentId + '"></div>'
     else:
         html = '<div class="h5p-iframe-wrapper"><iframe id="h5p-iframe-' + contentId + '" class="h5p-iframe" data-content-id="' + \
-               contentId + '" style="height:1px" src="about:blank" frameBorder="0" scrolling="no"></iframe></div>'
+               contentId + \
+            '" style="height:1px" src="about:blank" frameBorder="0" scrolling="no"></iframe></div>'
 
     return {'html': html, 'data': data}
 
@@ -361,7 +367,8 @@ def h5pAddFilesAndSettings(request, embedType):
         str('cid-' + content['id'])] = h5pGetContentSettings(request.user, content)
 
     core = interface.h5pGetInstance('core')
-    preloadedDependencies = core.loadContentDependencies(content['id'], 'preloaded')
+    preloadedDependencies = core.loadContentDependencies(
+        content['id'], 'preloaded')
     files = core.getDependenciesFiles(preloadedDependencies)
     libraryList = h5pDependenciesToLibraryList(preloadedDependencies)
 
@@ -372,13 +379,13 @@ def h5pAddFilesAndSettings(request, embedType):
     if embedType == 'div':
         for script in files['scripts']:
             url = settings.MEDIA_URL + 'h5pp/' + \
-                  script['path'] + script['version']
+                script['path'] + script['version']
             filesAssets['js'].append(
                 settings.MEDIA_URL + 'h5pp/' + script['path'])
             integration['loadedJs'] = url
         for style in files['styles']:
             url = settings.MEDIA_URL + 'h5pp/' + \
-                  style['path'] + style['version']
+                style['path'] + style['version']
             filesAssets['css'].append(
                 settings.MEDIA_URL + 'h5pp/' + style['path'])
             integration['loadedCss'] = url
@@ -480,7 +487,7 @@ def h5pGetListContent(request):
 def determineEmbedType(contentEmbedType, libraryEmbedTypes):
     # Detect content embed type
     embedType = "div" if (
-            "div" in contentEmbedType.lower()) else "iframe"
+        "div" in contentEmbedType.lower()) else "iframe"
 
     if libraryEmbedTypes != None and libraryEmbedTypes != "":
         # Check that embed type is available for library
@@ -521,7 +528,7 @@ def h5pAddIframeAssets(request, integration, contentId, files):
     integration['core']['scripts'] = assets['js']
     integration['core']['styles'] = assets['css']
 
-    writable = False # Temporary, future feature
+    writable = False  # Temporary, future feature
     if writable:
         if not os.path.exists(os.path.join(settings.H5P_PATH, 'files')):
             os.mkdir(os.path.join(settings.H5P_PATH, 'files'))
@@ -543,7 +550,8 @@ def h5pAddIframeAssets(request, integration, contentId, files):
         integration['contents'][
             'cid-' + contentId]['styles'] = core.getAssetsUrls(files['styles'])
         # Override Css
-        integration['contents']['cid-' + contentId]['styles'].append(OVERRIDE_STYLES)
+        integration['contents'][
+            'cid-' + contentId]['styles'].append(OVERRIDE_STYLES)
 
     if writable:
         if not os.path.exists(os.path.join(settings.H5P_PATH, 'files')):
@@ -589,7 +597,8 @@ def h5pEmbed(request):
     content = h5pGetContent(request)
 
     integration['contents'] = dict()
-    integration['contents']['cid-' + content['id']] = h5pGetContentSettings(request.user, content)
+    integration['contents'][
+        'cid-' + content['id']] = h5pGetContentSettings(request.user, content)
 
     core = framework.h5pGetInstance('core')
     preloadedDependencies = core.loadContentDependencies(content['id'])
@@ -616,23 +625,28 @@ def getUserScore(contentId, user=None, ajax=False):
 
     if len(scores) > 0:
         if ajax:
-            return json.dumps(list(scores))
+            jsonserializer = serializers.get_serializer("json")
+            json_serializer = jsonserializer()
+            return json_serializer.serialize(scores)
         return scores
 
     return None
+
 
 def exportScore(contentId=None):
     response = ''
     if contentId:
         scores = h5p_points.objects.filter(content_id=contentId)
         content = h5p_contents.objects.get(content_id=contentId)
-        response = response + '[Content] : %s - [Users] : %s\n' % (content.title, len(scores))
+        response = response + \
+            '[Content] : %s - [Users] : %s\n' % (content.title, len(scores))
         for score in scores:
             score.uid = User.objects.get(id=score.uid).username
             score.has_finished = 'Completed' if score.finished >= score.started else 'Not completed'
             score.points = '..' if score.points == None else score.points
             score.max_points = '..' if score.max_points == None else score.max_points
-            response = response + '[Username] : %s | [Current] : %s | [Max] : %s | [Progression] : %s\n' % (score.uid, score.points, score.max_points, score.has_finished)
+            response = response + '[Username] : %s | [Current] : %s | [Max] : %s | [Progression] : %s\n' % (
+                score.uid, score.points, score.max_points, score.has_finished)
         return response
 
     scores = h5p_points.objects.all()
@@ -641,12 +655,14 @@ def exportScore(contentId=None):
     for score in scores:
         content = h5p_contents.objects.get(content_id=score.content_id)
         if content.content_id != currentContent:
-            response = response + '--------------------\n[Content] : %s\n--------------------\n' % content.title
+            response = response + \
+                '--------------------\n[Content] : %s\n--------------------\n' % content.title
         score.uid = User.objects.get(id=score.uid).username
         score.has_finished = 'Completed' if score.finished >= score.started else 'Not completed'
         score.points = '..' if score.points == None else score.points
         score.max_points = '..' if score.max_points == None else score.max_points
-        response = response + '[Username] : %s | [Current] : %s | [Max] : %s | [Progression] : %s\n' % (score.uid, score.points, score.max_points, score.has_finished)
+        response = response + '[Username] : %s | [Current] : %s | [Max] : %s | [Progression] : %s\n' % (
+            score.uid, score.points, score.max_points, score.has_finished)
         currentContent = content.content_id
     return response
 ##
