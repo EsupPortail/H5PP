@@ -1,5 +1,8 @@
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 from django.db import models
+
+from datetime import datetime
 
 # Stores information about what h5p uses what libraries
 
@@ -150,6 +153,24 @@ class h5p_points(models.Model):
         help_text='Current point of the user')
     max_points = models.PositiveIntegerField(null=True, blank=True,
         help_text='Maximum point that the user can have')
+
+    @property
+    def user(self):
+        return User.objects.get(username=self.uid)
+
+    @property
+    def date_started(self):
+        if self.started != 0:
+            return datetime.fromtimestamp(self.started)
+        else:
+            return "-"
+
+    @property
+    def date_finished(self):
+        if self.finished != 0:
+            return datetime.fromtimestamp(self.finished)
+        else:
+            return "-"
 
     class Meta:
         db_table = 'h5p_points'
